@@ -5,7 +5,7 @@ import {
   MessageCircle, BookOpen, Settings, Brain, Flame,
   GraduationCap, CheckSquare, History, LayoutDashboard,
   Languages, BookMarked, Headphones, Mic2, RotateCcw,
-  Compass, Youtube, Sparkles, Camera, TrendingUp, Bookmark, Share2, Phone,
+  Compass, Youtube, Sparkles, Camera, TrendingUp, Bookmark, Share2, Phone, Users,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/useAppStore";
@@ -14,8 +14,11 @@ const nav = [
   { href: "/dashboard",     icon: LayoutDashboard, label: "Dashboard" },
   { href: "/",              icon: MessageCircle,   label: "Chat" },
   { href: "/call",          icon: Phone,           label: "Voice Call" },
+  { href: "/tutor",         icon: Sparkles,        label: "AI Tutor" },
+  { href: "/partners",      icon: Users,           label: "Partners" },
+  { href: "/streak",        icon: Flame,           label: "Streak" },
   { href: "/courses",       icon: Compass,         label: "Khóa học" },
-  { href: "/learning-path", icon: Sparkles,        label: "Lộ trình AI" },
+  { href: "/learning-path", icon: Brain,           label: "Lộ trình AI" },
   { href: "/skills",        icon: TrendingUp,      label: "Kỹ năng" },
   { href: "/video",         icon: Youtube,         label: "Video Sub" },
   { href: "/ocr",           icon: Camera,          label: "Quét ảnh" },

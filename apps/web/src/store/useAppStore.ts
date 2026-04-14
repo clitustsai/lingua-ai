@@ -48,6 +48,24 @@ type SavedPhrase = {
   savedAt: string;
 };
 
+type StreakReward = {
+  day: number;
+  claimed: boolean;
+  xp: number;
+  emoji: string;
+};
+
+type PartnerProfile = {
+  id: string;
+  name: string;
+  flag: string;
+  level: string;
+  targetLanguage: string;
+  nativeLanguage: string;
+  bio: string;
+  online: boolean;
+};
+
 type AppStore = {
   settings: UserSettings;
   messages: Message[];
@@ -55,6 +73,7 @@ type AppStore = {
   isLoading: boolean;
   stats: DailyStats;
   streak: number;
+  streakRewards: StreakReward[];
   sessions: ConversationSession[];
   wordOfDay: WordOfDay | null;
   weeklyHistory: WeeklyRecord[];
@@ -73,6 +92,8 @@ type AppStore = {
   tutorMemory: TutorMemory;
   savedPhrases: SavedPhrase[];
   notificationsEnabled: boolean;
+  username: string;
+  lastStreakDate: string;
 
   setSettings: (s: Partial<UserSettings>) => void;
   addMessage: (m: Message) => void;
@@ -103,6 +124,8 @@ type AppStore = {
   savePhrase: (phrase: SavedPhrase) => void;
   removePhrase: (id: string) => void;
   setNotifications: (enabled: boolean) => void;
+  claimStreakReward: (day: number) => void;
+  setUsername: (name: string) => void;
 };
 
 function todayStr() { return new Date().toISOString().slice(0, 10); }
@@ -150,6 +173,16 @@ export const useAppStore = create<AppStore>()(
       tutorMemory: { commonErrors: [], weakAreas: [], strongAreas: [], totalSessions: 0, lastFeedback: "" },
       savedPhrases: [],
       notificationsEnabled: false,
+      username: "",
+      lastStreakDate: "",
+      streakRewards: [
+        { day: 1,  xp: 10,  emoji: "🌱", claimed: false },
+        { day: 3,  xp: 25,  emoji: "🔥", claimed: false },
+        { day: 7,  xp: 50,  emoji: "⚡", claimed: false },
+        { day: 14, xp: 100, emoji: "💎", claimed: false },
+        { day: 30, xp: 250, emoji: "🏆", claimed: false },
+        { day: 60, xp: 500, emoji: "👑", claimed: false },
+      ],
 
       setSettings: (s) => set((state) => ({ settings: { ...state.settings, ...s } })),
       addMessage: (m) => set((state) => ({ messages: [...state.messages, m] })),
@@ -308,6 +341,17 @@ export const useAppStore = create<AppStore>()(
       })),
 
       setNotifications: (enabled) => set({ notificationsEnabled: enabled }),
+
+      claimStreakReward: (day) => set((state) => {
+        const reward = state.streakRewards.find(r => r.day === day);
+        if (!reward || reward.claimed || state.streak < day) return state;
+        return {
+          totalXp: state.totalXp + reward.xp,
+          streakRewards: state.streakRewards.map(r => r.day === day ? { ...r, claimed: true } : r),
+        };
+      }),
+
+      setUsername: (name) => set({ username: name }),
     }),
     { name: "ai-lang-store-v2" }
   )
