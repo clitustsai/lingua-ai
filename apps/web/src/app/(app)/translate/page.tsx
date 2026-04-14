@@ -6,7 +6,7 @@ import { ArrowLeftRight, Loader2, Copy, Volume2, Plus } from "lucide-react";
 import { speakText } from "@/components/VoiceButton";
 
 export default function TranslatePage() {
-  const { settings, addFlashcard } = useAppStore();
+  const { settings, addFlashcard, incrementTranslations } = useAppStore();
   const [fromLang, setFromLang] = useState(settings.nativeLanguage.code);
   const [toLang, setToLang] = useState(settings.targetLanguage.code);
   const [input, setInput] = useState("");
@@ -29,6 +29,7 @@ export default function TranslatePage() {
         body: JSON.stringify({ text: input, fromLanguage: fromObj.name, toLanguage: toObj.name }),
       });
       setResult(await res.json());
+      incrementTranslations();
     } finally { setLoading(false); }
   };
 
