@@ -10,6 +10,7 @@ export type Message = {
   id: string;
   role: "user" | "assistant";
   content: string;
+  translation?: string;
   correction?: string;
   timestamp: Date;
 };

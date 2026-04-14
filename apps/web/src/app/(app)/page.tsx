@@ -17,6 +17,7 @@ export default function ChatPage() {
   const [isListening, setIsListening] = useState(false);
   const [volume, setVolume] = useState(0);
   const [showKeyboard, setShowKeyboard] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const recRef = useRef<any>(null);
   const animRef = useRef<number>(0);
@@ -57,11 +58,20 @@ export default function ChatPage() {
         id: (Date.now() + 1).toString(),
         role: "assistant",
         content: reply,
+        translation: data.translation || undefined,
         correction: data.correction || undefined,
         timestamp: new Date(),
       });
       if (data.newWords?.length) setNewWords(data.newWords);
       speakText(reply, settings.targetLanguage.code);
+      setIsSpeaking(true);
+      // detect when TTS ends
+      const checkEnd = setInterval(() => {
+        if (!window.speechSynthesis.speaking) {
+          setIsSpeaking(false);
+          clearInterval(checkEnd);
+        }
+      }, 300);
     } catch {
       addMessage({ id: (Date.now() + 1).toString(), role: "assistant", content: "Connection error.", timestamp: new Date() });
     } finally {
@@ -217,9 +227,8 @@ export default function ChatPage() {
           </div>
         )}
 
-        {/* Big mic */}
+        {/* Big mic / stop button */}
         <div className="relative flex items-center justify-center" style={{ width: 120, height: 120 }}>
-          {/* Animated rings */}
           {isListening && (
             <>
               <div className="absolute rounded-full bg-red-500/20 transition-all duration-100"
@@ -229,17 +238,21 @@ export default function ChatPage() {
             </>
           )}
           <button
-            onClick={toggleMic}
-            disabled={isLoading}
+            onClick={isSpeaking ? () => { window.speechSynthesis.cancel(); setIsSpeaking(false); } : toggleMic}
+            disabled={isLoading && !isSpeaking}
             className={cn(
-              "relative w-20 h-20 rounded-full flex items-center justify-center transition-all duration-200 shadow-2xl",
-              isListening
-                ? "bg-red-600 shadow-red-500/50 scale-110"
-                : "bg-primary-600 hover:bg-primary-500 shadow-primary-500/30",
-              isLoading && "opacity-50 cursor-not-allowed"
+              "relative w-20 h-20 flex items-center justify-center transition-all duration-200 shadow-2xl",
+              isSpeaking
+                ? "rounded-2xl bg-primary-600 hover:bg-primary-500 shadow-primary-500/40"
+                : isListening
+                ? "rounded-full bg-red-600 shadow-red-500/50 scale-110"
+                : "rounded-full bg-primary-600 hover:bg-primary-500 shadow-primary-500/30",
+              (isLoading && !isSpeaking) && "opacity-50 cursor-not-allowed"
             )}
           >
-            {isListening
+            {isSpeaking
+              ? <div className="w-7 h-7 bg-white rounded-sm" />
+              : isListening
               ? <MicOff className="w-8 h-8 text-white" />
               : <Mic className="w-8 h-8 text-white" />
             }
@@ -248,7 +261,7 @@ export default function ChatPage() {
 
         <div className="flex items-center gap-4">
           <span className="text-xs text-gray-500 w-24 text-center">
-            {isLoading ? "AI is thinking..." : isListening ? "Listening..." : "Tap to speak"}
+            {isLoading ? "AI is thinking..." : isSpeaking ? "Nhấn để ngắt" : isListening ? "Listening..." : "Tap to speak"}
           </span>
           <button onClick={() => setShowKeyboard(!showKeyboard)}
             className={cn("p-2 rounded-lg transition-colors", showKeyboard ? "text-primary-400 bg-primary-900/30" : "text-gray-500 hover:text-gray-300 hover:bg-gray-800")}>

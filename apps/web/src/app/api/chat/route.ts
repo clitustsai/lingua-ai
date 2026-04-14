@@ -19,6 +19,7 @@ Your role:
 Format your response as JSON:
 {
   "reply": "your response in ${targetLanguage}",
+  "translation": "translation of your reply in ${nativeLanguage}",
   "correction": "correction explanation in ${nativeLanguage} (null if no mistakes)",
   "newWords": ["array of new/interesting words from your reply"]
 }`;

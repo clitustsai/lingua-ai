@@ -7,24 +7,24 @@ export default function ChatMessage({ message }: { message: Message }) {
   const isUser = message.role === "user";
   return (
     <div className={cn("flex gap-3 mb-4", isUser ? "flex-row-reverse" : "flex-row")}>
-      <div
-        className={cn(
-          "w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0",
-          isUser ? "bg-primary-600" : "bg-accent-600"
-        )}
-      >
+      <div className={cn(
+        "w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0",
+        isUser ? "bg-primary-600" : "bg-accent-600"
+      )}>
         {isUser ? "U" : "AI"}
       </div>
-      <div className="max-w-[75%] flex flex-col gap-2">
-        <div
-          className={cn(
-            "px-4 py-3 rounded-2xl text-sm leading-relaxed",
-            isUser
-              ? "bg-primary-600 text-white rounded-tr-sm"
-              : "bg-gray-800 text-gray-100 rounded-tl-sm"
-          )}
-        >
+      <div className="max-w-[75%] flex flex-col gap-1.5">
+        <div className={cn(
+          "px-4 py-3 rounded-2xl text-sm leading-relaxed",
+          isUser ? "bg-primary-600 text-white rounded-tr-sm" : "bg-gray-800 text-gray-100 rounded-tl-sm"
+        )}>
           {message.content}
+          {/* Translation below AI message */}
+          {!isUser && message.translation && (
+            <p className="mt-1.5 text-xs text-gray-400 leading-relaxed border-t border-gray-700 pt-1.5">
+              {message.translation}
+            </p>
+          )}
         </div>
         {message.correction && (
           <div className="flex gap-2 bg-yellow-900/30 border border-yellow-700/50 rounded-xl px-3 py-2 text-xs text-yellow-300">
