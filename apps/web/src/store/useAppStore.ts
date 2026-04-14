@@ -12,6 +12,18 @@ type CourseProgress = {
   enrolledAt: string;
 };
 
+type LearningPath = {
+  pathTitle: string;
+  description: string;
+  estimatedWeeks: number;
+  dailyMinutes: number;
+  goal: string;
+  level: string;
+  days: any[];
+  milestones: any[];
+  createdAt: string;
+};
+
 type AppStore = {
   settings: UserSettings;
   messages: Message[];
@@ -31,6 +43,8 @@ type AppStore = {
   totalXp: number;
   translationCount: number;
   languageUsage: Record<string, number>; // langCode -> message count
+  learningPath: LearningPath | null;
+  pathDaysDone: number[];
 
   setSettings: (s: Partial<UserSettings>) => void;
   addMessage: (m: Message) => void;
@@ -44,6 +58,9 @@ type AppStore = {
   incrementGrammarChecks: () => void;
   incrementLessons: () => void;
   incrementTranslations: () => void;
+  setLearningPath: (path: LearningPath) => void;
+  markPathDay: (day: number) => void;
+  clearLearningPath: () => void;
   saveSession: (title: string) => void;
   deleteSession: (id: string) => void;
   loadSession: (id: string) => void;
@@ -94,6 +111,8 @@ export const useAppStore = create<AppStore>()(
       totalXp: 0,
       translationCount: 0,
       languageUsage: {},
+      learningPath: null,
+      pathDaysDone: [],
 
       setSettings: (s) => set((state) => ({ settings: { ...state.settings, ...s } })),
       addMessage: (m) => set((state) => ({ messages: [...state.messages, m] })),
@@ -150,6 +169,12 @@ export const useAppStore = create<AppStore>()(
       incrementGrammarChecks: () => set((state) => ({ grammarChecks: state.grammarChecks + 1 })),
       incrementLessons: () => set((state) => ({ lessonsCompleted: state.lessonsCompleted + 1 })),
       incrementTranslations: () => set((state) => ({ translationCount: state.translationCount + 1 })),
+
+      setLearningPath: (path) => set({ learningPath: path, pathDaysDone: [] }),
+      markPathDay: (day) => set((state) => ({
+        pathDaysDone: state.pathDaysDone.includes(day) ? state.pathDaysDone : [...state.pathDaysDone, day],
+      })),
+      clearLearningPath: () => set({ learningPath: null, pathDaysDone: [] }),
 
       tickMinutes: () => set((state) => {
         const today = todayStr();

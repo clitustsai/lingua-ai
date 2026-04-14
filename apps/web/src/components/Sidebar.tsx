@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import {
   MessageCircle, BookOpen, Settings, Brain, Flame,
   GraduationCap, CheckSquare, History, LayoutDashboard,
-  Languages, BookMarked, Headphones, Mic2, RotateCcw, Compass,
+  Languages, BookMarked, Headphones, Mic2, RotateCcw, Compass, Youtube, Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/useAppStore";
@@ -13,6 +13,8 @@ const nav = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { href: "/", icon: MessageCircle, label: "Chat" },
   { href: "/courses", icon: Compass, label: "Khóa học" },
+  { href: "/learning-path", icon: Sparkles, label: "Lộ trình AI" },
+  { href: "/video", icon: Youtube, label: "Video Sub" },
   { href: "/flashcards", icon: BookOpen, label: "Flashcards" },
   { href: "/review", icon: RotateCcw, label: "Review" },
   { href: "/lessons", icon: GraduationCap, label: "Lessons" },
