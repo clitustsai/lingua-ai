@@ -12,6 +12,8 @@ export type Message = {
   content: string;
   translation?: string;
   correction?: string;
+  betterWay?: string;
+  suggestions?: string[];
   timestamp: Date;
 };
 
@@ -107,6 +109,15 @@ export const CONVERSATION_TOPICS = [
   { id: "health", label: "Health", emoji: "🏥" },
   { id: "hobbies", label: "Hobbies", emoji: "🎨" },
   { id: "news", label: "Current Events", emoji: "📰" },
+];
+
+export const CHAT_SCENARIOS = [
+  { id: "tutor",       label: "AI Gia sư",          emoji: "🎓", persona: "tutor",       desc: "Học có hướng dẫn, sửa lỗi" },
+  { id: "native",      label: "Người bản xứ",        emoji: "🌍", persona: "native",      desc: "Chat tự nhiên như bạn bè" },
+  { id: "interviewer", label: "Phỏng vấn xin việc",  emoji: "💼", persona: "interviewer", desc: "Luyện phỏng vấn chuyên nghiệp" },
+  { id: "barista",     label: "Gọi đồ tại quán",     emoji: "☕", persona: "barista",     desc: "Thực hành tình huống thực tế" },
+  { id: "doctor",      label: "Khám bệnh",           emoji: "🏥", persona: "doctor",      desc: "Từ vựng y tế, sức khỏe" },
+  { id: "shopkeeper",  label: "Mua sắm",             emoji: "🛍️", persona: "shopkeeper",  desc: "Hỏi giá, mặc cả, mua hàng" },
 ];
 
 export const SUPPORTED_LANGUAGES: Language[] = [
