@@ -184,33 +184,35 @@ export default function ChatPage() {
       )}
 
       {/* Input */}
-      <div className="px-6 py-4 border-t border-gray-800 bg-gray-950">
-        <div className="flex gap-3">
-          <VoiceButton
-            onTranscript={handleVoiceTranscript}
-            language={settings.targetLanguage.code}
-            disabled={isLoading}
-          />
+      <div className="px-6 pt-3 pb-5 border-t border-gray-800 bg-gray-950 flex flex-col items-center gap-3">
+        {/* Text input row */}
+        <div className="flex gap-2 w-full">
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
-            placeholder={`Type or speak in ${settings.targetLanguage.name}...`}
-            className="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary-500 transition-colors"
+            placeholder={`Type in ${settings.targetLanguage.name}...`}
+            className="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary-500 transition-colors"
           />
           <button
             onClick={() => sendMessage()}
             disabled={isLoading || !input.trim()}
             className={cn(
-              "p-3 rounded-xl transition-colors",
+              "p-2.5 rounded-xl transition-colors",
               isLoading || !input.trim()
                 ? "bg-gray-800 text-gray-600"
                 : "bg-primary-600 hover:bg-primary-700 text-white"
             )}
           >
-            <Send className="w-5 h-5" />
+            <Send className="w-4 h-4" />
           </button>
         </div>
+        {/* Big mic button */}
+        <VoiceButton
+          onTranscript={handleVoiceTranscript}
+          language={settings.targetLanguage.code}
+          disabled={isLoading}
+        />
       </div>
     </div>
   );

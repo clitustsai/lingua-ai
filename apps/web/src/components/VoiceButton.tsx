@@ -1,6 +1,6 @@
 ﻿"use client";
-import { useState, useRef, useEffect } from "react";
-import { Mic, MicOff } from "lucide-react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { Mic } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface VoiceButtonProps {
@@ -20,14 +20,26 @@ function toLangTag(code: string) {
 export default function VoiceButton({ onTranscript, language, disabled }: VoiceButtonProps) {
   const [isListening, setIsListening] = useState(false);
   const [volume, setVolume] = useState(0);
-  const recognitionRef = useRef<any>(null);
-  const animFrameRef = useRef<number>(0);
+  const recRef = useRef<any>(null);
+  const animRef = useRef<number>(0);
   const streamRef = useRef<any>(null);
   const analyserRef = useRef<any>(null);
 
-  useEffect(() => () => { stopListening(); }, []);
+  useEffect(() => () => { cleanup(); }, []);
 
-  const startListening = async () => {
+  const cleanup = () => {
+    recRef.current?.stop();
+    recRef.current = null;
+    cancelAnimationFrame(animRef.current);
+    streamRef.current?.getTracks().forEach((t: MediaStreamTrack) => t.stop());
+    streamRef.current = null;
+    analyserRef.current = null;
+    setIsListening(false);
+    setVolume(0);
+  };
+
+  const start = useCallback(async () => {
+    if (disabled) return;
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SR) { alert("Use Chrome for voice input."); return; }
 
@@ -43,7 +55,7 @@ export default function VoiceButton({ onTranscript, language, disabled }: VoiceB
         const d = new Uint8Array(analyser.frequencyBinCount);
         analyser.getByteFrequencyData(d);
         setVolume(d.reduce((a: number, b: number) => a + b, 0) / d.length);
-        animFrameRef.current = requestAnimationFrame(tick);
+        animRef.current = requestAnimationFrame(tick);
       };
       tick();
     } catch { /* mic denied */ }
@@ -55,43 +67,59 @@ export default function VoiceButton({ onTranscript, language, disabled }: VoiceB
     rec.onresult = (e: any) => {
       const r = e.results[0][0];
       onTranscript(r.transcript, r.confidence ?? 0.8);
-      stopListening();
     };
-    rec.onerror = () => stopListening();
-    rec.onend = () => stopListening();
-    recognitionRef.current = rec;
+    rec.onerror = () => cleanup();
+    rec.onend = () => cleanup();
+    recRef.current = rec;
     rec.start();
     setIsListening(true);
-  };
+  }, [disabled, language, onTranscript]);
 
-  const stopListening = () => {
-    recognitionRef.current?.stop();
-    recognitionRef.current = null;
-    cancelAnimationFrame(animFrameRef.current);
-    streamRef.current?.getTracks().forEach((t: MediaStreamTrack) => t.stop());
-    streamRef.current = null;
-    analyserRef.current = null;
-    setIsListening(false);
-    setVolume(0);
-  };
+  const stop = useCallback(() => {
+    recRef.current?.stop();
+  }, []);
 
-  const scale = isListening ? 1 + (volume / 255) * 0.5 : 1;
+  const scale = isListening ? 1 + (volume / 255) * 0.8 : 1;
+  const ringSize = isListening ? Math.round((volume / 255) * 40) : 0;
 
   return (
-    <button
-      onClick={() => isListening ? stopListening() : startListening()}
-      disabled={disabled}
-      title={isListening ? "Stop" : "Speak"}
-      className={cn(
-        "relative p-3 rounded-xl transition-all duration-100",
-        isListening ? "bg-red-600 hover:bg-red-700 text-white" : "bg-gray-700 hover:bg-gray-600 text-gray-300",
-        disabled && "opacity-40 cursor-not-allowed"
-      )}
-      style={{ transform: `scale(${scale})` }}
-    >
-      {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
-      {isListening && <span className="absolute inset-0 rounded-xl animate-ping bg-red-500 opacity-25" />}
-    </button>
+    <div className="flex flex-col items-center gap-2">
+      {/* Ripple rings */}
+      <div className="relative flex items-center justify-center">
+        {isListening && (
+          <>
+            <span
+              className="absolute rounded-full bg-red-500 opacity-20 transition-all duration-100"
+              style={{ width: 56 + ringSize, height: 56 + ringSize }}
+            />
+            <span
+              className="absolute rounded-full bg-red-500 opacity-10 transition-all duration-150"
+              style={{ width: 72 + ringSize, height: 72 + ringSize }}
+            />
+          </>
+        )}
+        <button
+          onMouseDown={start}
+          onMouseUp={stop}
+          onTouchStart={(e) => { e.preventDefault(); start(); }}
+          onTouchEnd={(e) => { e.preventDefault(); stop(); }}
+          disabled={disabled}
+          className={cn(
+            "relative w-14 h-14 rounded-full flex items-center justify-center transition-all duration-100 select-none",
+            isListening
+              ? "bg-red-600 shadow-lg shadow-red-500/40 scale-110"
+              : "bg-primary-600 hover:bg-primary-700 shadow-lg shadow-primary-500/30",
+            disabled && "opacity-40 cursor-not-allowed"
+          )}
+          style={{ transform: `scale(${scale})` }}
+        >
+          <Mic className={cn("w-6 h-6 text-white", isListening && "animate-pulse")} />
+        </button>
+      </div>
+      <span className="text-xs text-gray-500 select-none">
+        {isListening ? "Listening..." : disabled ? "Waiting..." : "Hold to speak"}
+      </span>
+    </div>
   );
 }
 
