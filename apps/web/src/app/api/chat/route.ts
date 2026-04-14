@@ -38,10 +38,25 @@ Format your response as JSON:
       response_format: { type: "json_object" },
     });
 
-    const result = JSON.parse(completion.choices[0].message.content || "{}");
-    return NextResponse.json(result);
+    const raw = completion.choices[0].message.content || "{}";
+    let result: any = {};
+    try {
+      result = JSON.parse(raw);
+    } catch {
+      // Model returned non-JSON, use raw text as reply
+      result = { reply: raw, translation: null, correction: null, newWords: [] };
+    }
+
+    // Normalize: some models return different key names
+    const reply = result.reply || result.response || result.message || result.text || raw;
+    return NextResponse.json({
+      reply,
+      translation: result.translation ?? null,
+      correction: result.correction ?? null,
+      newWords: Array.isArray(result.newWords) ? result.newWords : [],
+    });
   } catch (error) {
-    console.error(error);
+    console.error("[chat/route] error:", error);
     return NextResponse.json({ error: "Failed to get response" }, { status: 500 });
   }
 }

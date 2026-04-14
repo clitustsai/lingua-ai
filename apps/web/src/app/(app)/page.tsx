@@ -118,6 +118,9 @@ export default function ChatPage() {
         }),
       });
       const data = await res.json();
+      if (!res.ok || data.error) {
+        throw new Error(data.error || "API error");
+      }
       const reply = data.reply || "Sorry, I couldn't respond.";
       addMessage({
         id: (Date.now() + 1).toString(),
@@ -127,8 +130,8 @@ export default function ChatPage() {
         correction: data.correction || undefined,
         timestamp: new Date(),
       });
-      if (data.newWords?.length) setNewWords(data.newWords);
-      if (data.newWords?.length) incrementWords(data.newWords.length);
+      if (data.newWords?.length) setNewWords(data.newWords.filter((w: string) => w?.trim()));
+      if (data.newWords?.length) incrementWords(data.newWords.filter((w: string) => w?.trim()).length);
       incrementMessages();
       speakText(reply, settingsRef.current.targetLanguage.code);
       setIsSpeaking(true);
