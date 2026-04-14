@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useAppStore } from "@/store/useAppStore";
 import ChatMessage from "@/components/ChatMessage";
 import { speakText } from "@/components/VoiceButton";
@@ -7,6 +7,11 @@ import PronunciationScore from "@/components/PronunciationScore";
 import { Trash2, Plus, Volume2, Mic, MicOff, Send, Keyboard } from "lucide-react";
 import type { Message } from "@ai-lang/shared";
 import { cn } from "@/lib/utils";
+
+const LANG_MAP: Record<string, string> = {
+  en:"en-US", ja:"ja-JP", ko:"ko-KR", zh:"zh-CN",
+  fr:"fr-FR", es:"es-ES", de:"de-DE", vi:"vi-VN"
+};
 
 export default function ChatPage() {
   const { messages, addMessage, clearMessages, settings, isLoading, setLoading, addFlashcard } =
@@ -23,15 +28,73 @@ export default function ChatPage() {
   const animRef = useRef<number>(0);
   const streamRef = useRef<any>(null);
   const messagesRef = useRef(messages);
+  const settingsRef = useRef(settings);
+  const isLoadingRef = useRef(isLoading);
+  // keep refs in sync
   useEffect(() => { messagesRef.current = messages; }, [messages]);
+  useEffect(() => { settingsRef.current = settings; }, [settings]);
+  useEffect(() => { isLoadingRef.current = isLoading; }, [isLoading]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const sendMessage = async (text?: string) => {
+  // --- stopListening (defined first so startListening can reference it) ---
+  const stopListening = useCallback(() => {
+    recRef.current?.stop();
+    recRef.current = null;
+    cancelAnimationFrame(animRef.current);
+    streamRef.current?.getTracks().forEach((t: MediaStreamTrack) => t.stop());
+    streamRef.current = null;
+    setIsListening(false);
+    setVolume(0);
+  }, []);
+
+  // --- startListening ---
+  const startListening = useCallback(async () => {
+    if (isLoadingRef.current) return;
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SR) { alert("Use Chrome for voice input."); return; }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
+      const ctx = new AudioContext();
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 256;
+      ctx.createMediaStreamSource(stream).connect(analyser);
+      const tick = () => {
+        const d = new Uint8Array(analyser.frequencyBinCount);
+        analyser.getByteFrequencyData(d);
+        setVolume(d.reduce((a: number, b: number) => a + b, 0) / d.length);
+        animRef.current = requestAnimationFrame(tick);
+      };
+      tick();
+    } catch { /* mic denied */ }
+
+    const rec = new SR();
+    rec.lang = LANG_MAP[settingsRef.current.targetLanguage.code] ?? "en-US";
+    rec.interimResults = false;
+    rec.maxAlternatives = 1;
+    rec.onresult = (e: any) => {
+      const r = e.results[0][0];
+      setLastVoice({ transcript: r.transcript, confidence: r.confidence ?? 0.8 });
+      stopListening();
+      sendMessageRef.current(r.transcript);
+    };
+    rec.onerror = () => stopListening();
+    rec.onend = () => stopListening();
+    recRef.current = rec;
+    rec.start();
+    setIsListening(true);
+  }, [stopListening]);
+
+  // ref so sendMessage can call startListening without circular dep
+  const sendMessageRef = useRef<(text?: string) => void>(() => {});
+
+  const sendMessage = useCallback(async (text?: string) => {
     const content = (text ?? input).trim();
-    if (!content || isLoading) return;
+    if (!content || isLoadingRef.current) return;
     const userMsg: Message = {
       id: Date.now().toString(),
       role: "user",
@@ -47,9 +110,9 @@ export default function ChatPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: [...messagesRef.current, userMsg].map((m) => ({ role: m.role, content: m.content })),
-          targetLanguage: settings.targetLanguage.name,
-          nativeLanguage: settings.nativeLanguage.name,
-          level: settings.level,
+          targetLanguage: settingsRef.current.targetLanguage.name,
+          nativeLanguage: settingsRef.current.nativeLanguage.name,
+          level: settingsRef.current.level,
         }),
       });
       const data = await res.json();
@@ -63,13 +126,14 @@ export default function ChatPage() {
         timestamp: new Date(),
       });
       if (data.newWords?.length) setNewWords(data.newWords);
-      speakText(reply, settings.targetLanguage.code);
+      speakText(reply, settingsRef.current.targetLanguage.code);
       setIsSpeaking(true);
-      // detect when TTS ends
+      // poll until TTS done → auto restart mic
       const checkEnd = setInterval(() => {
         if (!window.speechSynthesis.speaking) {
           setIsSpeaking(false);
           clearInterval(checkEnd);
+          setTimeout(() => startListening(), 600);
         }
       }, 300);
     } catch {
@@ -77,57 +141,17 @@ export default function ChatPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [addMessage, setLoading, startListening, input]);
 
-  // Voice
-  const startListening = async () => {
-    if (isLoading) return;
-    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SR) { alert("Use Chrome for voice input."); return; }
-    const langMap: Record<string, string> = { en:"en-US", ja:"ja-JP", ko:"ko-KR", zh:"zh-CN", fr:"fr-FR", es:"es-ES", de:"de-DE", vi:"vi-VN" };
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      streamRef.current = stream;
-      const ctx = new AudioContext();
-      const analyser = ctx.createAnalyser();
-      analyser.fftSize = 256;
-      ctx.createMediaStreamSource(stream).connect(analyser);
-      const tick = () => {
-        const d = new Uint8Array(analyser.frequencyBinCount);
-        analyser.getByteFrequencyData(d);
-        setVolume(d.reduce((a: number, b: number) => a + b, 0) / d.length);
-        animRef.current = requestAnimationFrame(tick);
-      };
-      tick();
-    } catch { /* denied */ }
-    const rec = new SR();
-    rec.lang = langMap[settings.targetLanguage.code] ?? "en-US";
-    rec.interimResults = false;
-    rec.maxAlternatives = 1;
-    rec.onresult = (e: any) => {
-      const r = e.results[0][0];
-      setLastVoice({ transcript: r.transcript, confidence: r.confidence ?? 0.8 });
-      stopListening();
-      sendMessage(r.transcript);
-    };
-    rec.onerror = () => stopListening();
-    rec.onend = () => stopListening();
-    recRef.current = rec;
-    rec.start();
-    setIsListening(true);
-  };
-
-  const stopListening = () => {
-    recRef.current?.stop();
-    recRef.current = null;
-    cancelAnimationFrame(animRef.current);
-    streamRef.current?.getTracks().forEach((t: MediaStreamTrack) => t.stop());
-    streamRef.current = null;
-    setIsListening(false);
-    setVolume(0);
-  };
+  // keep ref updated
+  useEffect(() => { sendMessageRef.current = sendMessage; }, [sendMessage]);
 
   const toggleMic = () => isListening ? stopListening() : startListening();
+
+  const stopSpeaking = () => {
+    window.speechSynthesis.cancel();
+    setIsSpeaking(false);
+  };
 
   const saveFlashcard = async (word: string) => {
     const res = await fetch("/api/flashcard", {
@@ -209,7 +233,6 @@ export default function ChatPage() {
 
       {/* Bottom voice area */}
       <div className="border-t border-gray-800 bg-gray-950 pb-6 pt-4 flex flex-col items-center gap-3">
-        {/* Keyboard input (toggle) */}
         {showKeyboard && (
           <div className="flex gap-2 w-full px-6">
             <input
@@ -237,8 +260,12 @@ export default function ChatPage() {
                 style={{ width: 100 * ringScale, height: 100 * ringScale }} />
             </>
           )}
+          {isSpeaking && (
+            <div className="absolute rounded-full bg-primary-500/20 animate-ping"
+              style={{ width: 90, height: 90 }} />
+          )}
           <button
-            onClick={isSpeaking ? () => { window.speechSynthesis.cancel(); setIsSpeaking(false); } : toggleMic}
+            onClick={isSpeaking ? stopSpeaking : toggleMic}
             disabled={isLoading && !isSpeaking}
             className={cn(
               "relative w-20 h-20 flex items-center justify-center transition-all duration-200 shadow-2xl",
@@ -260,7 +287,7 @@ export default function ChatPage() {
         </div>
 
         <div className="flex items-center gap-4">
-          <span className="text-xs text-gray-500 w-24 text-center">
+          <span className="text-xs text-gray-500 w-28 text-center">
             {isLoading ? "AI is thinking..." : isSpeaking ? "Nhấn để ngắt" : isListening ? "Listening..." : "Tap to speak"}
           </span>
           <button onClick={() => setShowKeyboard(!showKeyboard)}
