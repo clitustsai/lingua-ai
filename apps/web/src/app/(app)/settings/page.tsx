@@ -1,8 +1,9 @@
 "use client";
 import { useAppStore } from "@/store/useAppStore";
 import { SUPPORTED_LANGUAGES, LEVELS, CONVERSATION_TOPICS } from "@ai-lang/shared";
-import { Volume2, Mic, Target, Sun, Moon } from "lucide-react";
+import { Volume2, Mic, Target } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { NotificationToggle } from "@/components/NotificationManager";
 
 export default function SettingsPage() {
   const { settings, setSettings, streak, stats, flashcards, totalMessages } = useAppStore();
@@ -126,6 +127,7 @@ export default function SettingsPage() {
               <span className={cn("absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform", settings.autoSpeak ? "translate-x-5" : "translate-x-0.5")} />
             </button>
           </div>
+          <NotificationToggle />
         </div>
 
         {/* Summary */}

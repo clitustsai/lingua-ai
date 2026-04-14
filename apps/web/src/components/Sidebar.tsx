@@ -4,28 +4,32 @@ import { usePathname } from "next/navigation";
 import {
   MessageCircle, BookOpen, Settings, Brain, Flame,
   GraduationCap, CheckSquare, History, LayoutDashboard,
-  Languages, BookMarked, Headphones, Mic2, RotateCcw, Compass, Youtube, Sparkles, Camera,
+  Languages, BookMarked, Headphones, Mic2, RotateCcw,
+  Compass, Youtube, Sparkles, Camera, TrendingUp, Bookmark, Share2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/useAppStore";
 
 const nav = [
-  { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-  { href: "/", icon: MessageCircle, label: "Chat" },
-  { href: "/courses", icon: Compass, label: "Khóa học" },
-  { href: "/learning-path", icon: Sparkles, label: "Lộ trình AI" },
-  { href: "/video", icon: Youtube, label: "Video Sub" },
-  { href: "/ocr", icon: Camera, label: "Quét ảnh" },
-  { href: "/flashcards", icon: BookOpen, label: "Flashcards" },
-  { href: "/review", icon: RotateCcw, label: "Review" },
-  { href: "/lessons", icon: GraduationCap, label: "Lessons" },
-  { href: "/reading", icon: BookMarked, label: "Reading" },
-  { href: "/listening", icon: Headphones, label: "Listening" },
-  { href: "/pronunciation", icon: Mic2, label: "Pronunciation" },
-  { href: "/grammar", icon: CheckSquare, label: "Grammar" },
-  { href: "/translate", icon: Languages, label: "Translate" },
-  { href: "/history", icon: History, label: "History" },
-  { href: "/settings", icon: Settings, label: "Settings" },
+  { href: "/dashboard",     icon: LayoutDashboard, label: "Dashboard" },
+  { href: "/",              icon: MessageCircle,   label: "Chat" },
+  { href: "/courses",       icon: Compass,         label: "Khóa học" },
+  { href: "/learning-path", icon: Sparkles,        label: "Lộ trình AI" },
+  { href: "/skills",        icon: TrendingUp,      label: "Kỹ năng" },
+  { href: "/video",         icon: Youtube,         label: "Video Sub" },
+  { href: "/ocr",           icon: Camera,          label: "Quét ảnh" },
+  { href: "/flashcards",    icon: BookOpen,        label: "Flashcards" },
+  { href: "/review",        icon: RotateCcw,       label: "Review" },
+  { href: "/saved",         icon: Bookmark,        label: "Câu hay" },
+  { href: "/lessons",       icon: GraduationCap,   label: "Lessons" },
+  { href: "/reading",       icon: BookMarked,      label: "Reading" },
+  { href: "/listening",     icon: Headphones,      label: "Listening" },
+  { href: "/pronunciation", icon: Mic2,            label: "Pronunciation" },
+  { href: "/grammar",       icon: CheckSquare,     label: "Grammar" },
+  { href: "/translate",     icon: Languages,       label: "Translate" },
+  { href: "/share",         icon: Share2,          label: "Chia sẻ" },
+  { href: "/history",       icon: History,         label: "History" },
+  { href: "/settings",      icon: Settings,        label: "Settings" },
 ];
 
 export default function Sidebar() {

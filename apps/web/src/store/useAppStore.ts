@@ -24,6 +24,30 @@ type LearningPath = {
   createdAt: string;
 };
 
+type SkillScore = {
+  speaking: number;   // 0-100
+  grammar: number;
+  fluency: number;
+  vocabulary: number;
+  updatedAt: string;
+};
+
+type TutorMemory = {
+  commonErrors: string[];
+  weakAreas: string[];
+  strongAreas: string[];
+  totalSessions: number;
+  lastFeedback: string;
+};
+
+type SavedPhrase = {
+  id: string;
+  text: string;
+  translation: string;
+  language: string;
+  savedAt: string;
+};
+
 type AppStore = {
   settings: UserSettings;
   messages: Message[];
@@ -42,9 +66,13 @@ type AppStore = {
   courseProgress: CourseProgress[];
   totalXp: number;
   translationCount: number;
-  languageUsage: Record<string, number>; // langCode -> message count
+  languageUsage: Record<string, number>;
   learningPath: LearningPath | null;
   pathDaysDone: number[];
+  skillScore: SkillScore;
+  tutorMemory: TutorMemory;
+  savedPhrases: SavedPhrase[];
+  notificationsEnabled: boolean;
 
   setSettings: (s: Partial<UserSettings>) => void;
   addMessage: (m: Message) => void;
@@ -70,6 +98,11 @@ type AppStore = {
   tickMinutes: () => void;
   enrollCourse: (courseId: string) => void;
   completeLesson: (courseId: string, lessonId: string, xp: number) => void;
+  updateSkillScore: (updates: Partial<SkillScore>) => void;
+  updateTutorMemory: (updates: Partial<TutorMemory>) => void;
+  savePhrase: (phrase: SavedPhrase) => void;
+  removePhrase: (id: string) => void;
+  setNotifications: (enabled: boolean) => void;
 };
 
 function todayStr() { return new Date().toISOString().slice(0, 10); }
@@ -113,6 +146,10 @@ export const useAppStore = create<AppStore>()(
       languageUsage: {},
       learningPath: null,
       pathDaysDone: [],
+      skillScore: { speaking: 0, grammar: 0, fluency: 0, vocabulary: 0, updatedAt: "" },
+      tutorMemory: { commonErrors: [], weakAreas: [], strongAreas: [], totalSessions: 0, lastFeedback: "" },
+      savedPhrases: [],
+      notificationsEnabled: false,
 
       setSettings: (s) => set((state) => ({ settings: { ...state.settings, ...s } })),
       addMessage: (m) => set((state) => ({ messages: [...state.messages, m] })),
@@ -252,6 +289,25 @@ export const useAppStore = create<AppStore>()(
           ),
         };
       }),
+
+      updateSkillScore: (updates) => set((state) => ({
+        skillScore: { ...state.skillScore, ...updates, updatedAt: new Date().toISOString() },
+      })),
+
+      updateTutorMemory: (updates) => set((state) => ({
+        tutorMemory: { ...state.tutorMemory, ...updates },
+      })),
+
+      savePhrase: (phrase) => set((state) => {
+        if (state.savedPhrases.find(p => p.text === phrase.text)) return state;
+        return { savedPhrases: [phrase, ...state.savedPhrases].slice(0, 200) };
+      }),
+
+      removePhrase: (id) => set((state) => ({
+        savedPhrases: state.savedPhrases.filter(p => p.id !== id),
+      })),
+
+      setNotifications: (enabled) => set({ notificationsEnabled: enabled }),
     }),
     { name: "ai-lang-store-v2" }
   )

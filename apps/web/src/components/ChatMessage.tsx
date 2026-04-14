@@ -1,8 +1,9 @@
 "use client";
 import { Message } from "@ai-lang/shared";
 import { cn } from "@/lib/utils";
-import { AlertCircle, Sparkles, Volume2 } from "lucide-react";
+import { AlertCircle, Sparkles, Volume2, Bookmark } from "lucide-react";
 import { speakText } from "@/components/VoiceButton";
+import { useAppStore } from "@/store/useAppStore";
 
 interface Props {
   message: Message;
@@ -12,6 +13,17 @@ interface Props {
 
 export default function ChatMessage({ message, langCode = "en", onSuggestionClick }: Props) {
   const isUser = message.role === "user";
+  const { savePhrase, settings } = useAppStore();
+
+  const handleBookmark = () => {
+    savePhrase({
+      id: Date.now().toString(),
+      text: message.content,
+      translation: message.translation ?? "",
+      language: langCode,
+      savedAt: new Date().toISOString(),
+    });
+  };
 
   return (
     <div className={cn("flex gap-3 mb-3", isUser ? "flex-row-reverse" : "flex-row")}>
@@ -33,12 +45,18 @@ export default function ChatMessage({ message, langCode = "en", onSuggestionClic
         )}>
           <div className="flex items-start justify-between gap-2">
             <span>{message.content}</span>
-            {!isUser && (
-              <button onClick={() => speakText(message.content, langCode)}
-                className="shrink-0 p-1 rounded text-gray-500 hover:text-primary-400 transition-colors -mr-1 -mt-0.5">
-                <Volume2 className="w-3.5 h-3.5" />
+            <div className="flex gap-1 shrink-0 -mr-1 -mt-0.5">
+              {!isUser && (
+                <button onClick={() => speakText(message.content, langCode)}
+                  className="p-1 rounded text-gray-500 hover:text-primary-400 transition-colors">
+                  <Volume2 className="w-3.5 h-3.5" />
+                </button>
+              )}
+              <button onClick={handleBookmark}
+                className="p-1 rounded text-gray-500 hover:text-yellow-400 transition-colors" title="Bookmark">
+                <Bookmark className="w-3.5 h-3.5" />
               </button>
-            )}
+            </div>
           </div>
           {/* Translation */}
           {!isUser && message.translation && (
