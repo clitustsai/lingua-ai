@@ -6,6 +6,12 @@ import type {
 } from "@ai-lang/shared";
 import { SUPPORTED_LANGUAGES, ACHIEVEMENTS } from "@ai-lang/shared";
 
+type CourseProgress = {
+  courseId: string;
+  completedLessons: string[]; // lesson ids
+  enrolledAt: string;
+};
+
 type AppStore = {
   settings: UserSettings;
   messages: Message[];
@@ -20,7 +26,9 @@ type AppStore = {
   totalMessages: number;
   grammarChecks: number;
   lessonsCompleted: number;
-  sessionStart: number; // timestamp
+  sessionStart: number;
+  courseProgress: CourseProgress[];
+  totalXp: number; // timestamp
 
   setSettings: (s: Partial<UserSettings>) => void;
   addMessage: (m: Message) => void;
@@ -40,6 +48,8 @@ type AppStore = {
   checkAchievements: () => void;
   unlockAchievement: (id: string) => void;
   tickMinutes: () => void;
+  enrollCourse: (courseId: string) => void;
+  completeLesson: (courseId: string, lessonId: string, xp: number) => void;
 };
 
 function todayStr() { return new Date().toISOString().slice(0, 10); }
@@ -77,6 +87,8 @@ export const useAppStore = create<AppStore>()(
       grammarChecks: 0,
       lessonsCompleted: 0,
       sessionStart: Date.now(),
+      courseProgress: [],
+      totalXp: 0,
 
       setSettings: (s) => set((state) => ({ settings: { ...state.settings, ...s } })),
       addMessage: (m) => set((state) => ({ messages: [...state.messages, m] })),
@@ -187,6 +199,26 @@ export const useAppStore = create<AppStore>()(
         if (s.grammarChecks >= 5) unlock("grammar_check");
         if (s.lessonsCompleted >= 1) unlock("lesson_complete");
       },
+
+      enrollCourse: (courseId) => set((state) => {
+        if (state.courseProgress.find(p => p.courseId === courseId)) return state;
+        return { courseProgress: [...state.courseProgress, { courseId, completedLessons: [], enrolledAt: new Date().toISOString() }] };
+      }),
+
+      completeLesson: (courseId, lessonId, xp) => set((state) => {
+        const prog = state.courseProgress.find(p => p.courseId === courseId);
+        if (!prog) return state;
+        if (prog.completedLessons.includes(lessonId)) return state;
+        return {
+          totalXp: state.totalXp + xp,
+          lessonsCompleted: state.lessonsCompleted + 1,
+          courseProgress: state.courseProgress.map(p =>
+            p.courseId === courseId
+              ? { ...p, completedLessons: [...p.completedLessons, lessonId] }
+              : p
+          ),
+        };
+      }),
     }),
     { name: "ai-lang-store-v2" }
   )

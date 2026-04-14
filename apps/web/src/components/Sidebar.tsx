@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import {
   MessageCircle, BookOpen, Settings, Brain, Flame,
   GraduationCap, CheckSquare, History, LayoutDashboard,
-  Languages, BookMarked, Headphones, Mic2, RotateCcw,
+  Languages, BookMarked, Headphones, Mic2, RotateCcw, Compass,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/useAppStore";
@@ -12,6 +12,7 @@ import { useAppStore } from "@/store/useAppStore";
 const nav = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { href: "/", icon: MessageCircle, label: "Chat" },
+  { href: "/courses", icon: Compass, label: "Khóa học" },
   { href: "/flashcards", icon: BookOpen, label: "Flashcards" },
   { href: "/review", icon: RotateCcw, label: "Review" },
   { href: "/lessons", icon: GraduationCap, label: "Lessons" },
