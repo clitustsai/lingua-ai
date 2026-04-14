@@ -1,81 +1,66 @@
-"use client";
+﻿"use client";
 import { useState, useRef, useEffect } from "react";
-import { Mic, MicOff, Volume2 } from "lucide-react";
+import { Mic, MicOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface VoiceButtonProps {
   onTranscript: (text: string, confidence: number) => void;
-  language: string; // e.g. "en-US"
+  language: string;
   disabled?: boolean;
+}
+
+function toLangTag(code: string) {
+  const map: Record<string, string> = {
+    en: "en-US", ja: "ja-JP", ko: "ko-KR", zh: "zh-CN",
+    fr: "fr-FR", es: "es-ES", de: "de-DE", vi: "vi-VN",
+  };
+  return map[code] ?? "en-US";
 }
 
 export default function VoiceButton({ onTranscript, language, disabled }: VoiceButtonProps) {
   const [isListening, setIsListening] = useState(false);
   const [volume, setVolume] = useState(0);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<any>(null);
   const animFrameRef = useRef<number>(0);
-  const analyserRef = useRef<AnalyserNode | null>(null);
-  const streamRef = useRef<MediaStream | null>(null);
+  const streamRef = useRef<any>(null);
+  const analyserRef = useRef<any>(null);
 
-  useEffect(() => {
-    return () => {
-      stopListening();
-    };
-  }, []);
+  useEffect(() => () => { stopListening(); }, []);
 
   const startListening = async () => {
-    const SpeechRecognition =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      alert("Your browser doesn't support voice input. Try Chrome.");
-      return;
-    }
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SR) { alert("Use Chrome for voice input."); return; }
 
-    // Visualizer
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
       const ctx = new AudioContext();
-      const source = ctx.createMediaStreamSource(stream);
       const analyser = ctx.createAnalyser();
       analyser.fftSize = 256;
-      source.connect(analyser);
+      ctx.createMediaStreamSource(stream).connect(analyser);
       analyserRef.current = analyser;
-
       const tick = () => {
-        const data = new Uint8Array(analyser.frequencyBinCount);
-        analyser.getByteFrequencyData(data);
-        const avg = data.reduce((a, b) => a + b, 0) / data.length;
-        setVolume(avg);
+        const d = new Uint8Array(analyser.frequencyBinCount);
+        analyser.getByteFrequencyData(d);
+        setVolume(d.reduce((a: number, b: number) => a + b, 0) / d.length);
         animFrameRef.current = requestAnimationFrame(tick);
       };
       tick();
-    } catch {}
+    } catch { /* mic denied */ }
 
-    const recognition = new SpeechRecognition();
-    recognition.lang = language === "en" ? "en-US"
-      : language === "ja" ? "ja-JP"
-      : language === "ko" ? "ko-KR"
-      : language === "zh" ? "zh-CN"
-      : language === "fr" ? "fr-FR"
-      : language === "es" ? "es-ES"
-      : language === "de" ? "de-DE"
-      : language === "vi" ? "vi-VN"
-      : "en-US";
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-
-    recognition.onresult = (e: SpeechRecognitionEvent) => {
-      const result = e.results[0][0];
-      onTranscript(result.transcript, result.confidence);
+    const rec = new SR();
+    rec.lang = toLangTag(language);
+    rec.interimResults = false;
+    rec.maxAlternatives = 1;
+    rec.onresult = (e: any) => {
+      const r = e.results[0][0];
+      onTranscript(r.transcript, r.confidence ?? 0.8);
       stopListening();
     };
-
-    recognition.onerror = () => stopListening();
-    recognition.onend = () => stopListening();
-
-    recognitionRef.current = recognition;
-    recognition.start();
+    rec.onerror = () => stopListening();
+    rec.onend = () => stopListening();
+    recognitionRef.current = rec;
+    rec.start();
     setIsListening(true);
   };
 
@@ -83,52 +68,38 @@ export default function VoiceButton({ onTranscript, language, disabled }: VoiceB
     recognitionRef.current?.stop();
     recognitionRef.current = null;
     cancelAnimationFrame(animFrameRef.current);
-    streamRef.current?.getTracks().forEach((t) => t.stop());
+    streamRef.current?.getTracks().forEach((t: MediaStreamTrack) => t.stop());
     streamRef.current = null;
     analyserRef.current = null;
     setIsListening(false);
     setVolume(0);
   };
 
-  const toggle = () => (isListening ? stopListening() : startListening());
-
-  const scale = isListening ? 1 + (volume / 255) * 0.6 : 1;
+  const scale = isListening ? 1 + (volume / 255) * 0.5 : 1;
 
   return (
     <button
-      onClick={toggle}
+      onClick={() => isListening ? stopListening() : startListening()}
       disabled={disabled}
-      title={isListening ? "Stop recording" : "Speak"}
+      title={isListening ? "Stop" : "Speak"}
       className={cn(
-        "relative p-3 rounded-xl transition-all duration-150",
-        isListening
-          ? "bg-red-600 hover:bg-red-700 text-white"
-          : "bg-gray-700 hover:bg-gray-600 text-gray-300",
+        "relative p-3 rounded-xl transition-all duration-100",
+        isListening ? "bg-red-600 hover:bg-red-700 text-white" : "bg-gray-700 hover:bg-gray-600 text-gray-300",
         disabled && "opacity-40 cursor-not-allowed"
       )}
       style={{ transform: `scale(${scale})` }}
     >
       {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
-      {isListening && (
-        <span className="absolute inset-0 rounded-xl animate-ping bg-red-500 opacity-30" />
-      )}
+      {isListening && <span className="absolute inset-0 rounded-xl animate-ping bg-red-500 opacity-25" />}
     </button>
   );
 }
 
 export function speakText(text: string, langCode: string) {
-  if (!window.speechSynthesis) return;
+  if (typeof window === "undefined" || !window.speechSynthesis) return;
   window.speechSynthesis.cancel();
-  const utter = new SpeechSynthesisUtterance(text);
-  utter.lang = langCode === "en" ? "en-US"
-    : langCode === "ja" ? "ja-JP"
-    : langCode === "ko" ? "ko-KR"
-    : langCode === "zh" ? "zh-CN"
-    : langCode === "fr" ? "fr-FR"
-    : langCode === "es" ? "es-ES"
-    : langCode === "de" ? "de-DE"
-    : langCode === "vi" ? "vi-VN"
-    : "en-US";
-  utter.rate = 0.9;
-  window.speechSynthesis.speak(utter);
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = toLangTag(langCode);
+  u.rate = 0.9;
+  window.speechSynthesis.speak(u);
 }
