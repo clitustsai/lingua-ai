@@ -19,7 +19,7 @@ interface GrammarResult {
 }
 
 export default function GrammarPage() {
-  const { settings } = useAppStore();
+  const { settings, incrementGrammarChecks, checkAchievements } = useAppStore();
   const [text, setText] = useState("");
   const [result, setResult] = useState<GrammarResult | null>(null);
   const [loading, setLoading] = useState(false);
@@ -41,6 +41,8 @@ export default function GrammarPage() {
       });
       const data = await res.json();
       setResult(data);
+      incrementGrammarChecks();
+      checkAchievements();
     } finally {
       setLoading(false);
     }

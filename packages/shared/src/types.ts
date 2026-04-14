@@ -22,7 +22,27 @@ export type Flashcard = {
   example: string;
   language: string;
   reviewCount?: number;
-  lastReviewed?: Date;
+  lastReviewed?: string;
+  // SM-2 spaced repetition fields
+  easeFactor?: number;   // default 2.5
+  interval?: number;     // days until next review
+  nextReview?: string;   // YYYY-MM-DD
+  repetitions?: number;
+};
+
+export type Achievement = {
+  id: string;
+  title: string;
+  description: string;
+  emoji: string;
+  unlockedAt?: string;
+};
+
+export type WeeklyRecord = {
+  date: string; // YYYY-MM-DD (Monday of week)
+  wordsLearned: number;
+  messagesCount: number;
+  minutesPracticed: number;
 };
 
 export type UserSettings = {
@@ -31,13 +51,17 @@ export type UserSettings = {
   level: Level;
   dailyGoal?: number;
   conversationTopic?: string;
+  theme?: "dark" | "light";
+  autoSpeak?: boolean;
+  speechRate?: number;
 };
 
 export type DailyStats = {
-  date: string; // YYYY-MM-DD
+  date: string;
   wordsLearned: number;
   messagesCount: number;
   streakDay: number;
+  minutesPracticed?: number;
 };
 
 export type ConversationSession = {
@@ -60,6 +84,19 @@ export type WordOfDay = {
   language: string;
   date: string;
 };
+
+export const ACHIEVEMENTS: Achievement[] = [
+  { id: "first_message", title: "First Words", description: "Send your first message", emoji: "💬" },
+  { id: "streak_3", title: "On a Roll", description: "3-day streak", emoji: "🔥" },
+  { id: "streak_7", title: "Week Warrior", description: "7-day streak", emoji: "⚡" },
+  { id: "streak_30", title: "Monthly Master", description: "30-day streak", emoji: "🏆" },
+  { id: "flashcard_10", title: "Word Collector", description: "Save 10 flashcards", emoji: "📚" },
+  { id: "flashcard_50", title: "Vocabulary Builder", description: "Save 50 flashcards", emoji: "🧠" },
+  { id: "quiz_perfect", title: "Perfect Score", description: "Get 100% on a quiz", emoji: "⭐" },
+  { id: "messages_50", title: "Chatterbox", description: "Send 50 messages total", emoji: "🗣️" },
+  { id: "grammar_check", title: "Grammar Guru", description: "Use grammar checker 5 times", emoji: "✅" },
+  { id: "lesson_complete", title: "Student", description: "Complete your first lesson", emoji: "🎓" },
+];
 
 export const CONVERSATION_TOPICS = [
   { id: "free", label: "Free Talk", emoji: "💬" },

@@ -123,11 +123,11 @@ export default function VoiceButton({ onTranscript, language, disabled }: VoiceB
   );
 }
 
-export function speakText(text: string, langCode: string) {
+export function speakText(text: string, langCode: string, rate = 0.9) {
   if (typeof window === "undefined" || !window.speechSynthesis) return;
   window.speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
   u.lang = toLangTag(langCode);
-  u.rate = 0.9;
+  u.rate = rate;
   window.speechSynthesis.speak(u);
 }

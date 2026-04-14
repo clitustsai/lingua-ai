@@ -16,7 +16,7 @@ const LANG_MAP: Record<string, string> = {
 };
 
 export default function ChatPage() {
-  const { messages, addMessage, clearMessages, settings, isLoading, setLoading, addFlashcard, incrementWords, incrementMessages, saveSession } =
+  const { messages, addMessage, clearMessages, settings, isLoading, setLoading, addFlashcard, incrementWords, incrementMessages, saveSession, checkAchievements } =
     useAppStore();
   const [input, setInput] = useState("");
   const [newWords, setNewWords] = useState<string[]>([]);
@@ -135,16 +135,19 @@ export default function ChatPage() {
       if (data.newWords?.length) setNewWords(data.newWords.filter((w: string) => w?.trim()));
       if (data.newWords?.length) incrementWords(data.newWords.filter((w: string) => w?.trim()).length);
       incrementMessages();
-      speakText(reply, settingsRef.current.targetLanguage.code);
-      setIsSpeaking(true);
-      // poll until TTS done → auto restart mic
-      const checkEnd = setInterval(() => {
-        if (!window.speechSynthesis.speaking) {
-          setIsSpeaking(false);
-          clearInterval(checkEnd);
-          setTimeout(() => startListening(), 600);
-        }
-      }, 300);
+      checkAchievements();
+      if (settingsRef.current.autoSpeak !== false) {
+        speakText(reply, settingsRef.current.targetLanguage.code, settingsRef.current.speechRate);
+        setIsSpeaking(true);
+        // poll until TTS done → auto restart mic
+        const checkEnd = setInterval(() => {
+          if (!window.speechSynthesis.speaking) {
+            setIsSpeaking(false);
+            clearInterval(checkEnd);
+            setTimeout(() => startListening(), 600);
+          }
+        }, 300);
+      }
     } catch {
       addMessage({ id: (Date.now() + 1).toString(), role: "assistant", content: "Connection error.", timestamp: new Date() });
     } finally {
