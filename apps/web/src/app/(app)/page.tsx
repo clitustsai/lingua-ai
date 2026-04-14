@@ -21,6 +21,8 @@ export default function ChatPage() {
   const recRef = useRef<any>(null);
   const animRef = useRef<number>(0);
   const streamRef = useRef<any>(null);
+  const messagesRef = useRef(messages);
+  useEffect(() => { messagesRef.current = messages; }, [messages]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -43,7 +45,7 @@ export default function ChatPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          messages: [...messages, userMsg].map((m) => ({ role: m.role, content: m.content })),
+          messages: [...messagesRef.current, userMsg].map((m) => ({ role: m.role, content: m.content })),
           targetLanguage: settings.targetLanguage.name,
           nativeLanguage: settings.nativeLanguage.name,
           level: settings.level,
@@ -95,8 +97,8 @@ export default function ChatPage() {
     rec.onresult = (e: any) => {
       const r = e.results[0][0];
       setLastVoice({ transcript: r.transcript, confidence: r.confidence ?? 0.8 });
-      sendMessage(r.transcript);
       stopListening();
+      sendMessage(r.transcript);
     };
     rec.onerror = () => stopListening();
     rec.onend = () => stopListening();
