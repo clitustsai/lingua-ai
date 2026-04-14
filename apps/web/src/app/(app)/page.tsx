@@ -2,7 +2,9 @@
 import { useState, useRef, useEffect } from "react";
 import { useAppStore } from "@/store/useAppStore";
 import ChatMessage from "@/components/ChatMessage";
-import { Send, Trash2, Plus } from "lucide-react";
+import VoiceButton, { speakText } from "@/components/VoiceButton";
+import PronunciationScore from "@/components/PronunciationScore";
+import { Send, Trash2, Plus, Volume2 } from "lucide-react";
 import type { Message } from "@ai-lang/shared";
 import { cn } from "@/lib/utils";
 
@@ -11,18 +13,20 @@ export default function ChatPage() {
     useAppStore();
   const [input, setInput] = useState("");
   const [newWords, setNewWords] = useState<string[]>([]);
+  const [lastVoice, setLastVoice] = useState<{ transcript: string; confidence: number } | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const sendMessage = async () => {
-    if (!input.trim() || isLoading) return;
+  const sendMessage = async (text?: string) => {
+    const content = (text ?? input).trim();
+    if (!content || isLoading) return;
     const userMsg: Message = {
       id: Date.now().toString(),
       role: "user",
-      content: input.trim(),
+      content,
       timestamp: new Date(),
     };
     addMessage(userMsg);
@@ -44,15 +48,18 @@ export default function ChatPage() {
         }),
       });
       const data = await res.json();
+      const reply = data.reply || "Sorry, I couldn't respond.";
       const aiMsg: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: data.reply || "Sorry, I couldn't respond.",
+        content: reply,
         correction: data.correction || undefined,
         timestamp: new Date(),
       };
       addMessage(aiMsg);
       if (data.newWords?.length) setNewWords(data.newWords);
+      // Auto speak AI reply
+      speakText(reply, settings.targetLanguage.code);
     } catch {
       addMessage({
         id: (Date.now() + 1).toString(),
@@ -63,6 +70,12 @@ export default function ChatPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleVoiceTranscript = (transcript: string, confidence: number) => {
+    setLastVoice({ transcript, confidence });
+    setInput(transcript);
+    sendMessage(transcript);
   };
 
   const saveFlashcard = async (word: string) => {
@@ -110,13 +123,24 @@ export default function ChatPage() {
           <div className="flex flex-col items-center justify-center h-full text-center gap-3">
             <div className="text-5xl">{settings.targetLanguage.flag}</div>
             <p className="text-gray-400 text-sm max-w-xs">
-              Start a conversation in {settings.targetLanguage.name}. Your AI tutor will help you
-              practice and correct mistakes.
+              Start a conversation in {settings.targetLanguage.name}. Tap the{" "}
+              <span className="text-red-400">🎤 mic</span> to speak or type below.
             </p>
           </div>
         )}
         {messages.map((m) => (
-          <ChatMessage key={m.id} message={m} />
+          <div key={m.id} className="group relative">
+            <ChatMessage message={m} />
+            {m.role === "assistant" && (
+              <button
+                onClick={() => speakText(m.content, settings.targetLanguage.code)}
+                className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-gray-500 hover:text-blue-400 transition-all"
+                title="Listen"
+              >
+                <Volume2 className="w-4 h-4" />
+              </button>
+            )}
+          </div>
         ))}
         {isLoading && (
           <div className="flex gap-3 mb-4">
@@ -132,6 +156,16 @@ export default function ChatPage() {
         )}
         <div ref={bottomRef} />
       </div>
+
+      {/* Pronunciation score */}
+      {lastVoice && (
+        <div className="px-6 py-2 border-t border-gray-800">
+          <PronunciationScore
+            confidence={lastVoice.confidence}
+            transcript={lastVoice.transcript}
+          />
+        </div>
+      )}
 
       {/* New words suggestion */}
       {newWords.length > 0 && (
@@ -152,15 +186,20 @@ export default function ChatPage() {
       {/* Input */}
       <div className="px-6 py-4 border-t border-gray-800 bg-gray-950">
         <div className="flex gap-3">
+          <VoiceButton
+            onTranscript={handleVoiceTranscript}
+            language={settings.targetLanguage.code}
+            disabled={isLoading}
+          />
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
-            placeholder={`Type in ${settings.targetLanguage.name}...`}
+            placeholder={`Type or speak in ${settings.targetLanguage.name}...`}
             className="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary-500 transition-colors"
           />
           <button
-            onClick={sendMessage}
+            onClick={() => sendMessage()}
             disabled={isLoading || !input.trim()}
             className={cn(
               "p-3 rounded-xl transition-colors",
