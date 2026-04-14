@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "LinguaAI",
+    "slug": "lingua-ai",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "linguaai",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "backgroundColor": "#030712"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.linguaai.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#030712"
+      },
+      "package": "com.linguaai.app"
+    },
+    "plugins": ["expo-router"]
+  }
+}
