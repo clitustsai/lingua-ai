@@ -5,10 +5,15 @@ const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages, targetLanguage, nativeLanguage, level } = await req.json();
+    const { messages, targetLanguage, nativeLanguage, level, topic } = await req.json();
+
+    const topicInstruction = topic && topic !== "free"
+      ? `Focus the conversation on the topic: "${topic}".`
+      : "Keep the conversation open and natural.";
 
     const systemPrompt = `You are a friendly ${targetLanguage} language tutor. 
 The student's native language is ${nativeLanguage} and their current level is ${level}.
+${topicInstruction}
 
 Your role:
 1. Respond naturally in ${targetLanguage} (adjusted to ${level} level)

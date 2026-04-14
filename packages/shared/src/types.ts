@@ -21,13 +21,35 @@ export type Flashcard = {
   translation: string;
   example: string;
   language: string;
+  reviewCount?: number;
+  lastReviewed?: Date;
 };
 
 export type UserSettings = {
   targetLanguage: Language;
   nativeLanguage: Language;
   level: Level;
+  dailyGoal?: number;
+  conversationTopic?: string;
 };
+
+export type DailyStats = {
+  date: string; // YYYY-MM-DD
+  wordsLearned: number;
+  messagesCount: number;
+  streakDay: number;
+};
+
+export const CONVERSATION_TOPICS = [
+  { id: "free", label: "Free Talk", emoji: "💬" },
+  { id: "travel", label: "Travel", emoji: "✈️" },
+  { id: "food", label: "Food & Dining", emoji: "🍜" },
+  { id: "business", label: "Business", emoji: "💼" },
+  { id: "shopping", label: "Shopping", emoji: "🛍️" },
+  { id: "health", label: "Health", emoji: "🏥" },
+  { id: "hobbies", label: "Hobbies", emoji: "🎨" },
+  { id: "news", label: "Current Events", emoji: "📰" },
+];
 
 export const SUPPORTED_LANGUAGES: Language[] = [
   { code: "en", name: "English", flag: "🇺🇸" },

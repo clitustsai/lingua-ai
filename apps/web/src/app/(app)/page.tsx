@@ -4,7 +4,8 @@ import { useAppStore } from "@/store/useAppStore";
 import ChatMessage from "@/components/ChatMessage";
 import { speakText } from "@/components/VoiceButton";
 import PronunciationScore from "@/components/PronunciationScore";
-import { Trash2, Plus, Volume2, Mic, MicOff, Send, Keyboard } from "lucide-react";
+import { Trash2, Plus, Volume2, Mic, MicOff, Send, Keyboard, Tag } from "lucide-react";
+import { CONVERSATION_TOPICS } from "@ai-lang/shared";
 import type { Message } from "@ai-lang/shared";
 import { cn } from "@/lib/utils";
 
@@ -14,7 +15,7 @@ const LANG_MAP: Record<string, string> = {
 };
 
 export default function ChatPage() {
-  const { messages, addMessage, clearMessages, settings, isLoading, setLoading, addFlashcard } =
+  const { messages, addMessage, clearMessages, settings, isLoading, setLoading, addFlashcard, incrementWords, incrementMessages } =
     useAppStore();
   const [input, setInput] = useState("");
   const [newWords, setNewWords] = useState<string[]>([]);
@@ -113,6 +114,7 @@ export default function ChatPage() {
           targetLanguage: settingsRef.current.targetLanguage.name,
           nativeLanguage: settingsRef.current.nativeLanguage.name,
           level: settingsRef.current.level,
+          topic: settingsRef.current.conversationTopic ?? "free",
         }),
       });
       const data = await res.json();
@@ -126,6 +128,8 @@ export default function ChatPage() {
         timestamp: new Date(),
       });
       if (data.newWords?.length) setNewWords(data.newWords);
+      if (data.newWords?.length) incrementWords(data.newWords.length);
+      incrementMessages();
       speakText(reply, settingsRef.current.targetLanguage.code);
       setIsSpeaking(true);
       // poll until TTS done → auto restart mic
@@ -172,7 +176,16 @@ export default function ChatPage() {
       <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
         <div>
           <h1 className="font-semibold text-white">{settings.targetLanguage.flag} {settings.targetLanguage.name} Conversation</h1>
-          <p className="text-xs text-gray-500">Level: {settings.level}</p>
+          <div className="flex items-center gap-2 mt-0.5">
+            <p className="text-xs text-gray-500">Level: {settings.level}</p>
+            {settings.conversationTopic && settings.conversationTopic !== "free" && (
+              <span className="text-xs text-primary-400 flex items-center gap-1">
+                <Tag className="w-3 h-3" />
+                {CONVERSATION_TOPICS.find(t => t.id === settings.conversationTopic)?.emoji}{" "}
+                {CONVERSATION_TOPICS.find(t => t.id === settings.conversationTopic)?.label}
+              </span>
+            )}
+          </div>
         </div>
         <button onClick={clearMessages} className="p-2 rounded-lg text-gray-500 hover:text-red-400 hover:bg-gray-800 transition-colors">
           <Trash2 className="w-4 h-4" />
