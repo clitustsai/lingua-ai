@@ -3,7 +3,19 @@ import { useState } from "react";
 import { useAppStore } from "@/store/useAppStore";
 import FlashcardItem from "@/components/FlashcardItem";
 import QuizMode from "@/components/QuizMode";
-import { BookOpen, Search, Trophy, X } from "lucide-react";
+import { BookOpen, Search, Trophy, X, Download } from "lucide-react";
+
+function exportCSV(flashcards: any[]) {
+  const header = "Word,Translation,Example,Language\n";
+  const rows = flashcards.map(f =>
+    `"${f.word}","${f.translation}","${f.example}","${f.language}"`
+  ).join("\n");
+  const blob = new Blob([header + rows], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = "flashcards.csv"; a.click();
+  URL.revokeObjectURL(url);
+}
 
 export default function FlashcardsPage() {
   const { flashcards, removeFlashcard } = useAppStore();
@@ -38,12 +50,20 @@ export default function FlashcardsPage() {
           <p className="text-sm text-gray-500 mt-1">{flashcards.length} cards saved</p>
         </div>
         {flashcards.length >= 2 && (
-          <button
-            onClick={() => setQuizOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-yellow-600/20 border border-yellow-500/30 text-yellow-300 rounded-xl text-sm font-medium hover:bg-yellow-600/30 transition-colors"
-          >
-            <Trophy className="w-4 h-4" /> Quiz Me
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => exportCSV(flashcards)}
+              className="flex items-center gap-2 px-3 py-2 bg-gray-800 border border-gray-700 text-gray-300 rounded-xl text-sm hover:border-gray-600 transition-colors"
+            >
+              <Download className="w-4 h-4" /> Export
+            </button>
+            <button
+              onClick={() => setQuizOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-yellow-600/20 border border-yellow-500/30 text-yellow-300 rounded-xl text-sm font-medium hover:bg-yellow-600/30 transition-colors"
+            >
+              <Trophy className="w-4 h-4" /> Quiz Me
+            </button>
+          </div>
         )}
       </div>
 

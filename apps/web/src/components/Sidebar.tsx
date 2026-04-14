@@ -1,13 +1,16 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { MessageCircle, BookOpen, Settings, Brain, Flame } from "lucide-react";
+import { MessageCircle, BookOpen, Settings, Brain, Flame, GraduationCap, CheckSquare, History } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/useAppStore";
 
 const nav = [
   { href: "/", icon: MessageCircle, label: "Chat" },
   { href: "/flashcards", icon: BookOpen, label: "Flashcards" },
+  { href: "/lessons", icon: GraduationCap, label: "Lessons" },
+  { href: "/grammar", icon: CheckSquare, label: "Grammar" },
+  { href: "/history", icon: History, label: "History" },
   { href: "/settings", icon: Settings, label: "Settings" },
 ];
 
@@ -18,7 +21,7 @@ export default function Sidebar() {
   const pct = Math.min((stats.wordsLearned / goal) * 100, 100);
 
   return (
-    <aside className="w-16 md:w-56 h-screen bg-gray-900 border-r border-gray-800 flex flex-col py-6 px-2 md:px-4 fixed left-0 top-0 z-10">
+    <aside className="w-16 md:w-56 h-screen bg-gray-900 border-r border-gray-800 flex flex-col py-6 px-2 md:px-4 fixed left-0 top-0 z-10 overflow-y-auto">
       <div className="flex items-center gap-2 mb-8 px-2">
         <Brain className="text-primary-500 w-7 h-7 shrink-0" />
         <span className="hidden md:block font-bold text-lg text-white">LinguaAI</span>

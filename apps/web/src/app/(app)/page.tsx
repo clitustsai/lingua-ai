@@ -4,8 +4,9 @@ import { useAppStore } from "@/store/useAppStore";
 import ChatMessage from "@/components/ChatMessage";
 import { speakText } from "@/components/VoiceButton";
 import PronunciationScore from "@/components/PronunciationScore";
-import { Trash2, Plus, Volume2, Mic, MicOff, Send, Keyboard, Tag } from "lucide-react";
+import { Trash2, Plus, Volume2, Mic, MicOff, Send, Keyboard, Tag, Save } from "lucide-react";
 import { CONVERSATION_TOPICS } from "@ai-lang/shared";
+import WordOfDay from "@/components/WordOfDay";
 import type { Message } from "@ai-lang/shared";
 import { cn } from "@/lib/utils";
 
@@ -15,7 +16,7 @@ const LANG_MAP: Record<string, string> = {
 };
 
 export default function ChatPage() {
-  const { messages, addMessage, clearMessages, settings, isLoading, setLoading, addFlashcard, incrementWords, incrementMessages } =
+  const { messages, addMessage, clearMessages, settings, isLoading, setLoading, addFlashcard, incrementWords, incrementMessages, saveSession } =
     useAppStore();
   const [input, setInput] = useState("");
   const [newWords, setNewWords] = useState<string[]>([]);
@@ -24,6 +25,7 @@ export default function ChatPage() {
   const [volume, setVolume] = useState(0);
   const [showKeyboard, setShowKeyboard] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [saveLabel, setSaveLabel] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
   const recRef = useRef<any>(null);
   const animRef = useRef<number>(0);
@@ -190,17 +192,34 @@ export default function ChatPage() {
             )}
           </div>
         </div>
-        <button onClick={clearMessages} className="p-2 rounded-lg text-gray-500 hover:text-red-400 hover:bg-gray-800 transition-colors">
-          <Trash2 className="w-4 h-4" />
-        </button>
+        <div className="flex items-center gap-2">
+          {messages.length > 0 && (
+            <button
+              onClick={() => {
+                const title = saveLabel.trim() || `${settings.targetLanguage.name} - ${new Date().toLocaleDateString()}`;
+                saveSession(title);
+                setSaveLabel("");
+              }}
+              className="p-2 rounded-lg text-gray-500 hover:text-primary-400 hover:bg-gray-800 transition-colors"
+              title="Save conversation"
+            >
+              <Save className="w-4 h-4" />
+            </button>
+          )}
+          <button onClick={clearMessages} className="p-2 rounded-lg text-gray-500 hover:text-red-400 hover:bg-gray-800 transition-colors">
+            <Trash2 className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-6 py-4">
         {messages.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full text-center gap-4">
-            <div className="text-6xl">{settings.targetLanguage.flag}</div>
-            <p className="text-gray-400 text-sm max-w-xs">Tap the mic and start speaking in {settings.targetLanguage.name}</p>
+          <div className="flex flex-col items-center justify-center h-full gap-4 px-4">
+            <div className="w-full max-w-sm">
+              <WordOfDay />
+            </div>
+            <p className="text-gray-500 text-xs">Tap the mic and start speaking in {settings.targetLanguage.name}</p>
           </div>
         )}
         {messages.map((m) => (

@@ -40,6 +40,27 @@ export type DailyStats = {
   streakDay: number;
 };
 
+export type ConversationSession = {
+  id: string;
+  title: string;
+  language: string;
+  topic: string;
+  messages: Message[];
+  createdAt: Date;
+};
+
+export type WordOfDay = {
+  word: string;
+  pronunciation?: string;
+  partOfSpeech?: string;
+  translation: string;
+  example: string;
+  exampleTranslation?: string;
+  mnemonic?: string;
+  language: string;
+  date: string;
+};
+
 export const CONVERSATION_TOPICS = [
   { id: "free", label: "Free Talk", emoji: "💬" },
   { id: "travel", label: "Travel", emoji: "✈️" },
