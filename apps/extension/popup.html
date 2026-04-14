@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LinguaAI</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">
+        <span class="logo-icon">🧠</span>
+        <span class="logo-text">LinguaAI</span>
+      </div>
+      <div class="header-right">
+        <span id="streak-badge" class="streak-badge hidden">🔥 <span id="streak-count">0</span></span>
+        <button id="settings-btn" class="icon-btn" title="Cài đặt">⚙️</button>
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div class="search-section">
+      <div class="search-box">
+        <input id="word-input" type="text" placeholder="Nhập từ cần tra..." autocomplete="off" />
+        <button id="search-btn">🔍</button>
+      </div>
+    </div>
+
+    <!-- Result -->
+    <div id="result-section" class="result-section hidden">
+      <div id="result-content"></div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" data-tab="flashcards">📚 Flashcards <span id="card-count" class="badge">0</span></button>
+      <button class="tab" data-tab="settings">⚙️ Cài đặt</button>
+    </div>
+
+    <!-- Flashcards tab -->
+    <div id="tab-flashcards" class="tab-content active">
+      <div id="flashcard-list" class="flashcard-list">
+        <div class="empty-state">
+          <p>Chưa có flashcard nào.</p>
+          <p class="hint">Highlight từ trên trang web → nhấn 💾 để lưu</p>
+        </div>
+      </div>
+      <div class="tab-footer">
+        <button id="open-app-btn" class="btn-primary">Mở LinguaAI App →</button>
+        <button id="clear-btn" class="btn-ghost">Xóa tất cả</button>
+      </div>
+    </div>
+
+    <!-- Settings tab -->
+    <div id="tab-settings" class="tab-content hidden">
+      <div class="settings-form">
+        <div class="form-group">
+          <label>Ngôn ngữ đang học</label>
+          <select id="target-lang">
+            <option value="English">🇺🇸 English</option>
+            <option value="Japanese">🇯🇵 Japanese</option>
+            <option value="Korean">🇰🇷 Korean</option>
+            <option value="Chinese">🇨🇳 Chinese</option>
+            <option value="French">🇫🇷 French</option>
+            <option value="Spanish">🇪🇸 Spanish</option>
+            <option value="German">🇩🇪 German</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Ngôn ngữ mẹ đẻ</label>
+          <select id="native-lang">
+            <option value="Vietnamese">🇻🇳 Tiếng Việt</option>
+            <option value="English">🇺🇸 English</option>
+            <option value="Chinese">🇨🇳 Chinese</option>
+            <option value="Japanese">🇯🇵 Japanese</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>API URL (LinguaAI)</label>
+          <input id="api-url" type="text" placeholder="https://your-app.vercel.app" />
+        </div>
+        <button id="save-settings-btn" class="btn-primary">Lưu cài đặt</button>
+      </div>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
