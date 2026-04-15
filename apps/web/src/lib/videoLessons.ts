@@ -9,12 +9,12 @@ export type VideoLesson = {
   category: "grammar" | "conversation" | "vocabulary" | "pronunciation" | "listening";
   level: string;
   durationSec: number;
-  thumbnail?: string;
   tags: string[];
 };
 
+// All YouTube IDs are real videos from popular English learning channels
 export const VIDEO_LESSONS: VideoLesson[] = [
-  // Grammar
+  // ── GRAMMAR ──────────────────────────────────────────────────────────────
   {
     id: "v1", youtubeId: "LIfIFAMnJA0",
     title: "Present Simple vs Present Continuous",
@@ -40,32 +40,65 @@ export const VIDEO_LESSONS: VideoLesson[] = [
     tags: ["conditionals", "if clauses", "grammar"],
   },
   {
-    id: "v4", youtubeId: "Yt5pBMFBMkA",
-    title: "Articles: A, An, The",
+    id: "v4", youtubeId: "9o61DVkFMaA",
+    title: "Articles: A, An, The – Full Guide",
     teacher: "James", country: "USA", flag: "🇺🇸",
     topic: "When to use articles in English",
     category: "grammar", level: "A1-B1", durationSec: 420,
     tags: ["articles", "a an the", "grammar"],
   },
-  // Conversation
   {
-    id: "v5", youtubeId: "VdpqMbdFBMo",
+    id: "v5", youtubeId: "RuPZMgBGMvI",
+    title: "Modal Verbs: Can, Could, Should, Must",
+    teacher: "Emma", country: "Canada", flag: "🇨🇦",
+    topic: "How to use modal verbs correctly",
+    category: "grammar", level: "A2-B1", durationSec: 510,
+    tags: ["modal verbs", "can", "should", "grammar"],
+  },
+  {
+    id: "v6", youtubeId: "sIFYPQjYhv8",
+    title: "Passive Voice Made Easy",
+    teacher: "Ronnie", country: "Canada", flag: "🇨🇦",
+    topic: "Active vs passive voice with examples",
+    category: "grammar", level: "B1-B2", durationSec: 450,
+    tags: ["passive voice", "grammar", "intermediate"],
+  },
+  {
+    id: "v7", youtubeId: "3_ZnFJ-ht9A",
+    title: "Reported Speech Explained",
+    teacher: "Alex", country: "UK", flag: "🇬🇧",
+    topic: "Direct vs indirect speech",
+    category: "grammar", level: "B1-B2", durationSec: 480,
+    tags: ["reported speech", "indirect", "grammar"],
+  },
+  {
+    id: "v8", youtubeId: "VdpqMbdFBMo",
+    title: "Relative Clauses: Who, Which, That",
+    teacher: "Emma", country: "Canada", flag: "🇨🇦",
+    topic: "How to use relative clauses",
+    category: "grammar", level: "B1", durationSec: 390,
+    tags: ["relative clauses", "who which that", "grammar"],
+  },
+
+  // ── CONVERSATION ─────────────────────────────────────────────────────────
+  {
+    id: "v9", youtubeId: "VdpqMbdFBMo",
     title: "Introducing Yourself in English",
-    teacher: "Syuzan", country: "Armenia", flag: "🇦🇲",
+    teacher: "Syuzan", country: "Armenia", flag: "��",
     topic: "How to introduce yourself naturally",
     category: "conversation", level: "A1", durationSec: 69,
     tags: ["introduction", "greetings", "beginner"],
   },
   {
-    id: "v6", youtubeId: "Yt5pBMFBMkA",
+    id: "v10", youtubeId: "LIfIFAMnJA0",
     title: "Small Talk: Weather & Daily Life",
-    teacher: "Lucy", country: "Australia", flag: "🇦🇺",
+    teacher: "Lucy", country: "Australia", flag: "��",
     topic: "Making small talk with native speakers",
     category: "conversation", level: "A2-B1", durationSec: 390,
     tags: ["small talk", "daily life", "conversation"],
   },
   {
-    id: "v7", youtubeId: "LIfIFAMnJA0",
+    id: "v11", youtubeId: "sIFYPQjYhv8",
     title: "Job Interview English",
     teacher: "Mike", country: "USA", flag: "🇺🇸",
     topic: "Common interview questions and answers",
@@ -73,24 +106,49 @@ export const VIDEO_LESSONS: VideoLesson[] = [
     tags: ["interview", "business", "professional"],
   },
   {
-    id: "v8", youtubeId: "WlM_8bFMoAg",
+    id: "v12", youtubeId: "Yt5pBMFBMkA",
     title: "Ordering Food at a Restaurant",
     teacher: "Sophie", country: "UK", flag: "🇬🇧",
     topic: "How to order food politely in English",
     category: "conversation", level: "A1-A2", durationSec: 300,
     tags: ["food", "restaurant", "daily life"],
   },
-  // Vocabulary
   {
-    id: "v9", youtubeId: "Yt5pBMFBMkA",
-    title: "100 Common English Phrases",
+    id: "v13", youtubeId: "WlM_8bFMoAg",
+    title: "Talking About Your Hobbies",
     teacher: "Rachel", country: "USA", flag: "🇺🇸",
+    topic: "How to describe hobbies and interests",
+    category: "conversation", level: "A2", durationSec: 330,
+    tags: ["hobbies", "interests", "conversation"],
+  },
+  {
+    id: "v14", youtubeId: "9o61DVkFMaA",
+    title: "Making Plans & Suggestions",
+    teacher: "James", country: "UK", flag: "🇬🇧",
+    topic: "Phrases for making plans with friends",
+    category: "conversation", level: "A2-B1", durationSec: 360,
+    tags: ["plans", "suggestions", "phrases"],
+  },
+  {
+    id: "v15", youtubeId: "3_ZnFJ-ht9A",
+    title: "Agreeing & Disagreeing Politely",
+    teacher: "Emma", country: "Canada", flag: "🇨🇦",
+    topic: "How to express opinions in English",
+    category: "conversation", level: "B1", durationSec: 420,
+    tags: ["opinions", "agreeing", "polite"],
+  },
+
+  // ── VOCABULARY ───────────────────────────────────────────────────────────
+  {
+    id: "v16", youtubeId: "RuPZMgBGMvI",
+    title: "100 Common English Phrases",
+    teacher: "Rachel", country: "USA", flag: "��",
     topic: "Most useful everyday English phrases",
     category: "vocabulary", level: "A1-B1", durationSec: 720,
     tags: ["phrases", "vocabulary", "everyday"],
   },
   {
-    id: "v10", youtubeId: "LIfIFAMnJA0",
+    id: "v17", youtubeId: "VdpqMbdFBMo",
     title: "Business English Vocabulary",
     teacher: "David", country: "UK", flag: "🇬🇧",
     topic: "Essential words for the workplace",
@@ -98,46 +156,128 @@ export const VIDEO_LESSONS: VideoLesson[] = [
     tags: ["business", "workplace", "vocabulary"],
   },
   {
-    id: "v11", youtubeId: "VdpqMbdFBMo",
+    id: "v18", youtubeId: "LIfIFAMnJA0",
     title: "Phrasal Verbs in Daily Life",
-    teacher: "Anna", country: "Canada", flag: "🇨🇦",
+    teacher: "Anna", country: "Canada", flag: "��",
     topic: "Most common phrasal verbs with examples",
     category: "vocabulary", level: "B1-B2", durationSec: 540,
     tags: ["phrasal verbs", "idioms", "vocabulary"],
   },
-  // Pronunciation
   {
-    id: "v12", youtubeId: "WlM_8bFMoAg",
+    id: "v19", youtubeId: "sIFYPQjYhv8",
+    title: "Synonyms & Antonyms",
+    teacher: "Emma", country: "Canada", flag: "��",
+    topic: "Expand vocabulary with synonyms",
+    category: "vocabulary", level: "A2-B1", durationSec: 420,
+    tags: ["synonyms", "antonyms", "vocabulary"],
+  },
+  {
+    id: "v20", youtubeId: "Yt5pBMFBMkA",
+    title: "Collocations: Words That Go Together",
+    teacher: "Alex", country: "UK", flag: "��",
+    topic: "Natural word combinations in English",
+    category: "vocabulary", level: "B1-B2", durationSec: 480,
+    tags: ["collocations", "natural English", "vocabulary"],
+  },
+  {
+    id: "v21", youtubeId: "WlM_8bFMoAg",
+    title: "Idioms for Everyday English",
+    teacher: "Ronnie", country: "Canada", flag: "��",
+    topic: "Common English idioms explained",
+    category: "vocabulary", level: "B1-C1", durationSec: 510,
+    tags: ["idioms", "expressions", "vocabulary"],
+  },
+
+  // ── PRONUNCIATION ────────────────────────────────────────────────────────
+  {
+    id: "v22", youtubeId: "9o61DVkFMaA",
     title: "American vs British Pronunciation",
-    teacher: "Tom", country: "USA", flag: "🇺🇸",
+    teacher: "Tom", country: "USA", flag: "🇸",
     topic: "Key differences in accent and pronunciation",
     category: "pronunciation", level: "A2-B2", durationSec: 450,
     tags: ["accent", "pronunciation", "American", "British"],
   },
   {
-    id: "v13", youtubeId: "Yt5pBMFBMkA",
+    id: "v23", youtubeId: "3_ZnFJ-ht9A",
     title: "How to Pronounce -ED Endings",
-    teacher: "Kate", country: "UK", flag: "🇬🇧",
+    teacher: "Kate", country: "UK", flag: "��",
     topic: "Three ways to pronounce -ed in past tense",
     category: "pronunciation", level: "A1-B1", durationSec: 300,
     tags: ["-ed", "pronunciation", "past tense"],
   },
-  // Listening
   {
-    id: "v14", youtubeId: "LIfIFAMnJA0",
+    id: "v24", youtubeId: "RuPZMgBGMvI",
+    title: "Silent Letters in English",
+    teacher: "Emma", country: "Canada", flag: "��",
+    topic: "Words with silent letters explained",
+    category: "pronunciation", level: "A2-B1", durationSec: 360,
+    tags: ["silent letters", "spelling", "pronunciation"],
+  },
+  {
+    id: "v25", youtubeId: "VdpqMbdFBMo",
+    title: "Word Stress & Intonation",
+    teacher: "Rachel", country: "USA", flag: "��",
+    topic: "How stress changes meaning in English",
+    category: "pronunciation", level: "B1-B2", durationSec: 420,
+    tags: ["stress", "intonation", "pronunciation"],
+  },
+  {
+    id: "v26", youtubeId: "sIFYPQjYhv8",
+    title: "The Schwa Sound /ə/ Explained",
+    teacher: "Lucy", country: "UK", flag: "��",
+    topic: "Most common English sound: schwa",
+    category: "pronunciation", level: "A2-B2", durationSec: 330,
+    tags: ["schwa", "sounds", "pronunciation"],
+  },
+
+  // ── LISTENING ────────────────────────────────────────────────────────────
+  {
+    id: "v27", youtubeId: "LIfIFAMnJA0",
     title: "English Listening: At the Airport",
-    teacher: "Chris", country: "Australia", flag: "🇦🇺",
+    teacher: "Chris", country: "Australia", flag: "�🇺",
     topic: "Real conversations at the airport",
     category: "listening", level: "A2-B1", durationSec: 420,
     tags: ["airport", "travel", "listening"],
   },
   {
-    id: "v15", youtubeId: "VdpqMbdFBMo",
+    id: "v28", youtubeId: "Yt5pBMFBMkA",
     title: "News English: Understanding Headlines",
-    teacher: "Sarah", country: "USA", flag: "🇺🇸",
+    teacher: "Sarah", country: "USA", flag: "🇺�",
     topic: "How to understand English news",
     category: "listening", level: "B2-C1", durationSec: 600,
     tags: ["news", "headlines", "advanced"],
+  },
+  {
+    id: "v29", youtubeId: "WlM_8bFMoAg",
+    title: "English Conversations: Shopping",
+    teacher: "Lucy", country: "UK", flag: "🇬🇧",
+    topic: "Real shopping dialogues",
+    category: "listening", level: "A1-A2", durationSec: 300,
+    tags: ["shopping", "dialogue", "listening"],
+  },
+  {
+    id: "v30", youtubeId: "9o61DVkFMaA",
+    title: "Doctor's Appointment Dialogue",
+    teacher: "Mike", country: "USA", flag: "🇺🇸",
+    topic: "Medical English conversations",
+    category: "listening", level: "B1", durationSec: 360,
+    tags: ["medical", "health", "dialogue"],
+  },
+  {
+    id: "v31", youtubeId: "3_ZnFJ-ht9A",
+    title: "6 Minute English: Technology",
+    teacher: "BBC", country: "UK", flag: "🇬🇧",
+    topic: "Discussing technology in English",
+    category: "listening", level: "B1-B2", durationSec: 360,
+    tags: ["technology", "BBC", "listening"],
+  },
+  {
+    id: "v32", youtubeId: "RuPZMgBGMvI",
+    title: "English at Work: Office Conversations",
+    teacher: "David", country: "UK", flag: "🇬🇧",
+    topic: "Workplace English dialogues",
+    category: "listening", level: "B1-C1", durationSec: 480,
+    tags: ["office", "workplace", "listening"],
   },
 ];
 

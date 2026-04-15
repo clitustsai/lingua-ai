@@ -340,7 +340,7 @@ export default function VideoDetailPage() {
                   <button key={v.id} onClick={() => router.push(`/videos/${v.id}`)}
                     className="flex items-center gap-3 p-3 rounded-xl text-left transition-colors hover:bg-white/5"
                     style={{ background: "rgba(26,16,53,0.6)", border: "1px solid rgba(139,92,246,0.1)" }}>
-                    <img src={`https://img.youtube.com/vi/${v.youtubeId}/mqdefault.jpg`} alt={v.title}
+                    <img src={`https://img.youtube.com/vi/${v.youtubeId}/hqdefault.jpg`} alt={v.title}
                       className="w-20 h-12 object-cover rounded-lg shrink-0" />
                     <div className="flex-1 min-w-0">
                       <p className="text-white text-sm font-medium line-clamp-2">{v.title}</p>

@@ -85,10 +85,9 @@ export default function VideosPage() {
             {/* Thumbnail */}
             <div className="relative aspect-video bg-gray-900 overflow-hidden">
               <img
-                src={`https://img.youtube.com/vi/${v.youtubeId}/mqdefault.jpg`}
+                src={`https://img.youtube.com/vi/${v.youtubeId}/hqdefault.jpg`}
                 alt={v.title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                onError={e => { (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${v.youtubeId}/0.jpg`; }}
               />
               {/* Play overlay */}
               <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors flex items-center justify-center">
