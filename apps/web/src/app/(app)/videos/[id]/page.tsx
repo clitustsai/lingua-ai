@@ -103,7 +103,7 @@ export default function VideoDetailPage() {
       {/* Video info - giống ảnh */}
       <div className="px-5 py-4" style={{ background: "rgba(200,240,200,0.08)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
         <div className="flex items-center gap-2 mb-1">
-          <span className="text-lg">{video.flag}</span>
+          <span className="text-lg">{video.flag.length === 2 ? video.flag.toUpperCase().split("").map((c: string) => String.fromCodePoint(0x1F1E6 + c.charCodeAt(0) - 65)).join("") : video.flag}</span>
           <span className="text-gray-300 text-sm">{video.teacher} / {video.country}</span>
         </div>
         <h1 className="text-white font-bold text-xl leading-tight">{video.title}</h1>
@@ -339,7 +339,7 @@ export default function VideoDetailPage() {
                       className="w-20 h-12 object-cover rounded-lg shrink-0" />
                     <div className="flex-1 min-w-0">
                       <p className="text-white text-sm font-medium line-clamp-2">{v.title}</p>
-                      <p className="text-gray-500 text-xs mt-0.5">{v.flag} {v.teacher} · {v.level}</p>
+                      <p className="text-gray-500 text-xs mt-0.5">{v.flag.length === 2 ? v.flag.toUpperCase().split("").map((c: string) => String.fromCodePoint(0x1F1E6 + c.charCodeAt(0) - 65)).join("") : v.flag} {v.teacher} · {v.level}</p>
                     </div>
                     <ChevronRight className="w-4 h-4 text-gray-600 shrink-0" />
                   </button>

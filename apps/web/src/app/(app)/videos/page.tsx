@@ -11,6 +11,10 @@ function formatDuration(sec: number) {
   return `${m}:${String(s).padStart(2, "0")}`;
 }
 
+function countryFlag(code: string) {
+  return code.toUpperCase().split("").map(c => String.fromCodePoint(0x1F1E6 + c.charCodeAt(0) - 65)).join("");
+}
+
 const LEVEL_COLOR: Record<string, string> = {
   "A1": "bg-green-900/40 text-green-300",
   "A1-A2": "bg-green-900/40 text-green-300",
@@ -110,7 +114,7 @@ export default function VideosPage() {
               <h3 className="text-white font-semibold text-sm leading-tight mb-1.5 line-clamp-2">{v.title}</h3>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-lg">{v.flag}</span>
+                  <span className="text-lg">{countryFlag(v.flag)}</span>
                   <span className="text-xs text-gray-400">{v.teacher}</span>
                 </div>
                 <span className={cn("text-xs px-2 py-0.5 rounded-full", LEVEL_COLOR[v.level] ?? "bg-gray-800 text-gray-400")}>
