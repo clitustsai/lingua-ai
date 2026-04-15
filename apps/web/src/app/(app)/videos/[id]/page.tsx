@@ -83,7 +83,7 @@ export default function VideoDetailPage() {
       </div>
 
       {/* YouTube Player */}
-      <div className="aspect-video bg-black">
+      <div className="aspect-video bg-black relative">
         <iframe
           id="yt-player-detail"
           className="w-full h-full"
@@ -91,6 +91,13 @@ export default function VideoDetailPage() {
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
         />
+        {/* Fallback overlay — watch on YouTube */}
+        <a href={`https://www.youtube.com/watch?v=${video.youtubeId}`}
+          target="_blank" rel="noopener noreferrer"
+          className="absolute bottom-3 right-3 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-red-600 hover:bg-red-500 text-white transition-colors shadow-lg"
+          style={{ zIndex: 10 }}>
+          ▶ Watch on YouTube
+        </a>
       </div>
 
       {/* Video info - giống ảnh */}

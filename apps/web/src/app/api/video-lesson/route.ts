@@ -10,22 +10,27 @@ export async function POST(req: NextRequest) {
       model: "llama-3.3-70b-versatile",
       messages: [{
         role: "user",
-        content: `Create a complete language lesson for a short video titled "${title}" about "${topic}" in ${targetLanguage} for a ${level} learner (native: ${nativeLanguage}).
+        content: `Create a complete English language lesson for a video titled "${title}" about "${topic}" for a ${level} learner whose native language is ${nativeLanguage}.
+
+IMPORTANT RULES:
+- "script", "keyPhrases", "vocabulary.word", "vocabulary.example", "grammar.examples" MUST be in ${targetLanguage} (English)
+- "scriptTranslation", "vocabulary.definition", "grammar.explanation", "grammar.tip", "quiz.question", "quiz.options", "quiz.explanation" should be in ${nativeLanguage} to help the learner understand
+- Quiz questions should test comprehension of the English content
 
 Return JSON:
 {
-  "script": "full natural script of the video in ${targetLanguage} (3-5 paragraphs, conversational)",
+  "script": "natural English script 3-4 paragraphs teaching the topic clearly",
   "scriptTranslation": "full translation in ${nativeLanguage}",
   "quiz": [
-    { "question": "comprehension question in ${nativeLanguage}", "options": ["A","B","C","D"], "correct": 0, "explanation": "in ${nativeLanguage}" }
+    { "question": "English comprehension question (e.g. 'Which tense do we use for habits?')", "options": ["option A in English","option B","option C","option D"], "correct": 0, "explanation": "brief explanation in ${nativeLanguage}" }
   ],
   "vocabulary": [
-    { "word": "", "pronunciation": "[IPA]", "partOfSpeech": "", "definition": "in ${nativeLanguage}", "example": "from the script", "level": "A1-C2" }
+    { "word": "English word", "pronunciation": "[IPA]", "partOfSpeech": "noun/verb/adj", "definition": "meaning in ${nativeLanguage}", "example": "example sentence in English", "level": "A1/A2/B1/B2/C1" }
   ],
   "grammar": [
-    { "point": "grammar point name", "explanation": "clear explanation in ${nativeLanguage}", "examples": ["example from script", "another example"], "tip": "memory tip in ${nativeLanguage}" }
+    { "point": "Grammar Point Name in English", "explanation": "explanation in ${nativeLanguage}", "examples": ["English example 1", "English example 2"], "tip": "memory tip in ${nativeLanguage}" }
   ],
-  "keyPhrases": ["useful phrase 1", "useful phrase 2", "useful phrase 3"]
+  "keyPhrases": ["useful English phrase 1", "useful English phrase 2", "useful English phrase 3", "useful English phrase 4"]
 }`
       }],
       response_format: { type: "json_object" },
