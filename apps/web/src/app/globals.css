@@ -100,3 +100,87 @@
     border-top: 1px solid rgba(139,92,246,0.2);
   }
 }
+
+/* ── Animations ─────────────────────────────────────────────────────────────── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+@keyframes pulse-ring {
+  0%   { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+@keyframes typing-dot {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30%            { transform: translateY(-6px); opacity: 1; }
+}
+@keyframes wave {
+  0%, 100% { transform: scaleY(0.4); }
+  50%       { transform: scaleY(1); }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-6px); }
+}
+
+.animate-fade-in-up    { animation: fadeInUp 0.35s ease both; }
+.animate-fade-in-scale { animation: fadeInScale 0.3s ease both; }
+.animate-slide-right   { animation: slideInRight 0.3s ease both; }
+.animate-slide-left    { animation: slideInLeft 0.3s ease both; }
+.animate-float         { animation: float 3s ease-in-out infinite; }
+
+/* AI typing indicator */
+.ai-typing-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #8b5cf6;
+  animation: typing-dot 1.2s ease-in-out infinite;
+}
+.ai-typing-dot:nth-child(2) { animation-delay: 0.2s; background: #a78bfa; }
+.ai-typing-dot:nth-child(3) { animation-delay: 0.4s; background: #c4b5fd; }
+
+/* AI loading shimmer */
+.ai-shimmer {
+  background: linear-gradient(90deg, rgba(139,92,246,0.1) 25%, rgba(139,92,246,0.25) 50%, rgba(139,92,246,0.1) 75%);
+  background-size: 200% auto;
+  animation: shimmer 1.5s linear infinite;
+}
+
+/* Voice wave bars */
+.voice-wave-bar {
+  width: 3px; border-radius: 2px;
+  background: linear-gradient(to top, #7c3aed, #c4b5fd);
+  animation: wave 0.8s ease-in-out infinite;
+}
+.voice-wave-bar:nth-child(2) { animation-delay: 0.1s; height: 16px; }
+.voice-wave-bar:nth-child(3) { animation-delay: 0.2s; height: 22px; }
+.voice-wave-bar:nth-child(4) { animation-delay: 0.3s; height: 14px; }
+.voice-wave-bar:nth-child(5) { animation-delay: 0.15s; height: 18px; }
+
+/* Message bubble entrance */
+.msg-user   { animation: slideInRight 0.28s cubic-bezier(0.34,1.56,0.64,1) both; }
+.msg-ai     { animation: slideInLeft  0.28s cubic-bezier(0.34,1.56,0.64,1) both; }
+
+/* Pulse ring for mic */
+.pulse-ring {
+  position: absolute; border-radius: 50%;
+  background: rgba(239,68,68,0.3);
+  animation: pulse-ring 1s ease-out infinite;
+}
+

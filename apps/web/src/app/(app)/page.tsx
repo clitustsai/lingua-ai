@@ -5,7 +5,7 @@ import ChatMessage from "@/components/ChatMessage";
 import { speakText } from "@/components/VoiceButton";
 import PronunciationScore from "@/components/PronunciationScore";
 import WordOfDay from "@/components/WordOfDay";
-import { Trash2, Plus, Mic, MicOff, Send, Keyboard, Save, ChevronDown, X } from "lucide-react";
+import { Trash2, Plus, Mic, Send, Save, ChevronDown } from "lucide-react";
 import { CHAT_SCENARIOS } from "@ai-lang/shared";
 import type { Message } from "@ai-lang/shared";
 import { cn } from "@/lib/utils";
@@ -26,7 +26,6 @@ export default function ChatPage() {
   const [newWords, setNewWords] = useState<string[]>([]);
   const [lastVoice, setLastVoice] = useState<{ transcript: string; confidence: number } | null>(null);
   const [isListening, setIsListening] = useState(false);
-  const [volume, setVolume] = useState(0);
   const [showKeyboard, setShowKeyboard] = useState(true);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [scenario, setScenario] = useState(CHAT_SCENARIOS[0]);
@@ -53,7 +52,6 @@ export default function ChatPage() {
     streamRef.current?.getTracks().forEach((t: MediaStreamTrack) => t.stop());
     streamRef.current = null;
     setIsListening(false);
-    setVolume(0);
   }, []);
 
   const startListening = useCallback(async () => {
@@ -68,13 +66,9 @@ export default function ChatPage() {
       analyser.fftSize = 256;
       ctx.createMediaStreamSource(stream).connect(analyser);
       const tick = () => {
-        const d = new Uint8Array(analyser.frequencyBinCount);
-        analyser.getByteFrequencyData(d);
-        setVolume(d.reduce((a: number, b: number) => a + b, 0) / d.length);
         animRef.current = requestAnimationFrame(tick);
       };
-      tick();
-    } catch { /* mic denied */ }
+      tick();    } catch { /* mic denied */ }
     const rec = new SR();
     rec.lang = LANG_MAP[settingsRef.current.targetLanguage.code] ?? "en-US";
     rec.interimResults = false;
@@ -184,7 +178,7 @@ export default function ChatPage() {
     inputRef.current?.focus();
   };
 
-  const ringScale = isListening ? 1 + (volume / 255) * 1.2 : 1;
+  const ringScale = isListening ? 1 : 1;
 
   return (
     <div className="flex flex-col h-screen" style={{ background: "#0f0a1e" }}>
@@ -274,12 +268,18 @@ export default function ChatPage() {
         )}
 
         {isLoading && (
-          <div className="flex gap-3 mb-3">
-            <div className="w-8 h-8 rounded-full bg-accent-600 flex items-center justify-center text-xs font-bold shrink-0">AI</div>
-            <div className="rounded-2xl rounded-tl-sm px-4 py-3 flex gap-1 items-center" style={{ background: "rgba(26,16,53,0.8)" }}>
-              <span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce [animation-delay:0ms]" />
-              <span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce [animation-delay:150ms]" />
-              <span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce [animation-delay:300ms]" />
+          <div className="flex gap-2.5 mb-4 msg-ai">
+            <div className="w-8 h-8 rounded-2xl bg-gradient-to-br from-accent-500 to-purple-700 flex items-center justify-center text-xs font-bold shrink-0 shadow-lg">
+              🤖
+            </div>
+            <div className="rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-3"
+              style={{ background: "rgba(30,20,60,0.9)", border: "1px solid rgba(139,92,246,0.2)" }}>
+              <div className="flex gap-1.5 items-end h-6">
+                <div className="ai-typing-dot" />
+                <div className="ai-typing-dot" />
+                <div className="ai-typing-dot" />
+              </div>
+              <span className="text-xs text-gray-500 ai-shimmer px-2 py-0.5 rounded-lg">AI đang soạn...</span>
             </div>
           </div>
         )}
@@ -323,10 +323,8 @@ export default function ChatPage() {
           <div className="relative flex items-center justify-center shrink-0" style={{ width: 48, height: 48 }}>
             {isListening && (
               <>
-                <div className="absolute rounded-full bg-red-500/20 transition-all duration-100"
-                  style={{ width: 40 * ringScale, height: 40 * ringScale }} />
-                <div className="absolute rounded-full bg-red-500/10 transition-all duration-150"
-                  style={{ width: 52 * ringScale, height: 52 * ringScale }} />
+                <div className="pulse-ring" style={{ width: 44, height: 44 }} />
+                <div className="pulse-ring" style={{ width: 44, height: 44, animationDelay: "0.4s" }} />
               </>
             )}
             {isSpeaking && (
@@ -339,14 +337,22 @@ export default function ChatPage() {
                 "relative w-12 h-12 rounded-full flex items-center justify-center transition-all shadow-lg",
                 isSpeaking ? "bg-primary-600 hover:bg-primary-500"
                   : isListening ? "bg-red-600 scale-110"
-                  : "bg-primary-600 hover:bg-primary-500",
+                  : "bg-gradient-to-br from-primary-500 to-primary-700 hover:from-primary-400 hover:to-primary-600",
                 isLoading && !isSpeaking && "opacity-50 cursor-not-allowed"
               )}>
-              {isSpeaking
-                ? <div className="w-4 h-4 bg-white rounded-sm" />
-                : isListening
-                ? <MicOff className="w-5 h-5 text-white" />
-                : <Mic className="w-5 h-5 text-white" />}
+              {isListening ? (
+                <div className="flex items-end gap-0.5 h-5">
+                  <div className="voice-wave-bar" style={{ height: 10 }} />
+                  <div className="voice-wave-bar" />
+                  <div className="voice-wave-bar" />
+                  <div className="voice-wave-bar" />
+                  <div className="voice-wave-bar" style={{ height: 10 }} />
+                </div>
+              ) : isSpeaking ? (
+                <div className="w-4 h-4 bg-white rounded-sm" />
+              ) : (
+                <Mic className="w-5 h-5 text-white" />
+              )}
             </button>
           </div>
 
