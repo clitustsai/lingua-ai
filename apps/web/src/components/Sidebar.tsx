@@ -1,14 +1,15 @@
 "use client";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   MessageCircle, BookOpen, Settings, Brain, Flame,
   GraduationCap, CheckSquare, History, LayoutDashboard,
   Languages, BookMarked, Headphones, Mic2, RotateCcw,
-  Compass, Youtube, Sparkles, Camera, TrendingUp, Bookmark, Share2, Phone, Users, Wand2, Globe, Target, Video,
+  Compass, Youtube, Sparkles, Camera, TrendingUp, Bookmark, Share2, Phone, Users, Wand2, Globe, Target, Video, Sun, Moon, LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/useAppStore";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const nav = [
   { href: "/dashboard",     icon: LayoutDashboard, label: "Dashboard" },
@@ -46,11 +47,15 @@ const nav = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { streak, stats, settings, flashcards } = useAppStore();
+  const { user, theme, setTheme, logout } = useAuthStore();
   const goal = settings.dailyGoal ?? 5;
   const pct = Math.min((stats.wordsLearned / goal) * 100, 100);
   const today = new Date().toISOString().slice(0, 10);
   const dueCount = flashcards.filter(f => !f.nextReview || f.nextReview <= today).length;
+
+  const handleLogout = () => { logout(); router.push("/auth"); };
 
   return (
     <aside className="w-16 md:w-56 h-screen bg-gray-900 border-r border-gray-800 flex flex-col py-4 px-2 md:px-3 fixed left-0 top-0 z-10 overflow-y-auto">
@@ -100,6 +105,40 @@ export default function Sidebar() {
           <Flame className="w-4 h-4" />
           <span className="text-xs font-bold">{streak}</span>
         </div>
+      </div>
+
+      {/* Theme toggle + User */}
+      <div className="hidden md:flex flex-col gap-2 mt-3 px-2 pb-2 border-t border-white/5 pt-3">
+        {/* Theme toggle */}
+        <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          className="flex items-center gap-2 px-2 py-2 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors w-full">
+          {theme === "dark" ? <Sun className="w-4 h-4 shrink-0" /> : <Moon className="w-4 h-4 shrink-0" />}
+          <span className="text-sm">{theme === "dark" ? "Light mode" : "Dark mode"}</span>
+        </button>
+        {/* User info */}
+        {user && (
+          <div className="flex items-center gap-2 px-2 py-2 rounded-lg" style={{ background: "rgba(139,92,246,0.1)" }}>
+            <span className="text-xl shrink-0">{user.avatar}</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-white text-xs font-semibold truncate">{user.name}</p>
+              <p className="text-gray-500 text-xs truncate">{user.email}</p>
+            </div>
+            <button onClick={handleLogout} className="p-1 rounded text-gray-600 hover:text-red-400 transition-colors shrink-0" title="Đăng xuất">
+              <LogOut className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Mobile theme toggle */}
+      <div className="flex md:hidden justify-center pb-2 gap-2">
+        <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          className="p-2 rounded-lg text-gray-500 hover:text-white hover:bg-gray-800 transition-colors">
+          {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+        </button>
+        <button onClick={handleLogout} className="p-2 rounded-lg text-gray-500 hover:text-red-400 transition-colors">
+          <LogOut className="w-4 h-4" />
+        </button>
       </div>
     </aside>
   );

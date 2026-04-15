@@ -1,12 +1,14 @@
 "use client";
 import { useAppStore } from "@/store/useAppStore";
+import { useAuthStore } from "@/store/useAuthStore";
 import { SUPPORTED_LANGUAGES, LEVELS, CONVERSATION_TOPICS } from "@ai-lang/shared";
-import { Volume2, Mic, Target } from "lucide-react";
+import { Volume2, Mic, Target, Sun, Moon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NotificationToggle } from "@/components/NotificationManager";
 
 export default function SettingsPage() {
   const { settings, setSettings, streak, stats, flashcards, totalMessages } = useAppStore();
+  const { theme, setTheme, user } = useAuthStore();
 
   return (
     <div className="p-6 max-w-lg">
@@ -117,6 +119,20 @@ export default function SettingsPage() {
 
         {/* Toggles */}
         <div className="flex flex-col gap-3">
+          {/* Theme toggle */}
+          <div className="flex items-center justify-between bg-gray-800 rounded-xl px-4 py-3">
+            <div className="flex items-center gap-2">
+              {theme === "dark" ? <Moon className="w-4 h-4 text-primary-400" /> : <Sun className="w-4 h-4 text-yellow-400" />}
+              <div>
+                <p className="text-sm text-gray-300">Chế độ {theme === "dark" ? "tối" : "sáng"}</p>
+                <p className="text-xs text-gray-500">{theme === "dark" ? "Dark mode đang bật" : "Light mode đang bật"}</p>
+              </div>
+            </div>
+            <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className={cn("w-11 h-6 rounded-full transition-colors relative", theme === "light" ? "bg-yellow-500" : "bg-primary-600")}>
+              <span className={cn("absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform", theme === "light" ? "translate-x-5" : "translate-x-0.5")} />
+            </button>
+          </div>
           <div className="flex items-center justify-between bg-gray-800 rounded-xl px-4 py-3">
             <div className="flex items-center gap-2">
               <Volume2 className="w-4 h-4 text-gray-400" />
