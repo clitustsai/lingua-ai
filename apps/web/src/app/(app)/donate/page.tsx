@@ -169,36 +169,29 @@ export default function DonatePage() {
           {showQR && (
             <div className="mt-4 animate-fade-in-scale">
               <div className="grid grid-cols-3 gap-2">
-                {/* MoMo QR */}
-                <div className="flex flex-col items-center gap-1.5">
-                  <div className="bg-white p-1.5 rounded-xl shadow-lg w-full">
-                    <img src="/qr-momo.png" alt="QR MoMo" className="w-full rounded-lg"
-                      onError={(e) => { (e.target as HTMLImageElement).src = BANK_INFO.qrUrl(finalAmount, note); }}
-                    />
+                {[
+                  { src: `https://img.vietqr.io/image/MOMO-${BANK_INFO.accountNumber}-compact2.png?accountName=THAI+TUAN+KIET`, label: "MoMo", color: "#ae00ff", acct: BANK_INFO.accountNumber },
+                  { src: `https://img.vietqr.io/image/ZALOPAY-${BANK_INFO.accountNumber}-compact2.png?accountName=THAI+TUAN+KIET`, label: "ZaloPay", color: "#0068ff", acct: BANK_INFO.accountNumber },
+                  { src: `https://img.vietqr.io/image/ACB-${BANK_INFO.acbNumber}-compact2.png?accountName=THAI+TUAN+KIET`, label: "ACB", color: "#0066cc", acct: BANK_INFO.acbNumber },
+                ].map(q => (
+                  <div key={q.label} className="flex flex-col items-center gap-1.5">
+                    <div className="bg-white p-1.5 rounded-xl w-full">
+                      <img src={q.src} alt={q.label} className="w-full rounded-lg"
+                        onError={e => {
+                          const img = e.target as HTMLImageElement;
+                          img.style.display = "none";
+                          const fb = img.parentElement?.querySelector(".qr-fb") as HTMLElement;
+                          if (fb) fb.style.display = "flex";
+                        }}
+                      />
+                      <div className="qr-fb" style={{ display: "none", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 76, gap: 4 }}>
+                        <span className="text-xl font-black" style={{ color: q.color }}>{q.label[0]}</span>
+                        <span className="text-xs text-gray-500">{q.acct}</span>
+                      </div>
+                    </div>
+                    <p className="text-xs font-bold" style={{ color: q.color }}>{q.label}</p>
                   </div>
-                  <p className="text-xs font-bold" style={{ color: "#ae00ff" }}>💜 MoMo</p>
-                  <p className="text-xs text-gray-500">0906 857 331</p>
-                </div>
-                {/* ZaloPay QR */}
-                <div className="flex flex-col items-center gap-1.5">
-                  <div className="bg-white p-1.5 rounded-xl shadow-lg w-full">
-                    <img src="/qr-zalopay.png" alt="QR ZaloPay" className="w-full rounded-lg"
-                      onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                    />
-                  </div>
-                  <p className="text-xs font-bold" style={{ color: "#0068ff" }}>💙 ZaloPay</p>
-                  <p className="text-xs text-gray-500">0906 857 331</p>
-                </div>
-                {/* ACB QR */}
-                <div className="flex flex-col items-center gap-1.5">
-                  <div className="bg-white p-1.5 rounded-xl shadow-lg w-full">
-                    <img src="/qr-acb.png" alt="QR ACB" className="w-full rounded-lg"
-                      onError={(e) => { (e.target as HTMLImageElement).src = BANK_INFO.qrUrl(finalAmount, note); }}
-                    />
-                  </div>
-                  <p className="text-xs font-bold" style={{ color: "#0066cc" }}>🏦 ACB</p>
-                  <p className="text-xs text-gray-500">26996867</p>
-                </div>
+                ))}
               </div>
               <p className="text-xs text-gray-500 text-center mt-2">Quét bằng MoMo, ZaloPay, ACB hoặc app ngân hàng bất kỳ</p>
             </div>
