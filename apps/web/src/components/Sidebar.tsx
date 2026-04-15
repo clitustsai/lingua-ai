@@ -5,7 +5,7 @@ import {
   MessageCircle, BookOpen, Settings, Brain, Flame,
   GraduationCap, CheckSquare, History, LayoutDashboard,
   Languages, BookMarked, Headphones, Mic2, RotateCcw,
-  Compass, Youtube, Sparkles, Camera, TrendingUp, Bookmark, Share2, Phone, Users, Wand2, Globe, Target, Video, Sun, Moon, LogOut,
+  Compass, Youtube, Sparkles, Camera, TrendingUp, Bookmark, Share2, Phone, Users, Wand2, Globe, Target, Video, Sun, Moon, LogOut, DollarSign,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/useAppStore";
@@ -41,6 +41,7 @@ const nav = [
   { href: "/grammar",       icon: CheckSquare,     label: "Grammar" },
   { href: "/translate",     icon: Languages,       label: "Translate" },
   { href: "/share",         icon: Share2,          label: "Chia sẻ" },
+  { href: "/affiliate",     icon: DollarSign,      label: "Affiliate" },
   { href: "/history",       icon: History,         label: "History" },
   { href: "/settings",      icon: Settings,        label: "Settings" },
 ];
@@ -130,8 +131,13 @@ export default function Sidebar() {
         )}
       </div>
 
-      {/* Mobile theme toggle */}
-      <div className="flex md:hidden justify-center pb-2 gap-2">
+      {/* Mobile: avatar + theme + logout */}
+      <div className="flex md:hidden flex-col items-center pb-2 gap-2">
+        {user && (
+          <div className="w-9 h-9 rounded-xl bg-primary-600/30 flex items-center justify-center text-xl" title={user.name}>
+            {user.avatar}
+          </div>
+        )}
         <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
           className="p-2 rounded-lg text-gray-500 hover:text-white hover:bg-gray-800 transition-colors">
           {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
