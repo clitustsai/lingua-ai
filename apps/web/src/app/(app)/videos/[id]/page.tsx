@@ -84,37 +84,25 @@ export default function VideoDetailPage() {
 
       {/* Video card — opens YouTube instead of broken embed */}
       <div className="mx-4 mb-0">
-        <a href={`https://www.youtube.com/watch?v=${video.youtubeId}`}
-          target="_blank" rel="noopener noreferrer"
-          className="block relative aspect-video rounded-2xl overflow-hidden group cursor-pointer"
+        <div className="relative aspect-video rounded-2xl overflow-hidden group"
           style={{ background: `linear-gradient(135deg, #1a0533 0%, #0f0a1e 100%)` }}>
-          {/* Gradient bg based on category */}
-          <div className="absolute inset-0 opacity-30"
-            style={{
-              background: video.category === "grammar" ? "radial-gradient(circle at 30% 50%, #eab308 0%, transparent 60%)"
-                : video.category === "conversation" ? "radial-gradient(circle at 30% 50%, #3b82f6 0%, transparent 60%)"
-                : video.category === "vocabulary" ? "radial-gradient(circle at 30% 50%, #8b5cf6 0%, transparent 60%)"
-                : video.category === "pronunciation" ? "radial-gradient(circle at 30% 50%, #ec4899 0%, transparent 60%)"
-                : "radial-gradient(circle at 30% 50%, #10b981 0%, transparent 60%)"
-            }} />
-          {/* Center content */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-            <div className="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform">
-              <svg className="w-7 h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M8 5v14l11-7z"/>
-              </svg>
-            </div>
-            <div className="text-center px-4">
-              <p className="text-white font-semibold text-sm">{video.title}</p>
-              <p className="text-gray-400 text-xs mt-1">Click to watch on YouTube</p>
-            </div>
+          {/* Try nocookie embed first */}
+          <iframe
+            className="absolute inset-0 w-full h-full"
+            src={`https://www.youtube-nocookie.com/embed/${video.youtubeId}?rel=0&modestbranding=1`}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          />
+          {/* Overlay with YouTube button — always visible */}
+          <div className="absolute bottom-3 right-3 z-10">
+            <a href={`https://www.youtube.com/watch?v=${video.youtubeId}`}
+              target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-1.5 bg-red-600 hover:bg-red-500 text-white text-xs px-3 py-1.5 rounded-lg font-medium transition-colors shadow-lg">
+              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+              Watch on YouTube
+            </a>
           </div>
-          {/* YouTube badge */}
-          <div className="absolute bottom-3 right-3 flex items-center gap-1.5 bg-red-600 text-white text-xs px-2.5 py-1.5 rounded-lg font-medium">
-            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-            Watch on YouTube
-          </div>
-        </a>
+        </div>
       </div>
 
       {/* Video info - giống ảnh */}
