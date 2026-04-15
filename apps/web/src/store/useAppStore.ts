@@ -48,6 +48,37 @@ type SavedPhrase = {
   savedAt: string;
 };
 
+type CommunityPost = {
+  id: string;
+  authorName: string;
+  authorFlag: string;
+  language: string;
+  level: string;
+  text: string;
+  translation?: string;
+  question: string;
+  likes: number;
+  likedByMe: boolean;
+  comments: CommunityComment[];
+  createdAt: string;
+  corrections: CommunityCorrection[];
+};
+
+type CommunityComment = {
+  id: string;
+  authorName: string;
+  text: string;
+  createdAt: string;
+};
+
+type CommunityCorrection = {
+  id: string;
+  authorName: string;
+  corrected: string;
+  explanation: string;
+  createdAt: string;
+};
+
 type StreakReward = {
   day: number;
   claimed: boolean;
@@ -94,6 +125,7 @@ type AppStore = {
   notificationsEnabled: boolean;
   username: string;
   lastStreakDate: string;
+  communityPosts: CommunityPost[];
 
   setSettings: (s: Partial<UserSettings>) => void;
   addMessage: (m: Message) => void;
@@ -126,6 +158,10 @@ type AppStore = {
   setNotifications: (enabled: boolean) => void;
   claimStreakReward: (day: number) => void;
   setUsername: (name: string) => void;
+  addCommunityPost: (post: CommunityPost) => void;
+  likePost: (id: string) => void;
+  addComment: (postId: string, comment: CommunityComment) => void;
+  addCorrection: (postId: string, correction: CommunityCorrection) => void;
 };
 
 function todayStr() { return new Date().toISOString().slice(0, 10); }
@@ -175,6 +211,7 @@ export const useAppStore = create<AppStore>()(
       notificationsEnabled: false,
       username: "",
       lastStreakDate: "",
+      communityPosts: [],
       streakRewards: [
         { day: 1,  xp: 10,  emoji: "🌱", claimed: false },
         { day: 3,  xp: 25,  emoji: "🔥", claimed: false },
@@ -352,6 +389,25 @@ export const useAppStore = create<AppStore>()(
       }),
 
       setUsername: (name) => set({ username: name }),
+
+      addCommunityPost: (post) => set((state) => ({
+        communityPosts: [post, ...state.communityPosts].slice(0, 100),
+      })),
+      likePost: (id) => set((state) => ({
+        communityPosts: state.communityPosts.map(p =>
+          p.id === id ? { ...p, likes: p.likedByMe ? p.likes - 1 : p.likes + 1, likedByMe: !p.likedByMe } : p
+        ),
+      })),
+      addComment: (postId, comment) => set((state) => ({
+        communityPosts: state.communityPosts.map(p =>
+          p.id === postId ? { ...p, comments: [...p.comments, comment] } : p
+        ),
+      })),
+      addCorrection: (postId, correction) => set((state) => ({
+        communityPosts: state.communityPosts.map(p =>
+          p.id === postId ? { ...p, corrections: [...p.corrections, correction] } : p
+        ),
+      })),
     }),
     { name: "ai-lang-store-v2" }
   )
