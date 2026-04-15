@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { VIDEO_LESSONS, CATEGORIES } from "@/lib/videoLessons";
-import { Play, Clock, Search, X } from "lucide-react";
+import { Play, Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 function formatDuration(sec: number) {
@@ -26,12 +26,17 @@ const LEVEL_COLOR: Record<string, string> = {
   "A1-B1": "bg-green-900/40 text-green-300",
 };
 
-const CAT_COLOR: Record<string, string> = {
-  grammar:      "bg-yellow-900/30 text-yellow-300",
-  conversation: "bg-blue-900/30 text-blue-300",
-  vocabulary:   "bg-purple-900/30 text-purple-300",
-  pronunciation:"bg-pink-900/30 text-pink-300",
-  listening:    "bg-green-900/30 text-green-300",
+const CAT_GRADIENT: Record<string, string> = {
+  grammar:      "from-yellow-900/60 to-yellow-800/30",
+  conversation: "from-blue-900/60 to-blue-800/30",
+  vocabulary:   "from-purple-900/60 to-purple-800/30",
+  pronunciation:"from-pink-900/60 to-pink-800/30",
+  listening:    "from-green-900/60 to-green-800/30",
+};
+
+const CAT_ICON: Record<string, string> = {
+  grammar: "📐", conversation: "💬", vocabulary: "📚",
+  pronunciation: "🎤", listening: "🎧",
 };
 
 export default function VideosPage() {
@@ -86,29 +91,25 @@ export default function VideosPage() {
           <button key={v.id} onClick={() => router.push(`/videos/${v.id}`)}
             className="text-left rounded-2xl overflow-hidden transition-all hover:scale-[1.02] hover:shadow-2xl group"
             style={{ background: "rgba(26,16,53,0.8)", border: "1px solid rgba(139,92,246,0.15)" }}>
-            {/* Thumbnail */}
-            <div className="relative aspect-video bg-gray-900 overflow-hidden">
-              <img
-                src={`https://i.ytimg.com/vi/${v.youtubeId}/hqdefault.jpg`}
-                alt={v.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${v.youtubeId}/0.jpg`;
-                }}
-              />
-              {/* Play overlay */}
-              <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
-                  <Play className="w-5 h-5 text-gray-900 ml-0.5" />
+            {/* Thumbnail — CSS gradient, no external image needed */}
+            <div className={cn("relative aspect-video overflow-hidden bg-gradient-to-br", CAT_GRADIENT[v.category] ?? "from-gray-900 to-gray-800")}>
+              {/* Background pattern */}
+              <div className="absolute inset-0 opacity-10"
+                style={{ backgroundImage: "radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)", backgroundSize: "30px 30px" }} />
+              {/* Center icon */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+                <span className="text-4xl opacity-60 group-hover:opacity-90 group-hover:scale-110 transition-all duration-300">{CAT_ICON[v.category]}</span>
+                <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/30 transition-colors">
+                  <Play className="w-4 h-4 text-white ml-0.5" />
                 </div>
               </div>
               {/* Duration */}
-              <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-1.5 py-0.5 rounded font-mono">
+              <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded font-mono">
                 {formatDuration(v.durationSec)}
               </div>
               {/* Category badge */}
-              <div className={cn("absolute top-2 left-2 text-xs px-2 py-0.5 rounded-full font-medium", CAT_COLOR[v.category])}>
-                {CATEGORIES.find(c => c.id === v.category)?.emoji} {v.category}
+              <div className="absolute top-2 left-2 text-xs px-2 py-0.5 rounded-full font-medium bg-black/40 text-white backdrop-blur-sm">
+                {CAT_ICON[v.category]} {v.category}
               </div>
             </div>
 
