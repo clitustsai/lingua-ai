@@ -2,19 +2,127 @@
 import { useAppStore } from "@/store/useAppStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { SUPPORTED_LANGUAGES, LEVELS, CONVERSATION_TOPICS } from "@ai-lang/shared";
-import { Volume2, Mic, Target, Sun, Moon } from "lucide-react";
+import { Volume2, Target, Sun, Moon, Camera, Check, X, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NotificationToggle } from "@/components/NotificationManager";
+import { useState, useRef } from "react";
+
+const AVATARS = ["🦊","🐼","🦁","🐯","🦋","🐸","🦄","🐙","🦅","🐬","🌟","🎭","🐺","🦝","🐨","🦜","🐲","🧸","🎃","🤖","👾","🎯"];
 
 export default function SettingsPage() {
   const { settings, setSettings, streak, stats, flashcards, totalMessages } = useAppStore();
-  const { theme, setTheme, user } = useAuthStore();
+  const { theme, setTheme, user, updateProfile } = useAuthStore();
+
+  const [editingName, setEditingName] = useState(false);
+  const [editingNick, setEditingNick] = useState(false);
+  const [nameVal, setNameVal] = useState(user?.name ?? "");
+  const [nickVal, setNickVal] = useState((user as any)?.nickname ?? "");
+  const [showAvatarPicker, setShowAvatarPicker] = useState(false);
+
+  const saveName = () => {
+    if (nameVal.trim()) updateProfile({ name: nameVal.trim() });
+    setEditingName(false);
+  };
+  const saveNick = () => {
+    if (nickVal.trim()) updateProfile({ nickname: nickVal.trim() } as any);
+    setEditingNick(false);
+  };
 
   return (
     <div className="p-6 max-w-lg">
       <h1 className="text-xl font-bold text-white mb-6">Settings</h1>
 
       <div className="flex flex-col gap-6">
+
+        {/* ── PROFILE ── */}
+        {user && (
+          <div className="rounded-2xl p-4" style={{ background: "rgba(26,16,53,0.8)", border: "1px solid rgba(139,92,246,0.25)" }}>
+            <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-3">Hồ sơ</p>
+
+            {/* Avatar picker */}
+            <div className="flex items-center gap-4 mb-4">
+              <div className="relative">
+                <div className="w-16 h-16 rounded-2xl bg-primary-600/30 flex items-center justify-center text-4xl cursor-pointer hover:bg-primary-600/50 transition-colors"
+                  style={{ border: "1px solid rgba(139,92,246,0.4)" }}
+                  onClick={() => setShowAvatarPicker(!showAvatarPicker)}>
+                  {user.avatar}
+                </div>
+                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-primary-600 rounded-full flex items-center justify-center cursor-pointer"
+                  onClick={() => setShowAvatarPicker(!showAvatarPicker)}>
+                  <Camera className="w-3 h-3 text-white" />
+                </div>
+              </div>
+              <div className="flex-1">
+                <p className="text-white font-semibold">{user.name}</p>
+                {(user as any).nickname && <p className="text-primary-400 text-sm">@{(user as any).nickname}</p>}
+                <p className="text-gray-500 text-xs">{user.email}</p>
+              </div>
+            </div>
+
+            {/* Avatar grid */}
+            {showAvatarPicker && (
+              <div className="grid grid-cols-11 gap-1.5 mb-4 p-3 rounded-xl" style={{ background: "rgba(15,10,30,0.6)" }}>
+                {AVATARS.map(a => (
+                  <button key={a} onClick={() => { updateProfile({ avatar: a }); setShowAvatarPicker(false); }}
+                    className={cn("text-2xl w-9 h-9 rounded-lg flex items-center justify-center transition-colors hover:bg-primary-600/30",
+                      user.avatar === a ? "bg-primary-600/50 ring-1 ring-primary-400" : "")}>
+                    {a}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Name */}
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-xs text-gray-500 w-16 shrink-0">Tên</span>
+              {editingName ? (
+                <div className="flex-1 flex gap-2">
+                  <input value={nameVal} onChange={e => setNameVal(e.target.value)}
+                    className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-primary-500"
+                    onKeyDown={e => e.key === "Enter" && saveName()}
+                    autoFocus
+                  />
+                  <button onClick={saveName} className="p-1.5 rounded-lg bg-primary-600/30 text-primary-300 hover:bg-primary-600/50"><Check className="w-3.5 h-3.5" /></button>
+                  <button onClick={() => setEditingName(false)} className="p-1.5 rounded-lg bg-gray-800 text-gray-500 hover:text-gray-300"><X className="w-3.5 h-3.5" /></button>
+                </div>
+              ) : (
+                <div className="flex-1 flex items-center justify-between">
+                  <span className="text-white text-sm">{user.name}</span>
+                  <button onClick={() => { setNameVal(user.name); setEditingName(true); }}
+                    className="p-1.5 rounded-lg text-gray-600 hover:text-gray-300 hover:bg-gray-800 transition-colors">
+                    <Pencil className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Nickname */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-500 w-16 shrink-0">Nickname</span>
+              {editingNick ? (
+                <div className="flex-1 flex gap-2">
+                  <input value={nickVal} onChange={e => setNickVal(e.target.value)}
+                    placeholder="@nickname"
+                    className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-primary-500"
+                    onKeyDown={e => e.key === "Enter" && saveNick()}
+                    autoFocus
+                  />
+                  <button onClick={saveNick} className="p-1.5 rounded-lg bg-primary-600/30 text-primary-300 hover:bg-primary-600/50"><Check className="w-3.5 h-3.5" /></button>
+                  <button onClick={() => setEditingNick(false)} className="p-1.5 rounded-lg bg-gray-800 text-gray-500 hover:text-gray-300"><X className="w-3.5 h-3.5" /></button>
+                </div>
+              ) : (
+                <div className="flex-1 flex items-center justify-between">
+                  <span className="text-sm">{(user as any).nickname ? <span className="text-primary-400">@{(user as any).nickname}</span> : <span className="text-gray-600">Chưa đặt</span>}</span>
+                  <button onClick={() => { setNickVal((user as any).nickname ?? ""); setEditingNick(true); }}
+                    className="p-1.5 rounded-lg text-gray-600 hover:text-gray-300 hover:bg-gray-800 transition-colors">
+                    <Pencil className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Stats */}
         <div className="grid grid-cols-3 gap-3">
           <div className="bg-gray-800 rounded-xl p-3 text-center">

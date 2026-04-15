@@ -1,6 +1,6 @@
 "use client";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { VIDEO_LESSONS } from "@/lib/videoLessons";
 import { useAppStore } from "@/store/useAppStore";
 import { ArrowLeft, Loader2, Volume2, Plus, CheckCircle2, XCircle, ChevronRight } from "lucide-react";
@@ -23,27 +23,9 @@ export default function VideoDetailPage() {
   const [quizChecked, setQuizChecked] = useState(false);
   const [savedWords, setSavedWords] = useState<Set<string>>(new Set());
   const [completed, setCompleted] = useState(false);
-  const playerRef = useRef<any>(null);
 
   useEffect(() => {
     if (!video) return;
-    // Load YouTube player
-    const tag = document.createElement("script");
-    tag.src = "https://www.youtube.com/iframe_api";
-    if (!document.getElementById("yt-api")) { tag.id = "yt-api"; document.head.appendChild(tag); }
-    (window as any).onYouTubeIframeAPIReady = () => {
-      playerRef.current = new (window as any).YT.Player("yt-player-detail", {
-        videoId: video.youtubeId,
-        playerVars: { rel: 0, modestbranding: 1 },
-      });
-    };
-    if ((window as any).YT?.Player) {
-      playerRef.current = new (window as any).YT.Player("yt-player-detail", {
-        videoId: video.youtubeId,
-        playerVars: { rel: 0, modestbranding: 1 },
-      });
-    }
-    // Generate lesson content
     generateLesson();
   }, [id]);
 
@@ -102,7 +84,13 @@ export default function VideoDetailPage() {
 
       {/* YouTube Player */}
       <div className="aspect-video bg-black">
-        <div id="yt-player-detail" className="w-full h-full" />
+        <iframe
+          id="yt-player-detail"
+          className="w-full h-full"
+          src={`https://www.youtube.com/embed/${video.youtubeId}?rel=0&modestbranding=1`}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        />
       </div>
 
       {/* Video info - giống ảnh */}
