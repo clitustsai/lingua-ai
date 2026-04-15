@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import AppInit from "@/components/AppInit";
+import { GlobalErrorHandler } from "@/components/ErrorBoundary";
 
 export const metadata: Metadata = {
   title: "LinguaAI - Learn Languages with AI",
@@ -11,7 +12,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
-        <AppInit>{children}</AppInit>
+        <AppInit>
+          <GlobalErrorHandler />
+          {children}
+        </AppInit>
       </body>
     </html>
   );
