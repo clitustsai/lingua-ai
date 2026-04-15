@@ -4,14 +4,15 @@ import { Heart, Copy, Check, ExternalLink, Coffee, Zap, Star, Crown, Rocket, Gif
 import { useAuthStore } from "@/store/useAuthStore";
 import { cn } from "@/lib/utils";
 
-// Thay bằng thông tin tài khoản thật của bạn
+// Thông tin thanh toán thật
 const BANK_INFO = {
-  bankName: "MBBank",
-  accountNumber: "0123456789",
-  accountName: "NGUYEN VAN A",
-  // QR VietQR format
+  bankName: "MoMo",
+  accountNumber: "0906857331",
+  accountName: "THAI TUAN KIET",
+  qrMomo: "/qr-momo.png",
+  qrZalopay: "/qr-zalopay.png",
   qrUrl: (amount: number, note: string) =>
-    `https://img.vietqr.io/image/MB-0123456789-compact2.png?amount=${amount}&addInfo=${encodeURIComponent(note)}&accountName=NGUYEN%20VAN%20A`,
+    `https://img.vietqr.io/image/MB-0906857331-compact2.png?amount=${amount}&addInfo=${encodeURIComponent(note)}&accountName=THAI%20TUAN%20KIET`,
 };
 
 const TIERS = [
@@ -140,8 +141,8 @@ export default function DonatePage() {
           <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-3">Chuyển khoản ngân hàng</p>
           <div className="flex flex-col gap-2">
             {[
-              { label: "Ngân hàng", value: BANK_INFO.bankName },
-              { label: "Số tài khoản", value: BANK_INFO.accountNumber, copyId: "acc" },
+              { label: "Ví / Ngân hàng", value: "MoMo · ZaloPay" },
+              { label: "Số điện thoại", value: BANK_INFO.accountNumber, copyId: "acc" },
               { label: "Chủ tài khoản", value: BANK_INFO.accountName },
               { label: "Số tiền", value: `${finalAmount.toLocaleString("vi-VN")} VND`, copyId: "amount" },
               { label: "Nội dung CK", value: note, copyId: "note" },
@@ -156,30 +157,45 @@ export default function DonatePage() {
             ))}
           </div>
 
-          {/* QR Code */}
+          {/* QR Code — 2 ảnh thật */}
           <button onClick={() => setShowQR(!showQR)}
             className="w-full mt-4 py-2.5 rounded-xl text-sm font-medium transition-colors border border-primary-500/40 text-primary-300 hover:bg-primary-900/20">
             {showQR ? "Ẩn QR" : "Hiện QR Code"}
           </button>
 
-          {showQR && finalAmount >= 10000 && (
-            <div className="mt-3 flex flex-col items-center gap-2 animate-fade-in-scale">
-              <div className="bg-white p-3 rounded-2xl">
-                <img
-                  src={BANK_INFO.qrUrl(finalAmount, note)}
-                  alt="QR chuyển khoản"
-                  className="w-48 h-48 object-contain"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = "none";
-                    (e.target as HTMLImageElement).nextElementSibling?.classList.remove("hidden");
-                  }}
-                />
-                <div className="hidden text-center p-4">
-                  <p className="text-gray-500 text-xs">QR không load được</p>
-                  <p className="text-gray-400 text-xs mt-1">Vui lòng chuyển khoản thủ công</p>
+          {showQR && (
+            <div className="mt-4 animate-fade-in-scale">
+              <div className="grid grid-cols-2 gap-3">
+                {/* MoMo QR */}
+                <div className="flex flex-col items-center gap-2">
+                  <div className="bg-white p-2 rounded-2xl shadow-lg">
+                    <img src="/qr-momo.png" alt="QR MoMo" className="w-full rounded-xl"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = `https://img.vietqr.io/image/MB-0906857331-compact2.png?amount=${finalAmount}&addInfo=${encodeURIComponent(note)}&accountName=THAI%20TUAN%20KIET`;
+                      }}
+                    />
+                  </div>
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold"
+                    style={{ background: "rgba(174,0,255,0.15)", color: "#ae00ff" }}>
+                    <span>💜</span> MoMo
+                  </div>
+                </div>
+                {/* ZaloPay QR */}
+                <div className="flex flex-col items-center gap-2">
+                  <div className="bg-white p-2 rounded-2xl shadow-lg">
+                    <img src="/qr-zalopay.png" alt="QR ZaloPay" className="w-full rounded-xl"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = "none";
+                      }}
+                    />
+                  </div>
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold"
+                    style={{ background: "rgba(0,104,255,0.15)", color: "#0068ff" }}>
+                    <span>💙</span> ZaloPay
+                  </div>
                 </div>
               </div>
-              <p className="text-xs text-gray-500">Quét bằng app ngân hàng bất kỳ</p>
+              <p className="text-xs text-gray-500 text-center mt-2">Quét bằng MoMo, ZaloPay hoặc app ngân hàng bất kỳ</p>
             </div>
           )}
         </div>
@@ -194,11 +210,11 @@ export default function DonatePage() {
               </div>
               <div>
                 <p className="text-white font-medium text-sm">MoMo</p>
-                <p className="text-gray-500 text-xs">0123 456 789 · {BANK_INFO.accountName}</p>
+                <p className="text-gray-500 text-xs">0906 857 331 · THAI TUAN KIET</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <CopyBtn text="0123456789" id="momo" />
+              <CopyBtn text="0906857331" id="momo" />
               <a href="https://me.momo.vn/linguaai" target="_blank" rel="noopener noreferrer"
                 className="p-1.5 rounded-lg text-gray-500 hover:text-primary-400 transition-colors">
                 <ExternalLink className="w-3.5 h-3.5" />
