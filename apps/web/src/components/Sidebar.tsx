@@ -119,7 +119,12 @@ export default function Sidebar() {
         {/* User info */}
         {user && (
           <div className="flex items-center gap-2 px-2 py-2 rounded-lg" style={{ background: "rgba(139,92,246,0.1)" }}>
-            <span className="text-xl shrink-0">{user.avatar}</span>
+            <div className="w-8 h-8 rounded-xl overflow-hidden bg-primary-600/30 flex items-center justify-center shrink-0">
+              {user.avatar?.startsWith("http")
+                ? <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                : <span className="text-xl">{user.avatar}</span>
+              }
+            </div>
             <div className="flex-1 min-w-0">
               <p className="text-white text-xs font-semibold truncate">{user.name}</p>
               <p className="text-gray-500 text-xs truncate">{user.email}</p>
@@ -134,8 +139,11 @@ export default function Sidebar() {
       {/* Mobile: avatar + theme + logout */}
       <div className="flex md:hidden flex-col items-center pb-2 gap-2">
         {user && (
-          <div className="w-9 h-9 rounded-xl bg-primary-600/30 flex items-center justify-center text-xl" title={user.name}>
-            {user.avatar}
+          <div className="w-9 h-9 rounded-xl overflow-hidden bg-primary-600/30 flex items-center justify-center" title={user.name}>
+            {user.avatar?.startsWith("http")
+              ? <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+              : <span className="text-xl">{user.avatar}</span>
+            }
           </div>
         )}
         <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}

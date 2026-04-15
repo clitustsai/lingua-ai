@@ -5,7 +5,8 @@ export type AuthUser = {
   id: string;
   name: string;
   email: string;
-  avatar: string; // emoji
+  avatar: string; // emoji or URL
+  nickname?: string;
   createdAt: string;
 };
 

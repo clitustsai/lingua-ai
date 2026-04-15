@@ -16,7 +16,7 @@ export default function SettingsPage() {
   const [editingName, setEditingName] = useState(false);
   const [editingNick, setEditingNick] = useState(false);
   const [nameVal, setNameVal] = useState(user?.name ?? "");
-  const [nickVal, setNickVal] = useState((user as any)?.nickname ?? "");
+  const [nickVal, setNickVal] = useState(user?.nickname ?? "");
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
 
   const saveName = () => {
@@ -24,9 +24,12 @@ export default function SettingsPage() {
     setEditingName(false);
   };
   const saveNick = () => {
-    if (nickVal.trim()) updateProfile({ nickname: nickVal.trim() } as any);
+    updateProfile({ nickname: nickVal.trim() || undefined });
     setEditingNick(false);
   };
+
+  // avatar là emoji hay URL ảnh
+  const isAvatarUrl = user?.avatar?.startsWith("http");
 
   return (
     <div className="p-6 max-w-lg">
@@ -42,10 +45,13 @@ export default function SettingsPage() {
             {/* Avatar picker */}
             <div className="flex items-center gap-4 mb-4">
               <div className="relative">
-                <div className="w-16 h-16 rounded-2xl bg-primary-600/30 flex items-center justify-center text-4xl cursor-pointer hover:bg-primary-600/50 transition-colors"
+                <div className="w-16 h-16 rounded-2xl bg-primary-600/30 flex items-center justify-center overflow-hidden cursor-pointer hover:opacity-80 transition-opacity"
                   style={{ border: "1px solid rgba(139,92,246,0.4)" }}
                   onClick={() => setShowAvatarPicker(!showAvatarPicker)}>
-                  {user.avatar}
+                  {isAvatarUrl
+                    ? <img src={user.avatar} alt="avatar" className="w-full h-full object-cover" />
+                    : <span className="text-4xl">{user.avatar}</span>
+                  }
                 </div>
                 <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-primary-600 rounded-full flex items-center justify-center cursor-pointer"
                   onClick={() => setShowAvatarPicker(!showAvatarPicker)}>
@@ -54,7 +60,7 @@ export default function SettingsPage() {
               </div>
               <div className="flex-1">
                 <p className="text-white font-semibold">{user.name}</p>
-                {(user as any).nickname && <p className="text-primary-400 text-sm">@{(user as any).nickname}</p>}
+                {user.nickname && <p className="text-primary-400 text-sm">@{user.nickname}</p>}
                 <p className="text-gray-500 text-xs">{user.email}</p>
               </div>
             </div>
@@ -112,8 +118,8 @@ export default function SettingsPage() {
                 </div>
               ) : (
                 <div className="flex-1 flex items-center justify-between">
-                  <span className="text-sm">{(user as any).nickname ? <span className="text-primary-400">@{(user as any).nickname}</span> : <span className="text-gray-600">Chưa đặt</span>}</span>
-                  <button onClick={() => { setNickVal((user as any).nickname ?? ""); setEditingNick(true); }}
+                  <span className="text-sm">{user.nickname ? <span className="text-primary-400">@{user.nickname}</span> : <span className="text-gray-600">Chưa đặt</span>}</span>
+                  <button onClick={() => { setNickVal(user.nickname ?? ""); setEditingNick(true); }}
                     className="p-1.5 rounded-lg text-gray-600 hover:text-gray-300 hover:bg-gray-800 transition-colors">
                     <Pencil className="w-3.5 h-3.5" />
                   </button>
