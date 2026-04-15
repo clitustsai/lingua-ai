@@ -8,27 +8,30 @@ import NotificationManager from "@/components/NotificationManager";
 export default function AppLayoutClient({ children }: { children: React.ReactNode }) {
   const { isLoggedIn, theme } = useAuthStore();
   const router = useRouter();
-  const [checked, setChecked] = useState(false);
+  // hydrated = zustand persist đã load xong từ localStorage
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    // Apply theme
-    document.documentElement.setAttribute("data-theme", theme);
+    setHydrated(true);
+  }, []);
 
-    // Register SW
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/sw.js").catch(() => {});
+  useEffect(() => {
+    if (hydrated) {
+      document.documentElement.setAttribute("data-theme", theme);
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("/sw.js").catch(() => {});
+      }
     }
+  }, [hydrated, theme]);
 
-    // Auth check after hydration
-    if (!isLoggedIn) {
+  useEffect(() => {
+    if (hydrated && !isLoggedIn) {
       router.replace("/auth");
-    } else {
-      setChecked(true);
     }
-  }, [isLoggedIn, theme]);
+  }, [hydrated, isLoggedIn]);
 
-  // Don't render app until auth confirmed
-  if (!checked || !isLoggedIn) {
+  // Chờ hydration xong mới kiểm tra
+  if (!hydrated || !isLoggedIn) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: "#0f0a1e" }}>
         <div className="flex flex-col items-center gap-3">
