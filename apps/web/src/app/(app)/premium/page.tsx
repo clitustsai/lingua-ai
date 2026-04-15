@@ -1,0 +1,381 @@
+"use client";
+import { useState } from "react";
+import { Check, Star, Zap, Crown, Lock, Play, ChevronRight, X, ExternalLink } from "lucide-react";
+import { useAuthStore } from "@/store/useAuthStore";
+import { cn } from "@/lib/utils";
+
+const PLANS = [
+  {
+    id: "basic",
+    name: "Free",
+    price: 0,
+    period: "",
+    color: "#6b7280",
+    emoji: "🆓",
+    features: [
+      "Chat AI cơ bản (20 tin/ngày)",
+      "Flashcards không giới hạn",
+      "Video lessons (xem YouTube)",
+      "Grammar checker",
+      "Streak & achievements",
+    ],
+    locked: [],
+    cta: "Đang dùng",
+    ctaDisabled: true,
+  },
+  {
+    id: "pro",
+    name: "Pro",
+    price: 99000,
+    priceUSD: 4,
+    period: "/tháng",
+    color: "#8b5cf6",
+    emoji: "⚡",
+    popular: true,
+    features: [
+      "Chat AI không giới hạn",
+      "Video lessons nâng cao + Script AI",
+      "Quiz & Vocab từ video",
+      "AI Tutor cá nhân hóa",
+      "Pronunciation scoring",
+      "Export PDF lịch sử chat",
+      "AI Kiếm Tiền tools",
+      "Ưu tiên hỗ trợ",
+    ],
+    locked: [],
+    cta: "Mua Pro",
+    ctaDisabled: false,
+    highlight: "Phổ biến nhất",
+  },
+  {
+    id: "lifetime",
+    name: "Lifetime",
+    price: 499000,
+    priceUSD: 19,
+    period: " một lần",
+    color: "#f59e0b",
+    emoji: "👑",
+    features: [
+      "Tất cả tính năng Pro",
+      "Truy cập vĩnh viễn",
+      "Tất cả khóa học tương lai",
+      "1-on-1 AI coaching session",
+      "Badge đặc biệt trên profile",
+      "Ưu tiên tính năng mới",
+    ],
+    locked: [],
+    cta: "Mua Lifetime",
+    ctaDisabled: false,
+    badge: "Tiết kiệm nhất",
+  },
+];
+
+const COURSES = [
+  {
+    id: "c1",
+    title: "English for Work & Career",
+    emoji: "💼",
+    level: "B1-B2",
+    lessons: 24,
+    videos: 12,
+    price: 199000,
+    priceUSD: 8,
+    rating: 4.9,
+    students: 1240,
+    color: "#3b82f6",
+    topics: ["Job interviews", "Business emails", "Presentations", "Negotiations", "Office conversations"],
+    preview: "2wlKKsA1HMQ",
+    locked: true,
+  },
+  {
+    id: "c2",
+    title: "IELTS Speaking Masterclass",
+    emoji: "🎯",
+    level: "B2-C1",
+    lessons: 30,
+    videos: 15,
+    price: 299000,
+    priceUSD: 12,
+    rating: 4.8,
+    students: 890,
+    color: "#10b981",
+    topics: ["Part 1: Personal questions", "Part 2: Long turn", "Part 3: Discussion", "Pronunciation tips", "Band 7+ strategies"],
+    preview: "XMf1OkdruEY",
+    locked: true,
+  },
+  {
+    id: "c3",
+    title: "Daily English: A1 to B1",
+    emoji: "🌱",
+    level: "A1-B1",
+    lessons: 40,
+    videos: 20,
+    price: 149000,
+    priceUSD: 6,
+    rating: 4.9,
+    students: 3200,
+    color: "#8b5cf6",
+    topics: ["Greetings & introductions", "Shopping & food", "Travel & directions", "Family & relationships", "Daily routines"],
+    preview: "BNSoDln1FQ8",
+    locked: false, // free preview
+  },
+  {
+    id: "c4",
+    title: "English for TikTok & Social Media",
+    emoji: "📱",
+    level: "A2-B2",
+    lessons: 20,
+    videos: 10,
+    price: 179000,
+    priceUSD: 7,
+    rating: 4.7,
+    students: 560,
+    color: "#ec4899",
+    topics: ["Viral hooks & captions", "Trending phrases", "Comment replies", "Collab messages", "Brand English"],
+    preview: "q9aFVmzRgLg",
+    locked: true,
+  },
+];
+
+function formatVND(n: number) {
+  return n.toLocaleString("vi-VN") + "đ";
+}
+
+export default function PremiumPage() {
+  const { user } = useAuthStore();
+  const [selectedCourse, setSelectedCourse] = useState<typeof COURSES[0] | null>(null);
+  const [tab, setTab] = useState<"plans" | "courses">("plans");
+
+  const handleBuy = (item: { name?: string; title?: string; price: number; priceUSD?: number }) => {
+    const name = item.name || item.title || "";
+    // Redirect to payment — replace with your actual payment link
+    const msg = encodeURIComponent(`Mua ${name} - ${formatVND(item.price)}`);
+    window.open(`https://me.momo.vn/linguaai?message=${msg}`, "_blank");
+  };
+
+  return (
+    <div className="p-5 max-w-2xl">
+      <div className="pt-2 mb-6">
+        <h1 className="text-xl font-bold text-white flex items-center gap-2">
+          <Crown className="w-5 h-5 text-yellow-400" /> Premium & Khóa học
+        </h1>
+        <p className="text-sm text-gray-400 mt-1">Nâng cấp để học nhanh hơn, sâu hơn</p>
+      </div>
+
+      {/* Tab */}
+      <div className="flex gap-1 p-1 rounded-2xl mb-6" style={{ background: "rgba(15,10,30,0.6)" }}>
+        <button onClick={() => setTab("plans")}
+          className={cn("flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all",
+            tab === "plans" ? "bg-primary-600 text-white shadow-lg" : "text-gray-400 hover:text-gray-200")}>
+          ⚡ Gói Premium
+        </button>
+        <button onClick={() => setTab("courses")}
+          className={cn("flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all",
+            tab === "courses" ? "bg-primary-600 text-white shadow-lg" : "text-gray-400 hover:text-gray-200")}>
+          📚 Khóa học
+        </button>
+      </div>
+
+      {/* PLANS TAB */}
+      {tab === "plans" && (
+        <div className="flex flex-col gap-4">
+          {PLANS.map(plan => (
+            <div key={plan.id}
+              className={cn("rounded-2xl p-5 relative transition-all", plan.popular && "ring-2 ring-primary-500")}
+              style={{ background: "rgba(26,16,53,0.8)", border: `1px solid ${plan.color}30` }}>
+              {plan.popular && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-xs font-bold text-white"
+                  style={{ background: "linear-gradient(135deg,#7c3aed,#6366f1)" }}>
+                  ⭐ {plan.highlight}
+                </div>
+              )}
+              {plan.badge && (
+                <div className="absolute -top-3 right-4 px-3 py-1 rounded-full text-xs font-bold text-black bg-yellow-400">
+                  {plan.badge}
+                </div>
+              )}
+
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <span className="text-3xl">{plan.emoji}</span>
+                  <div>
+                    <p className="text-white font-bold text-lg">{plan.name}</p>
+                    {plan.price > 0 && (
+                      <p className="text-xs text-gray-500">~${plan.priceUSD} USD</p>
+                    )}
+                  </div>
+                </div>
+                <div className="text-right">
+                  {plan.price === 0 ? (
+                    <p className="text-2xl font-black text-gray-400">Miễn phí</p>
+                  ) : (
+                    <>
+                      <p className="text-2xl font-black text-white">{formatVND(plan.price)}</p>
+                      <p className="text-xs text-gray-500">{plan.period}</p>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2 mb-4">
+                {plan.features.map(f => (
+                  <div key={f} className="flex items-center gap-2">
+                    <Check className="w-4 h-4 shrink-0" style={{ color: plan.color }} />
+                    <span className="text-sm text-gray-300">{f}</span>
+                  </div>
+                ))}
+              </div>
+
+              <button
+                onClick={() => !plan.ctaDisabled && handleBuy(plan)}
+                disabled={plan.ctaDisabled}
+                className={cn("w-full py-3 rounded-xl font-bold text-sm transition-all",
+                  plan.ctaDisabled
+                    ? "bg-gray-800 text-gray-500 cursor-default"
+                    : "text-white hover:opacity-90 active:scale-95"
+                )}
+                style={!plan.ctaDisabled ? { background: `linear-gradient(135deg, ${plan.color}, ${plan.color}cc)` } : {}}>
+                {plan.ctaDisabled ? "✓ " + plan.cta : plan.cta + " →"}
+              </button>
+            </div>
+          ))}
+
+          {/* Guarantee */}
+          <div className="rounded-2xl p-4 text-center"
+            style={{ background: "rgba(16,185,129,0.05)", border: "1px solid rgba(16,185,129,0.2)" }}>
+            <p className="text-green-400 font-semibold text-sm">🛡️ Hoàn tiền 7 ngày nếu không hài lòng</p>
+            <p className="text-gray-500 text-xs mt-1">Liên hệ qua MoMo hoặc email để được hỗ trợ</p>
+          </div>
+        </div>
+      )}
+
+      {/* COURSES TAB */}
+      {tab === "courses" && (
+        <div className="flex flex-col gap-4">
+          {COURSES.map(course => (
+            <div key={course.id} className="rounded-2xl overflow-hidden"
+              style={{ background: "rgba(26,16,53,0.8)", border: "1px solid rgba(139,92,246,0.15)" }}>
+              {/* Video preview */}
+              <div className="relative aspect-video bg-gray-900 cursor-pointer group"
+                onClick={() => setSelectedCourse(course)}>
+                <div className={cn("absolute inset-0 bg-gradient-to-br opacity-40")}
+                  style={{ background: `linear-gradient(135deg, ${course.color}60, transparent)` }} />
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+                  <span className="text-5xl">{course.emoji}</span>
+                  <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
+                    <Play className="w-4 h-4 text-white" />
+                    <span className="text-white text-sm font-medium">Xem preview</span>
+                  </div>
+                </div>
+                {course.locked && (
+                  <div className="absolute top-3 right-3 flex items-center gap-1 bg-black/60 text-yellow-400 text-xs px-2 py-1 rounded-lg">
+                    <Lock className="w-3 h-3" /> Premium
+                  </div>
+                )}
+                {!course.locked && (
+                  <div className="absolute top-3 right-3 bg-green-600 text-white text-xs px-2 py-1 rounded-lg font-medium">
+                    Free preview
+                  </div>
+                )}
+              </div>
+
+              <div className="p-4">
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <h3 className="text-white font-bold text-base leading-tight">{course.title}</h3>
+                  <span className="text-xs bg-gray-800 text-gray-400 px-2 py-0.5 rounded-full shrink-0">{course.level}</span>
+                </div>
+
+                <div className="flex items-center gap-3 text-xs text-gray-500 mb-3">
+                  <span className="flex items-center gap-1"><Star className="w-3 h-3 text-yellow-400" />{course.rating}</span>
+                  <span>{course.students.toLocaleString()} học viên</span>
+                  <span>{course.lessons} bài · {course.videos} video</span>
+                </div>
+
+                <div className="flex gap-1 flex-wrap mb-4">
+                  {course.topics.slice(0, 3).map(t => (
+                    <span key={t} className="text-xs bg-gray-800 text-gray-400 px-2 py-0.5 rounded-full">{t}</span>
+                  ))}
+                  {course.topics.length > 3 && (
+                    <span className="text-xs text-gray-600">+{course.topics.length - 3} more</span>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-white font-black text-xl">{formatVND(course.price)}</span>
+                    <span className="text-gray-500 text-xs ml-1">~${course.priceUSD}</span>
+                  </div>
+                  <button onClick={() => handleBuy(course)}
+                    className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-bold text-white transition-all hover:opacity-90 active:scale-95"
+                    style={{ background: `linear-gradient(135deg, ${course.color}, ${course.color}cc)` }}>
+                    Mua ngay <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+
+          {/* Bundle upsell */}
+          <div className="rounded-2xl p-5 relative overflow-hidden"
+            style={{ background: "linear-gradient(135deg,rgba(124,58,237,0.3),rgba(99,102,241,0.2))", border: "2px solid rgba(139,92,246,0.4)" }}>
+            <div className="absolute top-0 right-0 w-32 h-32 rounded-full opacity-10"
+              style={{ background: "radial-gradient(circle,#f59e0b,transparent)", transform: "translate(30%,-30%)" }} />
+            <p className="text-yellow-400 font-bold text-xs uppercase tracking-wide mb-1">🔥 Bundle Deal</p>
+            <p className="text-white font-black text-lg mb-1">Tất cả 4 khóa học</p>
+            <p className="text-gray-400 text-sm mb-3">Tiết kiệm 40% so với mua lẻ</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-500 text-sm line-through">{formatVND(826000)}</p>
+                <p className="text-white font-black text-2xl">{formatVND(499000)}</p>
+              </div>
+              <button onClick={() => handleBuy({ title: "Bundle 4 khóa học", price: 499000, priceUSD: 19 })}
+                className="px-5 py-3 rounded-xl font-bold text-white text-sm transition-all hover:opacity-90"
+                style={{ background: "linear-gradient(135deg,#f59e0b,#f97316)" }}>
+                Mua Bundle 🎉
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Course preview modal */}
+      {selectedCourse && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
+          style={{ background: "rgba(0,0,0,0.8)", backdropFilter: "blur(8px)" }}
+          onClick={() => setSelectedCourse(null)}>
+          <div className="w-full max-w-lg rounded-3xl overflow-hidden animate-fade-in-scale"
+            style={{ background: "#0f0a1e", border: "1px solid rgba(139,92,246,0.3)" }}
+            onClick={e => e.stopPropagation()}>
+            {/* Video */}
+            <div className="aspect-video relative">
+              <iframe className="w-full h-full"
+                src={`https://www.youtube-nocookie.com/embed/${selectedCourse.preview}?autoplay=1&rel=0`}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen />
+              <button onClick={() => setSelectedCourse(null)}
+                className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 flex items-center justify-center text-white hover:bg-black/80 transition-colors">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            {/* Info */}
+            <div className="p-5">
+              <h3 className="text-white font-bold text-lg mb-1">{selectedCourse.title}</h3>
+              <p className="text-gray-400 text-sm mb-4">{selectedCourse.lessons} bài học · {selectedCourse.videos} video · Level {selectedCourse.level}</p>
+              <div className="flex gap-3">
+                <button onClick={() => { handleBuy(selectedCourse); setSelectedCourse(null); }}
+                  className="flex-1 py-3 rounded-xl font-bold text-white text-sm transition-all hover:opacity-90"
+                  style={{ background: `linear-gradient(135deg, ${selectedCourse.color}, ${selectedCourse.color}cc)` }}>
+                  Mua {formatVND(selectedCourse.price)} →
+                </button>
+                <button onClick={() => setSelectedCourse(null)}
+                  className="px-4 py-3 rounded-xl border border-gray-700 text-gray-400 hover:text-white text-sm transition-colors">
+                  Đóng
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
