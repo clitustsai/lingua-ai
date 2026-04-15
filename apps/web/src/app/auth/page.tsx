@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore, registerUser, loginUser } from "@/store/useAuthStore";
 import { Eye, EyeOff, Brain, Loader2 } from "lucide-react";
@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 
 export default function AuthPage() {
   const router = useRouter();
-  const { login } = useAuthStore();
+  const { login, isLoggedIn } = useAuthStore();
   const [mode, setMode] = useState<"login" | "register">("login");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -15,6 +15,11 @@ export default function AuthPage() {
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Already logged in → go to app
+  useEffect(() => {
+    if (isLoggedIn) router.replace("/dashboard");
+  }, [isLoggedIn]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -128,9 +133,7 @@ export default function AuthPage() {
           <div className="mt-4 pt-4 border-t border-white/5 text-center">
             <p className="text-xs text-gray-600 mb-2">Hoặc dùng tài khoản demo</p>
             <button onClick={() => {
-              setEmail("demo@lingua.ai"); setPassword("demo123");
-              // Auto-register demo if not exists
-              const { registerUser: reg, loginUser: log } = require("@/store/useAuthStore");
+              // Auto-register demo if not exists, then login
               const r = loginUser("demo@lingua.ai", "demo123");
               if (!r.ok) registerUser("Demo User", "demo@lingua.ai", "demo123");
               const result = loginUser("demo@lingua.ai", "demo123");

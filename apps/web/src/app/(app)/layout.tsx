@@ -1,10 +1,5 @@
-import Sidebar from "@/components/Sidebar";
+import AppLayoutClient from "../../components/AppLayoutClient";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex min-h-screen">
-      <Sidebar />
-      <main className="flex-1 ml-16 md:ml-56">{children}</main>
-    </div>
-  );
+  return <AppLayoutClient>{children}</AppLayoutClient>;
 }
