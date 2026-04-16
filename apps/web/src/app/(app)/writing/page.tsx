@@ -5,9 +5,9 @@ import { Loader2, PenLine, CheckCircle2, RotateCcw, ChevronRight, Sparkles, Aler
 import { cn } from "@/lib/utils";
 
 const MODES = [
-  { id: "sentence", label: "Câu đơn", emoji: "✏️", desc: "Viết 1-2 câu", color: "#10b981", minWords: 5 },
-  { id: "paragraph", label: "Đoạn văn", emoji: "📝", desc: "Viết 3-5 câu", color: "#8b5cf6", minWords: 20 },
-  { id: "essay", label: "Bài luận", emoji: "📄", desc: "Viết 1-2 đoạn", color: "#3b82f6", minWords: 50 },
+  { id: "sentence", label: "Câu đơn", emoji: "✏️", desc: "Viết 1-2 câu", color: "#10b981", minWords: 5, minChars: 8 },
+  { id: "paragraph", label: "Đoạn văn", emoji: "📝", desc: "Viết 3-5 câu", color: "#8b5cf6", minWords: 20, minChars: 30 },
+  { id: "essay", label: "Bài luận", emoji: "📄", desc: "Viết 1-2 đoạn", color: "#3b82f6", minWords: 50, minChars: 80 },
 ];
 
 const PROMPTS: Record<string, Record<string, string[]>> = {
@@ -142,10 +142,17 @@ export default function WritingPage() {
   const lang = settings.targetLanguage.name;
   const prompts = getPrompts(mode.id, lang);
   const currentPrompt = prompts[promptIdx] || `Write a ${mode.id} in ${lang}.`;
-  const wordCount = text.trim().split(/\s+/).filter(Boolean).length;
+  const isNonLatin = ["Chinese", "Japanese", "Korean", "Arabic", "Thai"].some(l => lang.includes(l));
+  // Non-Latin languages: count characters; Latin: count words
+  const wordCount = isNonLatin
+    ? text.replace(/\s/g, "").length
+    : text.trim().split(/\s+/).filter(Boolean).length;
+  const minLabel = isNonLatin ? "ký tự" : "từ";
+
+  const minRequired = isNonLatin ? mode.minChars : mode.minWords;
 
   const check = async () => {
-    if (!text.trim() || wordCount < mode.minWords) return;
+    if (!text.trim() || wordCount < minRequired) return;
     setLoading(true);
     setResult(null);
     setShowBetter(false);
@@ -232,11 +239,11 @@ export default function WritingPage() {
               style={{ background: "rgba(26,16,53,0.8)" }}
             />
             <div className="absolute bottom-3 right-3 text-xs text-gray-600">
-              {wordCount} từ {wordCount < mode.minWords && <span className="text-red-500">(cần {mode.minWords}+)</span>}
+              {wordCount} {minLabel} {wordCount < minRequired && <span className="text-red-500">(cần {minRequired}+)</span>}
             </div>
           </div>
 
-          <button onClick={check} disabled={loading || wordCount < mode.minWords}
+          <button onClick={check} disabled={loading || wordCount < minRequired}
             className="w-full py-3.5 rounded-2xl font-bold text-white flex items-center justify-center gap-2 transition-all disabled:opacity-40"
             style={{ background: `linear-gradient(135deg, ${mode.color}, ${mode.color}cc)` }}>
             {loading
