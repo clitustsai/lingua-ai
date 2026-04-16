@@ -6,7 +6,7 @@ import { Loader2, BookOpen, ChevronDown, ChevronUp, Plus, Volume2, Star, Zap, Ta
 import { cn } from "@/lib/utils";
 import { speakText } from "@/components/VoiceButton";
 
-interface Vocab { word: string; translation: string; example: string; pronunciation?: string; }
+interface Vocab { word: string; translation: string; example: string; pronunciation?: string; romanization?: string; }
 interface DialogueLine { speaker: string; text: string; translation: string; }
 interface Exercise { question: string; answer: string; type?: string; }
 interface Lesson {
