@@ -23,9 +23,26 @@ export default function VideoDetailPage() {
   const [quizChecked, setQuizChecked] = useState(false);
   const [savedWords, setSavedWords] = useState<Set<string>>(new Set());
   const [completed, setCompleted] = useState(false);
+  const [realVideoId, setRealVideoId] = useState<string | null>(null);
+  const [videoLoading, setVideoLoading] = useState(false);
+
+  // For English use stored ID; for others fetch real ID via YouTube API
+  const isEnglish = video?.language === "English";
 
   useEffect(() => {
     if (!video) return;
+    if (isEnglish) {
+      setRealVideoId(video.youtubeId);
+    } else {
+      // Try to fetch real video ID
+      setVideoLoading(true);
+      const query = `${video.title} ${video.language} lesson`;
+      fetch(`/api/youtube-search?q=${encodeURIComponent(query)}`)
+        .then(r => r.json())
+        .then(d => { if (d.videoId) setRealVideoId(d.videoId); })
+        .catch(() => {})
+        .finally(() => setVideoLoading(false));
+    }
     generateLesson();
   }, [id]);
 
@@ -82,42 +99,43 @@ export default function VideoDetailPage() {
         </button>
       </div>
 
-      {/* Video card — opens YouTube search for non-English languages */}
+      {/* Video player */}
       <div className="mx-4 mb-0">
-        <a href={
-          video.language === "English"
-            ? `https://www.youtube.com/watch?v=${video.youtubeId}`
-            : `https://www.youtube.com/results?search_query=${encodeURIComponent(video.title + " " + video.language + " lesson")}`
-        }
-          target="_blank" rel="noopener noreferrer"
-          className="block relative aspect-video rounded-2xl overflow-hidden group cursor-pointer"
-          style={{ background: "linear-gradient(135deg, #1a0533 0%, #0f0a1e 100%)" }}>
-          <div className="absolute inset-0 opacity-30"
-            style={{
-              background: video.category === "grammar" ? "radial-gradient(circle at 30% 50%, #eab308 0%, transparent 60%)"
-                : video.category === "conversation" ? "radial-gradient(circle at 30% 50%, #3b82f6 0%, transparent 60%)"
-                : video.category === "vocabulary" ? "radial-gradient(circle at 30% 50%, #8b5cf6 0%, transparent 60%)"
-                : video.category === "pronunciation" ? "radial-gradient(circle at 30% 50%, #ec4899 0%, transparent 60%)"
-                : "radial-gradient(circle at 30% 50%, #10b981 0%, transparent 60%)"
-            }} />
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-            <div className="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform">
-              <svg className="w-7 h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M8 5v14l11-7z"/>
-              </svg>
-            </div>
-            <div className="text-center px-4">
-              <p className="text-white font-semibold text-sm">{video.title}</p>
-              <p className="text-gray-400 text-xs mt-1">
-                {video.language === "English" ? "Watch on YouTube" : `Search "${video.title}" on YouTube`}
-              </p>
+        {videoLoading ? (
+          <div className="aspect-video rounded-2xl flex items-center justify-center"
+            style={{ background: "rgba(26,16,53,0.8)", border: "1px solid rgba(139,92,246,0.2)" }}>
+            <div className="flex flex-col items-center gap-3">
+              <Loader2 className="w-8 h-8 text-primary-400 animate-spin" />
+              <p className="text-gray-500 text-sm">Đang tìm video...</p>
             </div>
           </div>
-          <div className="absolute bottom-3 right-3 flex items-center gap-1.5 bg-red-600 text-white text-xs px-2.5 py-1.5 rounded-lg font-medium">
-            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-            {video.language === "English" ? "Watch on YouTube" : "Search on YouTube"}
+        ) : realVideoId ? (
+          <div className="relative aspect-video rounded-2xl overflow-hidden bg-black">
+            <iframe
+              className="w-full h-full"
+              src={`https://www.youtube-nocookie.com/embed/${realVideoId}?rel=0&modestbranding=1`}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+            />
+            <a href={`https://www.youtube.com/watch?v=${realVideoId}`}
+              target="_blank" rel="noopener noreferrer"
+              className="absolute bottom-3 right-3 flex items-center gap-1.5 bg-red-600 hover:bg-red-500 text-white text-xs px-2.5 py-1.5 rounded-lg font-medium transition-colors shadow-lg z-10">
+              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+              YouTube
+            </a>
           </div>
-        </a>
+        ) : (
+          <a href={`https://www.youtube.com/results?search_query=${encodeURIComponent(video.title + " " + video.language + " lesson")}`}
+            target="_blank" rel="noopener noreferrer"
+            className="flex aspect-video rounded-2xl flex-col items-center justify-center gap-3 cursor-pointer hover:opacity-90 transition-opacity"
+            style={{ background: "rgba(26,16,53,0.8)", border: "1px solid rgba(139,92,246,0.2)" }}>
+            <div className="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center">
+              <svg className="w-7 h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+            <p className="text-white font-semibold text-sm">{video.title}</p>
+            <p className="text-gray-400 text-xs">Tìm trên YouTube</p>
+          </a>
+        )}
       </div>
 
       {/* Video info - giống ảnh */}
