@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect, useRef } from "react";
 import { useAppStore } from "@/store/useAppStore";
 import { GraduationCap, Loader2, CheckCircle2, XCircle, Star, RefreshCw, ChevronRight, Timer, Zap, Target, BookOpen, Mic2, PenLine, Brain } from "lucide-react";

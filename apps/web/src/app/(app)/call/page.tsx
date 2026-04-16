@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useAppStore } from "@/store/useAppStore";
 import { Phone, PhoneOff, Mic, MicOff, Volume2, VolumeX, Camera, CameraOff, Star, AlertCircle, ChevronDown, Sparkles } from "lucide-react";
@@ -10,12 +10,12 @@ const LANG_MAP: Record<string, string> = {
 };
 
 const ROLEPLAY_MODES = [
-  { id: "native",      emoji: "🌍", label: "Nguoi ban xu",       desc: "Chat tu nhien nhu ban be",          persona: "native",      color: "#8b5cf6" },
-  { id: "interview",   emoji: "💼", label: "Job Interview",       desc: "Luyen phong van xin viec",          persona: "interviewer", color: "#3b82f6" },
-  { id: "dating",      emoji: "💕", label: "Dating Conversation", desc: "Luyen noi chuyen lam quen",         persona: "friend",      color: "#ec4899" },
-  { id: "travel",      emoji: "✈️", label: "Travel English",      desc: "San bay, khach san, du lich",       persona: "customer",    color: "#10b981" },
-  { id: "business",    emoji: "📊", label: "Business Meeting",    desc: "Hop, thuyet trinh, dam phan",       persona: "interviewer", color: "#f59e0b" },
-  { id: "tutor",       emoji: "🎓", label: "AI Teacher",          desc: "Giao vien day ngu phap, tu vung",   persona: "tutor",       color: "#06b6d4" },
+  { id: "native",    emoji: "🌍", label: "Nguoi ban xu",     desc: "Chat tu nhien nhu ban be",    persona: "native",      color: "#8b5cf6" },
+  { id: "interview", emoji: "💼", label: "Job Interview",    desc: "Luyen phong van xin viec",    persona: "interviewer", color: "#3b82f6" },
+  { id: "dating",    emoji: "💕", label: "Dating",           desc: "Luyen noi chuyen lam quen",   persona: "friend",      color: "#ec4899" },
+  { id: "travel",    emoji: "✈️", label: "Travel English",   desc: "San bay, khach san, du lich", persona: "customer",    color: "#10b981" },
+  { id: "business",  emoji: "📊", label: "Business Meeting", desc: "Hop, thuyet trinh, dam phan", persona: "interviewer", color: "#f59e0b" },
+  { id: "tutor",     emoji: "🎓", label: "AI Teacher",       desc: "Giao vien day ngu phap",      persona: "tutor",       color: "#06b6d4" },
 ];
 
 type CallState = "idle" | "connecting" | "listening" | "thinking" | "speaking" | "ended";
@@ -359,7 +359,7 @@ export default function SpeakingRoomPage() {
               className={cn("flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-colors border",
                 cameraOn ? "border-primary-500 bg-primary-900/20 text-primary-300" : "border-gray-700 bg-gray-800 text-gray-400")}>
               {cameraOn ? <Camera className="w-4 h-4" /> : <CameraOff className="w-4 h-4" />}
-              {cameraOn ? "Camera dang bat" : "Bat camera (tuy chon)"}
+              {cameraOn ? "Camera đang bật" : "Bật camera (tùy chọn)"}
             </button>
 
             {/* Start */}
@@ -414,3 +414,4 @@ export default function SpeakingRoomPage() {
     </div>
   );
 }
+
