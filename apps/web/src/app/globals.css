@@ -101,7 +101,12 @@
   }
 }
 
-/* ── Animations ─────────────────────────────────────────────────────────────── */
+/* ── Mobile safe area ───────────────────────────────────────────────────────── */
+.safe-area-pb { padding-bottom: env(safe-area-inset-bottom, 0px); }
+
+/* ── Page transition ────────────────────────────────────────────────────────── */
+main > * { animation: fadeInUp 0.2s ease both; }
+
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0); }

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
 import Sidebar from "@/components/Sidebar";
 import NotificationManager from "@/components/NotificationManager";
+import BottomNav from "@/components/BottomNav";
 
 export default function AppLayoutClient({ children }: { children: React.ReactNode }) {
   const { isLoggedIn, theme } = useAuthStore();
@@ -47,10 +48,11 @@ export default function AppLayoutClient({ children }: { children: React.ReactNod
   return (
     <div className="flex min-h-screen">
       <Sidebar />
-      <main className="flex-1 ml-16 md:ml-56">
+      <main className="flex-1 ml-16 md:ml-56 pb-20 md:pb-0">
         <NotificationManager />
         {children}
       </main>
+      <BottomNav />
     </div>
   );
 }
