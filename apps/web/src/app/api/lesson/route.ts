@@ -18,7 +18,7 @@ Return JSON:
   "title": "lesson title",
   "objective": "what student will learn (in ${nativeLanguage})",
   "vocabulary": [
-    { "word": "", "translation": "", "example": "" }
+    { "word": "", "translation": "", "example": "", "pronunciation": "" }
   ],
   "grammar": { "rule": "grammar rule name", "explanation": "explanation in ${nativeLanguage}", "examples": ["example1", "example2"] },
   "dialogue": [
@@ -27,7 +27,8 @@ Return JSON:
   ],
   "exercises": [
     { "question": "fill in the blank or translate", "answer": "" }
-  ]
+  ],
+  "tips": ["practical learning tip 1 in ${nativeLanguage}", "practical learning tip 2 in ${nativeLanguage}", "practical learning tip 3 in ${nativeLanguage}"]
 }`,
       }],
       response_format: { type: "json_object" },
