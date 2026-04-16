@@ -5,7 +5,7 @@ import {
   MessageCircle, BookOpen, Settings, Brain, Flame,
   GraduationCap, CheckSquare, History, LayoutDashboard,
   Languages, BookMarked, Headphones, Mic2, RotateCcw,
-  Compass, Youtube, Sparkles, Camera, TrendingUp, Bookmark, Share2, Phone, Users, Wand2, Globe, Target, Video, Sun, Moon, LogOut, DollarSign, Banknote, Heart, Crown, Gamepad2, Star,
+  Compass, Youtube, Sparkles, Camera, TrendingUp, Bookmark, Share2, Phone, Users, Wand2, Globe, Target, Video, Sun, Moon, LogOut, DollarSign, Banknote, Heart, Crown, Gamepad2, Star, PenLine,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/useAppStore";
@@ -38,6 +38,7 @@ const nav = [
   { href: "/reading",       icon: BookMarked,      label: "Reading" },
   { href: "/listening",     icon: Headphones,      label: "Listening" },
   { href: "/pronunciation", icon: Mic2,            label: "Pronunciation" },
+  { href: "/writing",       icon: PenLine,         label: "Luyện viết" },
   { href: "/grammar",       icon: CheckSquare,     label: "Grammar" },
   { href: "/translate",     icon: Languages,       label: "Translate" },
   { href: "/share",         icon: Share2,          label: "Chia sẻ" },
