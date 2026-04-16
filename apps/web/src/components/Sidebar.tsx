@@ -5,7 +5,7 @@ import {
   MessageCircle, BookOpen, Settings, Brain, Flame,
   GraduationCap, CheckSquare, History, LayoutDashboard,
   Languages, BookMarked, Headphones, Mic2, RotateCcw,
-  Compass, Youtube, Sparkles, Camera, TrendingUp, Bookmark, Share2, Phone, Users, Wand2, Globe, Target, Video, Sun, Moon, LogOut, DollarSign, Banknote, Heart, Crown,
+  Compass, Youtube, Sparkles, Camera, TrendingUp, Bookmark, Share2, Phone, Users, Wand2, Globe, Target, Video, Sun, Moon, LogOut, DollarSign, Banknote, Heart, Crown, Gamepad2, Star,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/useAppStore";
@@ -45,6 +45,8 @@ const nav = [
   { href: "/money",         icon: Banknote,        label: "AI Kiếm Tiền" },
   { href: "/donate",        icon: Heart,           label: "Ủng hộ" },
   { href: "/premium",       icon: Crown,           label: "Premium" },
+  { href: "/minigame",      icon: Gamepad2,        label: "Mini Games" },
+  { href: "/reviews",       icon: Star,            label: "Danh gia" },
   { href: "/history",       icon: History,         label: "History" },
   { href: "/settings",      icon: Settings,        label: "Settings" },
 ];
