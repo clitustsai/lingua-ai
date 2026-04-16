@@ -9,6 +9,8 @@
   },
   "dependencies": {
     "@ai-lang/shared": "*",
+    "@supabase/ssr": "^0.10.2",
+    "@supabase/supabase-js": "^2.103.2",
     "clsx": "^2.1.1",
     "framer-motion": "^12.9.4",
     "groq-sdk": "^1.1.2",
