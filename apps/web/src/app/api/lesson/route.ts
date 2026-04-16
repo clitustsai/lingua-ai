@@ -18,7 +18,7 @@ Return JSON:
   "title": "lesson title",
   "objective": "what student will learn (in ${nativeLanguage})",
   "vocabulary": [
-    { "word": "", "translation": "", "example": "", "pronunciation": "" }
+    { "word": "native script of the word (e.g. 你好 for Chinese, こんにちは for Japanese, 안녕하세요 for Korean, or the word itself for Latin-script languages)", "romanization": "pronunciation/romanization for non-Latin scripts only (e.g. nǐ hǎo), null for Latin languages", "translation": "", "example": "", "pronunciation": "IPA or romanization for Latin languages" }
   ],
   "grammar": { "rule": "grammar rule name", "explanation": "explanation in ${nativeLanguage}", "examples": ["example1", "example2"] },
   "dialogue": [

@@ -18,7 +18,7 @@ Return JSON:
 {
   "warmup": "fun fact or motivational quote related to ${targetLanguage} in ${nativeLanguage}",
   "vocabulary": [
-    {"word":"","translation":"","example":"","tip":""}
+    {"word":"native script (e.g. 你好 for Chinese, こんにちは for Japanese, 안녕하세요 for Korean, or the word itself for English/French/etc)","romanization":"romanization/pronunciation (e.g. nǐ hǎo, konnichiwa) — only for non-Latin scripts, null for Latin languages","translation":"meaning in ${nativeLanguage}","example":"example sentence in ${targetLanguage}","tip":"memory tip in ${nativeLanguage}"}
   ],
   "grammarPoint": {"rule":"","explanation":"in ${nativeLanguage}","examples":["",""]},
   "speakingPrompt": "conversation prompt in ${nativeLanguage}",

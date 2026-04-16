@@ -167,12 +167,13 @@ export default function LessonsPage() {
                 <div key={i} className="rounded-2xl p-4" style={{ background: "rgba(26,16,53,0.8)", border: "1px solid rgba(139,92,246,0.15)" }}>
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 flex-wrap mb-1">
+                      <div className="flex items-baseline gap-2 flex-wrap mb-1">
                         <button onClick={() => speakText(v.word, settings.targetLanguage.code)}
                           className="text-white font-bold text-base hover:text-primary-300 transition-colors">
                           {v.word}
                         </button>
-                        {v.pronunciation && <span className="text-xs text-gray-500 font-mono">{v.pronunciation}</span>}
+                        {v.romanization && <span className="text-gray-400 text-sm font-mono">{v.romanization}</span>}
+                        {v.pronunciation && !v.romanization && <span className="text-xs text-gray-500 font-mono">{v.pronunciation}</span>}
                         <button onClick={() => speakText(v.word, settings.targetLanguage.code)}
                           className="p-1 rounded text-gray-600 hover:text-primary-400 transition-colors">
                           <Volume2 className="w-3.5 h-3.5" />

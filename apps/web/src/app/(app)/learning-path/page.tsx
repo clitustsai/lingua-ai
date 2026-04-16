@@ -213,8 +213,13 @@ export default function LearningPathPage() {
                         <Headphones className="w-3.5 h-3.5" />
                       </button>
                       <div>
-                        <span className="text-white font-semibold text-sm">{v.word}</span>
-                        <span className="text-gray-400 text-sm ml-2">— {v.translation}</span>
+                        <div className="flex items-baseline gap-2 flex-wrap">
+                          <span className="text-white font-bold text-base">{v.word}</span>
+                          {v.romanization && (
+                            <span className="text-gray-400 text-sm font-mono">{v.romanization}</span>
+                          )}
+                          <span className="text-gray-400 text-sm">— {v.translation}</span>
+                        </div>
                         {v.example && <p className="text-xs text-gray-500 mt-0.5 italic">{v.example}</p>}
                         {v.tip && <p className="text-xs text-yellow-400/70 mt-0.5">💡 {v.tip}</p>}
                       </div>
