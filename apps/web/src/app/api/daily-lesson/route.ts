@@ -7,6 +7,12 @@ export async function POST(req: NextRequest) {
   try {
     const { theme, focus, targetLanguage, nativeLanguage, level, goal } = await req.json();
 
+    const isNonLatin = ["Chinese", "Japanese", "Korean", "Arabic", "Thai", "Hindi"].some(l => targetLanguage.includes(l));
+
+    const vocabInstruction = isNonLatin
+      ? `CRITICAL: "word" field MUST contain the native script characters (e.g. 你好 NOT "ni hao", 我叫 NOT "wo jiao", こんにちは NOT "konnichiwa"). Put romanization/pinyin/furigana in "romanization" field.`
+      : `"word" field contains the actual word. "romanization" should be null.`;
+
     const completion = await groq.chat.completions.create({
       model: "llama-3.3-70b-versatile",
       messages: [{
@@ -14,20 +20,28 @@ export async function POST(req: NextRequest) {
         content: `Generate today's ${targetLanguage} lesson for a ${level} learner.
 Theme: "${theme}", Focus: ${focus}, Goal: ${goal}
 
+${vocabInstruction}
+
 Return JSON:
 {
-  "warmup": "fun fact or motivational quote related to ${targetLanguage} in ${nativeLanguage}",
+  "warmup": "fun fact or motivational quote in ${nativeLanguage}",
   "vocabulary": [
-    {"word":"native script (e.g. 你好 for Chinese, こんにちは for Japanese, 안녕하세요 for Korean, or the word itself for English/French/etc)","romanization":"romanization/pronunciation (e.g. nǐ hǎo, konnichiwa) — only for non-Latin scripts, null for Latin languages","translation":"meaning in ${nativeLanguage}","example":"example sentence in ${targetLanguage}","tip":"memory tip in ${nativeLanguage}"}
+    {
+      "word": "${isNonLatin ? "native script ONLY e.g. 你好 or こんにちは or 안녕하세요" : "the word itself"}",
+      "romanization": "${isNonLatin ? "pinyin/furigana/romanization e.g. ni hao" : null}",
+      "translation": "meaning in ${nativeLanguage}",
+      "example": "example sentence in ${targetLanguage}",
+      "tip": "memory tip in ${nativeLanguage}"
+    }
   ],
   "grammarPoint": {"rule":"","explanation":"in ${nativeLanguage}","examples":["",""]},
   "speakingPrompt": "conversation prompt in ${nativeLanguage}",
-  "listeningText": "short text to listen to in ${targetLanguage}",
+  "listeningText": "short text in ${targetLanguage}",
   "listeningTranslation": "translation in ${nativeLanguage}",
   "quiz": [
     {"question":"","options":["","","",""],"correct":0,"explanation":"in ${nativeLanguage}"}
   ],
-  "dailyChallenge": "one fun challenge to do today in ${nativeLanguage}"
+  "dailyChallenge": "one fun challenge in ${nativeLanguage}"
 }`
       }],
       response_format: { type: "json_object" },
