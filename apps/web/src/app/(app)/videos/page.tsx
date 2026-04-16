@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAppStore } from "@/store/useAppStore";
 import { VIDEO_LESSONS, CATEGORIES } from "@/lib/videoLessons";
 import { Play, Search, X, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -48,11 +49,14 @@ const PREVIEW_IDS: Record<string, string> = {
 
 export default function VideosPage() {
   const router = useRouter();
+  const { settings } = useAppStore();
   const [category, setCategory] = useState("all");
   const [search, setSearch] = useState("");
   const [previewId, setPreviewId] = useState<string | null>(null);
 
   const filtered = VIDEO_LESSONS.filter(v => {
+    // Filter by current target language
+    if (v.language !== settings.targetLanguage.name) return false;
     if (category !== "all" && v.category !== category) return false;
     if (search && !v.title.toLowerCase().includes(search.toLowerCase()) &&
         !v.teacher.toLowerCase().includes(search.toLowerCase()) &&
@@ -68,7 +72,9 @@ export default function VideosPage() {
         <h1 className="text-xl font-bold text-white flex items-center gap-2">
           🎬 Video Lessons
         </h1>
-        <p className="text-sm text-gray-500 mt-1">English learning videos · Script · Quiz · Vocab · Grammar</p>
+        <p className="text-sm text-gray-500 mt-1">
+          {settings.targetLanguage.flag} {settings.targetLanguage.name} videos · Script · Quiz · Vocab · Grammar
+        </p>
       </div>
 
       {/* Search */}
@@ -153,7 +159,14 @@ export default function VideosPage() {
       {filtered.length === 0 && (
         <div className="text-center py-12 text-gray-500">
           <p className="text-4xl mb-3">🎬</p>
-          <p>No videos found</p>
+          <p className="font-medium text-white mb-1">
+            {search ? "Không tìm thấy video phù hợp" : `Chưa có video cho ${settings.targetLanguage.name}`}
+          </p>
+          {!search && (
+            <p className="text-sm text-gray-600 mt-1">
+              Đổi ngôn ngữ học trong Settings để xem video phù hợp
+            </p>
+          )}
         </div>
       )}
     </div>
