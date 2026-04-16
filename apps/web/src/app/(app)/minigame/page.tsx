@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect, useCallback } from "react";
 import { useAppStore } from "@/store/useAppStore";
 import { Trophy, Zap, RotateCcw, Star, Gift, Timer } from "lucide-react";
@@ -313,7 +313,7 @@ export default function MiniGamePage() {
         <div className="rounded-2xl p-5 w-full text-center"
           style={{ background: "linear-gradient(135deg,rgba(139,92,246,0.2),rgba(99,102,241,0.1))", border: "1px solid rgba(139,92,246,0.3)" }}>
           <p className="text-yellow-400 font-bold text-lg">+{prize.xp} XP</p>
-          <p className="text-gray-400 text-sm mt-1">Phan thuong cua ban hom nay</p>
+          <p className="text-gray-400 text-sm mt-1">Phần thưởng của bạn hôm nay</p>
           <div className="flex justify-center gap-1 mt-3">
             {[...Array(5)].map((_, i) => (
               <Star key={i} className={cn("w-5 h-5", i < Math.ceil((result.score / maxScore) * 5) ? "text-yellow-400 fill-yellow-400" : "text-gray-700")} />
@@ -324,11 +324,11 @@ export default function MiniGamePage() {
           <button onClick={reset}
             className="flex-1 py-3 rounded-2xl font-bold text-white transition-all"
             style={{ background: "linear-gradient(135deg,#7c3aed,#6366f1)" }}>
-            Choi lai
+            Chơi lại
           </button>
           <button onClick={() => { setResult(null); setActiveGame(null); }}
             className="flex-1 py-3 rounded-2xl font-bold border border-gray-700 text-gray-300 hover:text-white transition-colors">
-            Chon game khac
+            Chọn game khác
           </button>
         </div>
       </div>
@@ -340,7 +340,7 @@ export default function MiniGamePage() {
     return (
       <div className="p-5 max-w-lg">
         <div className="flex items-center gap-3 mb-6">
-          <button onClick={reset} className="text-gray-400 hover:text-white transition-colors text-sm">← Quay lai</button>
+          <button onClick={reset} className="text-gray-400 hover:text-white transition-colors text-sm">← Quay lại</button>
           <div className="flex items-center gap-2">
             <span className="text-xl">{game.emoji}</span>
             <p className="text-white font-bold">{game.label}</p>
@@ -359,7 +359,7 @@ export default function MiniGamePage() {
         <h1 className="text-xl font-bold text-white flex items-center gap-2">
           <Zap className="w-5 h-5 text-yellow-400" /> Mini Games
         </h1>
-        <p className="text-sm text-gray-400 mt-1">Choi game hoc tieng Anh · Nhan XP · Mo huy hieu</p>
+        <p className="text-sm text-gray-400 mt-1">Chơi game học tiếng Anh · Nhận XP · Mở huy hiệu</p>
       </div>
 
       {/* Daily reward banner */}
@@ -367,8 +367,8 @@ export default function MiniGamePage() {
         style={{ background: "linear-gradient(135deg,rgba(245,158,11,0.15),rgba(239,68,68,0.1))", border: "1px solid rgba(245,158,11,0.3)" }}>
         <Gift className="w-8 h-8 text-yellow-400 shrink-0" />
         <div>
-          <p className="text-white font-semibold text-sm">Phan thuong hang ngay</p>
-          <p className="text-gray-400 text-xs">Choi du 3 game hom nay de nhan 500 XP bonus!</p>
+          <p className="text-white font-semibold text-sm">Phần thưởng hàng ngày</p>
+          <p className="text-gray-400 text-xs">Chơi đủ 3 game hôm nay để nhận 500 XP bonus!</p>
         </div>
         <div className="ml-auto flex gap-1">
           {GAMES.map(g => (
@@ -391,11 +391,11 @@ export default function MiniGamePage() {
               <p className="text-white font-bold">{game.label}</p>
               <p className="text-gray-400 text-sm">{game.desc}</p>
               {todayPlayed.includes(game.id) && (
-                <span className="text-xs text-green-400 font-medium">Da choi hom nay ✓</span>
+                <span className="text-xs text-green-400 font-medium">Đã chơi hôm nay ✓</span>
               )}
             </div>
             <div className="text-right shrink-0">
-              <p className="text-xs text-gray-500">Phan thuong</p>
+              <p className="text-xs text-gray-500">Phần thưởng</p>
               <p className="font-bold text-sm" style={{ color: game.color }}>+200 XP</p>
             </div>
           </button>
@@ -404,14 +404,14 @@ export default function MiniGamePage() {
 
       {/* Prize table */}
       <div className="rounded-2xl p-4" style={{ background: "rgba(26,16,53,0.8)", border: "1px solid rgba(139,92,246,0.15)" }}>
-        <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-3">Bang phan thuong</p>
+        <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-3">Bảng phần thưởng</p>
         <div className="flex flex-col gap-2">
           {PRIZES.map(p => (
             <div key={p.score} className="flex items-center gap-3">
               <span className="text-xl w-8">{p.emoji}</span>
               <div className="flex-1">
                 <p className="text-white text-sm font-medium">{p.label}</p>
-                <p className="text-gray-500 text-xs">Dat tu {p.score} diem</p>
+                <p className="text-gray-500 text-xs">Đạt từ {p.score} điểm</p>
               </div>
               <span className="text-yellow-400 font-bold text-sm">+{p.xp} XP</span>
             </div>
@@ -421,3 +421,6 @@ export default function MiniGamePage() {
     </div>
   );
 }
+
+
+

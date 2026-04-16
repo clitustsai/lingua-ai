@@ -6,9 +6,9 @@ import { cn } from "@/lib/utils";
 const OWNER = { momo: "0906857331", zalopay: "0906857331", acb: "26996867", name: "THAI TUAN KIET" };
 
 const PLANS = [
-  { id: "basic", name: "Free", price: 0, period: "", color: "#6b7280", emoji: "FREE", cta: "Dang dung", ctaDisabled: true, features: ["Chat AI co ban (20 tin/ngay)", "Flashcards khong gioi han", "Video lessons", "Grammar checker", "Streak & achievements"] },
-  { id: "pro", name: "Pro", price: 99000, priceUSD: 4, period: "/thang", color: "#8b5cf6", emoji: "PRO", cta: "Mua Pro", ctaDisabled: false, popular: true, highlight: "Pho bien nhat", features: ["Chat AI khong gioi han", "Video lessons nang cao + Script AI", "Quiz & Vocab tu video", "AI Tutor ca nhan hoa", "Pronunciation scoring", "Export PDF lich su chat", "AI Kiem Tien tools", "Uu tien ho tro"] },
-  { id: "lifetime", name: "Lifetime", price: 499000, priceUSD: 19, period: " mot lan", color: "#f59e0b", emoji: "VIP", cta: "Mua Lifetime", ctaDisabled: false, badge: "Tiet kiem nhat", features: ["Tat ca tinh nang Pro", "Truy cap vinh vien", "Tat ca khoa hoc tuong lai", "1-on-1 AI coaching session", "Badge dac biet tren profile", "Uu tien tinh nang moi"] },
+  { id: "basic", name: "Free", price: 0, period: "", color: "#6b7280", emoji: "FREE", cta: "Đang dùng", ctaDisabled: true, features: ["Chat AI cơ bản (20 tin/ngày)", "Flashcards không giới hạn", "Video lessons", "Grammar checker", "Streak & achievements"] },
+  { id: "pro", name: "Pro", price: 99000, priceUSD: 4, period: "/thang", color: "#8b5cf6", emoji: "PRO", cta: "Mua Pro", ctaDisabled: false, popular: true, highlight: "Phổ biến nhất", features: ["Chat AI không giới hạn", "Video lessons nâng cao + Script AI", "Quiz & Vocab từ video", "AI Tutor cá nhân hóa", "Pronunciation scoring", "Export PDF lịch sử chat", "AI Kiếm Tiền tools", "Ưu tiên hỗ trợ"] },
+  { id: "lifetime", name: "Lifetime", price: 499000, priceUSD: 19, period: " mot lan", color: "#f59e0b", emoji: "VIP", cta: "Mua Lifetime", ctaDisabled: false, badge: "Tiết kiệm nhất", features: ["Tất cả tính năng Pro", "Truy cập vĩnh viễn", "Tất cả khóa học tương lai", "1-on-1 AI coaching session", "Badge đặc biệt trên profile", "Ưu tiên tính năng mới"] },
 ];
 
 const COURSES = [
@@ -30,9 +30,9 @@ function PayModal({ item, onClose }: { item: PayItem; onClose: () => void }) {
   const rows = [
     { label: "MoMo / ZaloPay", value: OWNER.momo, key: "momo" },
     { label: "ACB", value: OWNER.acb, key: "acb" },
-    { label: "Chu TK", value: OWNER.name },
-    { label: "So tien", value: formatVND(item.price), key: "amt" },
-    { label: "Noi dung CK", value: note, key: "note" },
+    { label: "Chủ TK", value: OWNER.name },
+    { label: "Số tiền", value: formatVND(item.price), key: "amt" },
+    { label: "Nội dung CK", value: note, key: "note" },
   ];
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
@@ -80,7 +80,7 @@ function PayModal({ item, onClose }: { item: PayItem; onClose: () => void }) {
             ))}
           </div>
           <p className="text-xs text-gray-500 text-center">
-            Sau khi chuyen khoan, nhan tin xac nhan MoMo <strong className="text-gray-300">0906857331</strong>
+            Sau khi chuyển khoản, nhắn tin xác nhận MoMo <strong className="text-gray-300">0906857331</strong>
           </p>
         </div>
       </div>
@@ -97,12 +97,12 @@ export default function PremiumPage() {
     <div className="p-5 max-w-2xl">
       <div className="pt-2 mb-6">
         <h1 className="text-xl font-bold text-white flex items-center gap-2">
-          <Crown className="w-5 h-5 text-yellow-400" /> Premium & Khoa hoc
+          <Crown className="w-5 h-5 text-yellow-400" /> Premium & Khóa học
         </h1>
-        <p className="text-sm text-gray-400 mt-1">Nang cap de hoc nhanh hon, sau hon</p>
+        <p className="text-sm text-gray-400 mt-1">Nâng cấp để học nhanh hơn, sâu hơn</p>
       </div>
       <div className="flex gap-1 p-1 rounded-2xl mb-6" style={{ background: "rgba(15,10,30,0.6)" }}>
-        <button onClick={() => setTab("plans")} className={cn("flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all", tab === "plans" ? "bg-primary-600 text-white shadow-lg" : "text-gray-400 hover:text-gray-200")}>Goi Premium</button>
+        <button onClick={() => setTab("plans")} className={cn("flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all", tab === "plans" ? "bg-primary-600 text-white shadow-lg" : "text-gray-400 hover:text-gray-200")}>Gói Premium</button>
         <button onClick={() => setTab("courses")} className={cn("flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all", tab === "courses" ? "bg-primary-600 text-white shadow-lg" : "text-gray-400 hover:text-gray-200")}>Khoa hoc</button>
       </div>
       {tab === "plans" && (
@@ -129,7 +129,7 @@ export default function PremiumPage() {
                 </div>
                 <div className="text-right">
                   {plan.price === 0
-                    ? <p className="text-2xl font-black text-gray-400">Mien phi</p>
+                    ? <p className="text-2xl font-black text-gray-400">Miễn phí</p>
                     : <><p className="text-2xl font-black text-white">{formatVND(plan.price)}</p><p className="text-xs text-gray-500">{plan.period}</p></>
                   }
                 </div>
@@ -150,8 +150,8 @@ export default function PremiumPage() {
             </div>
           ))}
           <div className="rounded-2xl p-4 text-center" style={{ background: "rgba(16,185,129,0.05)", border: "1px solid rgba(16,185,129,0.2)" }}>
-            <p className="text-green-400 font-semibold text-sm">Hoan tien 7 ngay neu khong hai long</p>
-            <p className="text-gray-500 text-xs mt-1">Lien he MoMo 0906857331</p>
+            <p className="text-green-400 font-semibold text-sm">Hoàn tiền 7 ngày nếu không hài lòng</p>
+            <p className="text-gray-500 text-xs mt-1">Liên hệ MoMo 0906857331</p>
           </div>
         </div>
       )}
@@ -180,8 +180,8 @@ export default function PremiumPage() {
                 </div>
                 <div className="flex items-center gap-3 text-xs text-gray-500 mb-3">
                   <span className="flex items-center gap-1"><Star className="w-3 h-3 text-yellow-400" />{course.rating}</span>
-                  <span>{course.students.toLocaleString()} hoc vien</span>
-                  <span>{course.lessons} bai · {course.videos} video</span>
+                  <span>{course.students.toLocaleString()} học viên</span>
+                  <span>{course.lessons} bài · {course.videos} video</span>
                 </div>
                 <div className="flex gap-1 flex-wrap mb-4">
                   {course.topics.slice(0, 3).map(t => <span key={t} className="text-xs bg-gray-800 text-gray-400 px-2 py-0.5 rounded-full">{t}</span>)}
@@ -203,14 +203,14 @@ export default function PremiumPage() {
           ))}
           <div className="rounded-2xl p-5 relative overflow-hidden" style={{ background: "linear-gradient(135deg,rgba(124,58,237,0.3),rgba(99,102,241,0.2))", border: "2px solid rgba(139,92,246,0.4)" }}>
             <p className="text-yellow-400 font-bold text-xs uppercase tracking-wide mb-1">Bundle Deal</p>
-            <p className="text-white font-black text-lg mb-1">Tat ca 4 khoa hoc</p>
-            <p className="text-gray-400 text-sm mb-3">Tiet kiem 40% so voi mua le</p>
+            <p className="text-white font-black text-lg mb-1">Tất cả 4 khóa học</p>
+            <p className="text-gray-400 text-sm mb-3">Tiết kiệm 40% so với mua lẻ</p>
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-500 text-sm line-through">{formatVND(826000)}</p>
                 <p className="text-white font-black text-2xl">{formatVND(499000)}</p>
               </div>
-              <button onClick={() => setPayItem({ title: "Bundle 4 khoa hoc", price: 499000 })}
+              <button onClick={() => setPayItem({ title: "Bundle 4 khóa học", price: 499000 })}
                 className="px-5 py-3 rounded-xl font-bold text-white text-sm transition-all hover:opacity-90"
                 style={{ background: "linear-gradient(135deg,#f59e0b,#f97316)" }}>
                 Mua Bundle
@@ -234,7 +234,7 @@ export default function PremiumPage() {
             </div>
             <div className="p-5">
               <h3 className="text-white font-bold text-lg mb-1">{selectedCourse.title}</h3>
-              <p className="text-gray-400 text-sm mb-4">{selectedCourse.lessons} bai · {selectedCourse.videos} video · {selectedCourse.level}</p>
+              <p className="text-gray-400 text-sm mb-4">{selectedCourse.lessons} bài · {selectedCourse.videos} video · {selectedCourse.level}</p>
               <div className="flex gap-3">
                 <button onClick={() => { setSelectedCourse(null); setPayItem(selectedCourse); }}
                   className="flex-1 py-3 rounded-xl font-bold text-white text-sm transition-all hover:opacity-90"
@@ -251,5 +251,6 @@ export default function PremiumPage() {
     </div>
   );
 }
+
 
 

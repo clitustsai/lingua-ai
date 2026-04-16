@@ -1,18 +1,18 @@
-"use client";
+﻿"use client";
 import { useState } from "react";
 import { Star, ThumbsUp, Send, Check } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { cn } from "@/lib/utils";
 
 const SEED_REVIEWS = [
-  { id: "r1", name: "Nguyen Thi Lan", avatar: "🦋", rating: 5, date: "2 ngay truoc", verified: true, helpful: 24, text: "App nay qua tuyet! Minh da hoc tieng Anh duoc 3 thang va thay su tien bo ro ret. AI chat rat tu nhien, giai thich ngu phap de hieu. Dac biet thich tinh nang phat am scoring - giup minh biet chinh xac cho nao can cai thien. Recommend cho tat ca moi nguoi!", tags: ["Chat AI", "Phat am", "Ngu phap"] },
-  { id: "r2", name: "Tran Van Minh", avatar: "🦁", rating: 5, date: "5 ngay truoc", verified: true, helpful: 18, text: "Minh la dan van phong can tieng Anh cho cong viec. LinguaAI giup minh viet email chuyen nghiep, luyen phong van bang tieng Anh. Tinh nang AI Kiem Tien viet caption ban hang bang tieng Anh rat huu ich. Da tang doanh so 30% nho viet duoc content tieng Anh tot hon!", tags: ["Business English", "AI Kiem Tien", "Email"] },
-  { id: "r3", name: "Le Thi Hoa", avatar: "🌸", rating: 5, date: "1 tuan truoc", verified: true, helpful: 31, text: "Con gai minh 15 tuoi dung app nay de on thi IELTS. Diem Speaking tang tu 5.5 len 7.0 chi sau 2 thang! Cac bai hoc video rat hay, quiz sau moi video giup ghi nho tot hon. Giao vien AI kien nhan, giai thich nhieu lan khong ngan. Rat xung dang voi gia tien!", tags: ["IELTS", "Speaking", "Video"] },
-  { id: "r4", name: "Pham Duc Anh", avatar: "🐯", rating: 4, date: "1 tuan truoc", verified: true, helpful: 12, text: "App kha tot, giao dien dep, de su dung. Tinh nang flashcard rat hieu qua, he thong spaced repetition giup nho tu lau hon. Chi tru 1 sao vi doi khi AI tra loi hoi cham. Nhung nhin chung rat hai long, se tiep tuc dung lau dai.", tags: ["Flashcard", "Tu vung", "UI/UX"] },
-  { id: "r5", name: "Vo Thi Thu", avatar: "🦊", rating: 5, date: "2 tuan truoc", verified: true, helpful: 27, text: "Minh da thu nhieu app hoc tieng Anh nhung LinguaAI la tot nhat! AI hieu nguyen ngu cua minh, tra loi bang tieng Viet khi can. Tinh nang Voice Call luyen noi rat thuc te. Sau 1 thang, minh da tu tin noi chuyen voi khach nuoc ngoai. Cam on team da tao ra san pham tuyet voi!", tags: ["Voice Call", "AI Chat", "Tieng Viet"] },
-  { id: "r6", name: "Hoang Van Long", avatar: "🐺", rating: 5, date: "3 tuan truoc", verified: true, helpful: 15, text: "Freelancer can tieng Anh de lam viec voi client nuoc ngoai. LinguaAI giup minh viet proposal, reply email, negotiate gia ca bang tieng Anh chuyen nghiep. Tinh nang AI Kiem Tien la game changer! Da tang thu nhap 50% nho viet duoc content tieng Anh tot.", tags: ["Freelance", "AI Kiem Tien", "Business"] },
-  { id: "r7", name: "Nguyen Thi Mai", avatar: "🦄", rating: 5, date: "1 thang truoc", verified: true, helpful: 42, text: "Minh la giao vien tieng Anh va rat an tuong voi chat luong cua LinguaAI. AI giai thich ngu phap chinh xac, vi du phong phu. Dac biet tinh nang Grammar Checker rat huu ich cho hoc sinh. Se gioi thieu cho tat ca hoc sinh cua minh!", tags: ["Ngu phap", "Giao vien", "Chat luong"] },
-  { id: "r8", name: "Bui Thanh Tung", avatar: "🐸", rating: 4, date: "1 thang truoc", verified: false, helpful: 8, text: "App tot, nhieu tinh nang hay. Dung duoc 2 tuan thay kha hieu qua. Tinh nang Brain Mode doc tai lieu tieng Anh rat hay. Mong team them nhieu video bai hoc hon nua. Overall rat hai long!", tags: ["Brain Mode", "Video", "Hoc lieu"] },
+  { id: "r1", name: "Nguyen Thi Lan", avatar: "🦋", rating: 5, date: "2 ngày trước", verified: true, helpful: 24, text: "App này quá tuyệt! Mình đã học tiếng Anh được 3 tháng và thấy sự tiến bộ rõ rệt. AI chat rất tự nhiên, giải thích ngữ pháp dễ hiểu. Đặc biệt thích tính năng phát âm scoring - giúp mình biết chính xác chỗ nào cần cải thiện. Recommend cho tất cả mọi người!", tags: ["Chat AI", "Phát âm", "Ngữ pháp"] },
+  { id: "r2", name: "Tran Van Minh", avatar: "🦁", rating: 5, date: "5 ngày trước", verified: true, helpful: 18, text: "Mình là dân văn phòng cần tiếng Anh cho công việc. LinguaAI giúp mình viết email chuyên nghiệp, luyện phỏng vấn bằng tiếng Anh. Tính năng AI Kiếm Tiền viết caption bán hàng bằng tiếng Anh rất hữu ích. Đã tăng doanh số 30% nhờ viết được content tiếng Anh tốt hơn!", tags: ["Business English", "AI Kiếm Tiền", "Email"] },
+  { id: "r3", name: "Le Thi Hoa", avatar: "🌸", rating: 5, date: "1 tuần trước", verified: true, helpful: 31, text: "Con gái mình 15 tuổi dùng app này để ôn thi IELTS. Điểm Speaking tăng từ 5.5 lên 7.0 chỉ sau 2 tháng! Các bài học video rất hay, quiz sau mỗi video giúp ghi nhớ tốt hơn. Giáo viên AI kiên nhẫn, giải thích nhiều lần không ngán. Rất xứng đáng với giá tiền!", tags: ["IELTS", "Speaking", "Video"] },
+  { id: "r4", name: "Pham Duc Anh", avatar: "🐯", rating: 4, date: "1 tuần trước", verified: true, helpful: 12, text: "App khá tốt, giao diện đẹp, dễ sử dụng. Tính năng flashcard rất hiệu quả, hệ thống spaced repetition giúp nhớ từ lâu hơn. Chỉ trừ 1 sao vì đôi khi AI trả lời hơi chậm. Nhưng nhìn chung rất hài lòng, sẽ tiếp tục dùng lâu dài.", tags: ["Flashcard", "Từ vựng", "UI/UX"] },
+  { id: "r5", name: "Vo Thi Thu", avatar: "🦊", rating: 5, date: "2 tuần trước", verified: true, helpful: 27, text: "Mình đã thử nhiều app học tiếng Anh nhưng LinguaAI là tốt nhất! AI hiểu nguyên ngữ của mình, trả lời bằng tiếng Việt khi cần. Tính năng Voice Call luyện nói rất thực tế. Sau 1 tháng, mình đã tự tin nói chuyện với khách nước ngoài. Cảm ơn team đã tạo ra sản phẩm tuyệt vời!", tags: ["Voice Call", "AI Chat", "Tiếng Việt"] },
+  { id: "r6", name: "Hoang Van Long", avatar: "🐺", rating: 5, date: "3 tuần trước", verified: true, helpful: 15, text: "Freelancer cần tiếng Anh để làm việc với client nước ngoài. LinguaAI giúp mình viết proposal, reply email, negotiate giá cả bằng tiếng Anh chuyên nghiệp. Tính năng AI Kiếm Tiền là game changer! Đã tăng thu nhập 50% nhờ viết được content tiếng Anh tốt.", tags: ["Freelance", "AI Kiếm Tiền", "Business"] },
+  { id: "r7", name: "Nguyen Thi Mai", avatar: "🦄", rating: 5, date: "1 tháng trước", verified: true, helpful: 42, text: "Mình là giáo viên tiếng Anh và rất ấn tượng với chất lượng của LinguaAI. AI giải thích ngữ pháp chính xác, ví dụ phong phú. Đặc biệt tính năng Grammar Checker rất hữu ích cho học sinh. Sẽ giới thiệu cho tất cả học sinh của mình!", tags: ["Ngữ pháp", "Giáo viên", "Chất lượng"] },
+  { id: "r8", name: "Bui Thanh Tung", avatar: "🐸", rating: 4, date: "1 tháng trước", verified: false, helpful: 8, text: "App tốt, nhiều tính năng hay. Dùng được 2 tuần thấy khá hiệu quả. Tính năng Brain Mode đọc tài liệu tiếng Anh rất hay. Mong team thêm nhiều video bài học hơn nữa. Overall rất hài lòng!", tags: ["Brain Mode", "Video", "Học liệu"] },
 ];
 
 const STATS = { total: 4.8, count: 1247, dist: [65, 20, 10, 3, 2] };
@@ -44,7 +44,7 @@ export default function ReviewsPage() {
       name: user?.name || "Ban",
       avatar: user?.avatar || "🌟",
       rating: myRating,
-      date: "Vua xong",
+      date: "Vừa xong",
       verified: true,
       helpful: 0,
       text: myText.trim(),
@@ -69,9 +69,9 @@ export default function ReviewsPage() {
     <div className="p-5 max-w-2xl">
       <div className="pt-2 mb-6">
         <h1 className="text-xl font-bold text-white flex items-center gap-2">
-          <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" /> Danh gia & Nhan xet
+          <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" /> Đánh giá & Nhận xét
         </h1>
-        <p className="text-sm text-gray-400 mt-1">Nguoi dung thuc su danh gia LinguaAI</p>
+        <p className="text-sm text-gray-400 mt-1">Người dùng thực sự đánh giá LinguaAI</p>
       </div>
 
       {/* Overall stats */}
@@ -80,7 +80,7 @@ export default function ReviewsPage() {
           <div className="text-center shrink-0">
             <p className="text-5xl font-black text-white">{STATS.total}</p>
             <StarRating rating={5} size="lg" />
-            <p className="text-gray-500 text-xs mt-1">{STATS.count.toLocaleString()} danh gia</p>
+            <p className="text-gray-500 text-xs mt-1">{STATS.count.toLocaleString()} đánh giá</p>
           </div>
           <div className="flex-1 flex flex-col gap-1.5">
             {[5,4,3,2,1].map((star, i) => (
@@ -98,9 +98,9 @@ export default function ReviewsPage() {
         </div>
         <div className="flex gap-3 mt-4 pt-4 border-t border-white/10 text-center">
           {[
-            { label: "Hoc vien", value: "12,400+" },
-            { label: "Danh gia 5 sao", value: "85%" },
-            { label: "Gioi thieu ban be", value: "92%" },
+            { label: "Học viên", value: "12,400+" },
+            { label: "Đánh giá 5 sao", value: "85%" },
+            { label: "Giới thiệu bạn bè", value: "92%" },
           ].map(s => (
             <div key={s.label} className="flex-1">
               <p className="text-white font-black text-lg">{s.value}</p>
@@ -113,7 +113,7 @@ export default function ReviewsPage() {
       {/* Write review */}
       {!submitted ? (
         <div className="rounded-2xl p-4 mb-5" style={{ background: "rgba(26,16,53,0.8)", border: "1px solid rgba(139,92,246,0.2)" }}>
-          <p className="text-white font-semibold text-sm mb-3">Viet danh gia cua ban</p>
+          <p className="text-white font-semibold text-sm mb-3">Viết đánh giá của bạn</p>
           <div className="flex gap-2 mb-3">
             {[1,2,3,4,5].map(i => (
               <button key={i} onClick={() => setMyRating(i)}>
@@ -122,7 +122,7 @@ export default function ReviewsPage() {
             ))}
           </div>
           <textarea value={myText} onChange={e => setMyText(e.target.value)}
-            placeholder="Chia se trai nghiem cua ban voi LinguaAI..."
+            placeholder="Chia sẻ trải nghiệm của bạn với LinguaAI..."
             rows={3}
             className="w-full rounded-xl px-3 py-2.5 text-sm text-white placeholder-gray-500 border border-gray-700 focus:outline-none focus:border-primary-500 resize-none mb-3"
             style={{ background: "rgba(15,10,30,0.8)" }}
@@ -130,14 +130,14 @@ export default function ReviewsPage() {
           <button onClick={submit} disabled={!myRating || !myText.trim()}
             className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white transition-all disabled:opacity-40"
             style={{ background: "linear-gradient(135deg,#7c3aed,#6366f1)" }}>
-            <Send className="w-4 h-4" /> Gui danh gia
+            <Send className="w-4 h-4" /> Gửi đánh giá
           </button>
         </div>
       ) : (
         <div className="rounded-2xl p-4 mb-5 flex items-center gap-3"
           style={{ background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.3)" }}>
           <Check className="w-5 h-5 text-green-400 shrink-0" />
-          <p className="text-green-300 text-sm font-medium">Cam on ban da danh gia! Danh gia cua ban giup nhieu nguoi hon.</p>
+          <p className="text-green-300 text-sm font-medium">Cảm ơn bạn đã đánh giá! Đánh giá của bạn giúp nhiều người hơn.</p>
         </div>
       )}
 
@@ -147,7 +147,7 @@ export default function ReviewsPage() {
           <button key={s} onClick={() => setFilter(s)}
             className={cn("flex items-center gap-1 px-3 py-1.5 rounded-xl border text-xs font-medium shrink-0 transition-colors",
               filter === s ? "border-yellow-500 bg-yellow-900/20 text-yellow-300" : "border-gray-700 bg-gray-800 text-gray-400")}>
-            {s === 0 ? "Tat ca" : <><Star className="w-3 h-3 fill-yellow-400 text-yellow-400" /> {s} sao</>}
+            {s === 0 ? "Tất cả" : <><Star className="w-3 h-3 fill-yellow-400 text-yellow-400" /> {s} sao</>}
           </button>
         ))}
       </div>
@@ -166,7 +166,7 @@ export default function ReviewsPage() {
                   <p className="text-white font-semibold text-sm">{rv.name}</p>
                   {rv.verified && (
                     <span className="text-xs bg-green-900/30 text-green-400 px-1.5 py-0.5 rounded-full flex items-center gap-0.5">
-                      <Check className="w-2.5 h-2.5" /> Da xac minh
+                      <Check className="w-2.5 h-2.5" /> Đã xác minh
                     </span>
                   )}
                 </div>
@@ -188,7 +188,7 @@ export default function ReviewsPage() {
               className={cn("flex items-center gap-1.5 text-xs transition-colors",
                 helpedIds.includes(rv.id) ? "text-primary-400" : "text-gray-600 hover:text-gray-400")}>
               <ThumbsUp className="w-3.5 h-3.5" />
-              Huu ich ({rv.helpful + (helpedIds.includes(rv.id) ? 1 : 0)})
+              Hữu ích ({rv.helpful + (helpedIds.includes(rv.id) ? 1 : 0)})
             </button>
           </div>
         ))}
@@ -196,3 +196,5 @@ export default function ReviewsPage() {
     </div>
   );
 }
+
+
