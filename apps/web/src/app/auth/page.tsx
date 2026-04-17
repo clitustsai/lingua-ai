@@ -21,6 +21,7 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [oauthLoading, setOauthLoading] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState("");
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   const supabase = createClient();
 
@@ -64,6 +65,7 @@ export default function AuthPage() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(""); setSuccessMsg("");
+    if (!agreedToTerms) { setError("Vui lòng đọc và đồng ý với điều khoản sử dụng"); return; }
     if (!email.trim() || !password.trim()) { setError("Vui lòng điền đầy đủ thông tin"); return; }
     if (password.length < 6) { setError("Mật khẩu tối thiểu 6 ký tự"); return; }
     setLoading(true);
@@ -139,12 +141,12 @@ export default function AuthPage() {
         <div className="rounded-3xl p-6" style={{ background: "rgba(26,16,53,0.9)", border: "1px solid rgba(139,92,246,0.25)", backdropFilter: "blur(20px)" }}>
           {/* Tabs */}
           <div className="flex gap-1 p-1 rounded-2xl mb-6" style={{ background: "rgba(15,10,30,0.6)" }}>
-            <button onClick={() => { setMode("login"); setError(""); setSuccessMsg(""); }}
+            <button onClick={() => { setMode("login"); setError(""); setSuccessMsg(""); setAgreedToTerms(false); }}
               className={cn("flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all",
                 mode === "login" ? "bg-primary-600 text-white shadow-lg" : "text-gray-400 hover:text-gray-200")}>
               Đăng nhập
             </button>
-            <button onClick={() => { setMode("register"); setError(""); setSuccessMsg(""); }}
+            <button onClick={() => { setMode("register"); setError(""); setSuccessMsg(""); setAgreedToTerms(false); }}
               className={cn("flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all",
                 mode === "register" ? "bg-primary-600 text-white shadow-lg" : "text-gray-400 hover:text-gray-200")}>
               Đăng ký
@@ -221,6 +223,40 @@ export default function AuthPage() {
               </div>
             </div>
 
+            {/* Terms checkbox */}
+            <label className="flex items-start gap-2.5 cursor-pointer select-none">
+              <div className="relative mt-0.5 flex-shrink-0">
+                <input
+                  type="checkbox"
+                  checked={agreedToTerms}
+                  onChange={e => { setAgreedToTerms(e.target.checked); setError(""); }}
+                  className="sr-only"
+                />
+                <div
+                  onClick={() => { setAgreedToTerms(v => !v); setError(""); }}
+                  className={cn(
+                    "w-4 h-4 rounded border-2 flex items-center justify-center transition-all",
+                    agreedToTerms
+                      ? "bg-primary-600 border-primary-600"
+                      : "bg-transparent border-gray-600 hover:border-primary-500"
+                  )}
+                >
+                  {agreedToTerms && (
+                    <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 10 8">
+                      <path d="M1 4l3 3 5-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  )}
+                </div>
+              </div>
+              <span className="text-xs text-gray-400 leading-relaxed">
+                Tôi đã đọc và đồng ý với{" "}
+                <a href="/terms" target="_blank" className="text-primary-400 hover:text-primary-300 underline underline-offset-2">
+                  điều khoản sử dụng
+                </a>{" "}
+                của LinguaAI
+              </span>
+            </label>
+
             {error && (
               <div className="rounded-xl px-4 py-2.5 text-sm text-red-300"
                 style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)" }}>
@@ -235,7 +271,7 @@ export default function AuthPage() {
               </div>
             )}
 
-            <button type="submit" disabled={loading}
+            <button type="submit" disabled={loading || !agreedToTerms}
               className="w-full py-3.5 rounded-xl font-bold text-white flex items-center justify-center gap-2 transition-all disabled:opacity-70 mt-1"
               style={{ background: "linear-gradient(135deg,#7c3aed,#6366f1)", boxShadow: "0 4px 20px rgba(124,58,237,0.4)" }}>
               {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Đang xử lý...</> : (
@@ -244,10 +280,6 @@ export default function AuthPage() {
             </button>
           </form>
         </div>
-
-        <p className="text-center text-xs text-gray-600 mt-4">
-          Bằng cách đăng ký, bạn đồng ý với điều khoản sử dụng của LinguaAI
-        </p>
       </div>
     </div>
   );
