@@ -2,7 +2,8 @@
 import { useAppStore } from "@/store/useAppStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { SUPPORTED_LANGUAGES, LEVELS, CONVERSATION_TOPICS } from "@ai-lang/shared";
-import { Volume2, Target, Sun, Moon, Camera, Check, X, Pencil } from "lucide-react";
+import { Volume2, Target, Sun, Moon, Camera, Check, X, Pencil, LogOut } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { NotificationToggle } from "@/components/NotificationManager";
 import { useState, useRef } from "react";
@@ -10,8 +11,11 @@ import { useState, useRef } from "react";
 const AVATARS = ["🦊","🐼","🦁","🐯","🦋","🐸","🦄","🐙","🦅","🐬","🌟","🎭","🐺","🦝","🐨","🦜","🐲","🧸","🎃","🤖","👾","🎯"];
 
 export default function SettingsPage() {
+  const router = useRouter();
   const { settings, setSettings, streak, stats, flashcards, totalMessages } = useAppStore();
-  const { theme, setTheme, user, updateProfile } = useAuthStore();
+  const { theme, setTheme, user, updateProfile, logout } = useAuthStore();
+
+  const handleLogout = () => { logout(); router.push("/auth"); };
 
   const [editingName, setEditingName] = useState(false);
   const [editingNick, setEditingNick] = useState(false);
@@ -233,6 +237,26 @@ export default function SettingsPage() {
 
         {/* Toggles */}
         <div className="flex flex-col gap-3">
+          {/* User card + logout */}
+          {user && (
+            <div className="flex items-center gap-3 bg-gray-800 rounded-xl px-4 py-3">
+              <div className="w-10 h-10 rounded-xl overflow-hidden bg-primary-600/30 flex items-center justify-center shrink-0">
+                {user.avatar?.startsWith("http")
+                  ? <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                  : <span className="text-2xl">{user.avatar}</span>
+                }
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-white text-sm font-semibold truncate">{user.name}</p>
+                <p className="text-gray-500 text-xs truncate">{user.email}</p>
+              </div>
+              <button onClick={handleLogout}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors text-xs font-medium shrink-0">
+                <LogOut className="w-3.5 h-3.5" />
+                Đăng xuất
+              </button>
+            </div>
+          )}
           {/* Theme toggle */}
           <div className="flex items-center justify-between bg-gray-800 rounded-xl px-4 py-3">
             <div className="flex items-center gap-2">
