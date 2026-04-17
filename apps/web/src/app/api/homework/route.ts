@@ -23,8 +23,14 @@ async function generateHomework(body: any) {
   const topicLine = topic ? `Topic: ${topic}` : "Topic: general";
   const weakLine = weakAreas?.length ? `Weak areas: ${weakAreas.slice(0, 3).join(", ")}` : "";
 
-  const prompt = `Create ${safeCount} language exercises for a ${level} student learning ${targetLanguage} (native: ${nativeLanguage}).
+  const prompt = `Create ${safeCount} ${targetLanguage} language exercises for a ${level} student (native language: ${nativeLanguage}).
 Skill: ${skill}. Difficulty: ${difficulty}. ${topicLine}. ${weakLine}
+
+IMPORTANT RULES:
+- All questions and answer options MUST be in ${targetLanguage} (the language being learned)
+- Instructions and hints may be in ${nativeLanguage} to help the student understand
+- The title should be in ${nativeLanguage}
+- Students are LEARNING ${targetLanguage}, so test them IN ${targetLanguage}
 
 Return ONLY valid JSON in this exact format:
 {
@@ -33,19 +39,19 @@ Return ONLY valid JSON in this exact format:
     {
       "id": "1",
       "type": "multiple-choice",
-      "instruction": "Chọn đáp án đúng",
-      "question": "question text",
-      "answer": "correct answer",
-      "hint": "optional hint",
+      "instruction": "brief instruction in ${nativeLanguage}",
+      "question": "question in ${targetLanguage}",
+      "answer": "correct answer in ${targetLanguage}",
+      "hint": "optional hint in ${nativeLanguage}",
       "points": 5,
-      "options": ["option A", "option B", "option C", "option D"]
+      "options": ["option in ${targetLanguage}", "option B", "option C", "option D"]
     }
   ]
 }
 
-Mix types: use multiple-choice for ~60%, fill-blank for ~40%.
-For fill-blank: no options field, answer is the missing word/phrase.
-Keep questions short and clear. Return exactly ${safeCount} exercises.`;
+Mix types: ~60% multiple-choice, ~40% fill-blank.
+For fill-blank: question has a blank (___), answer is the missing ${targetLanguage} word/phrase, no options field.
+Return exactly ${safeCount} exercises.`;
 
   const completion = await groq.chat.completions.create({
     model: "llama-3.1-8b-instant",
