@@ -1,15 +1,23 @@
 "use client";
 import { useAppStore } from "@/store/useAppStore";
+import { useAuthStore } from "@/store/useAuthStore";
 import { COURSES } from "@ai-lang/shared";
 import { useRouter } from "next/navigation";
 import { BookOpen, ChevronRight, Star, Flame, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
+import PremiumGate from "@/components/PremiumGate";
 
 const CATEGORIES = ["Tất cả", "Chứng chỉ", "Kỹ năng", "Giao tiếp", "Ngôn ngữ"];
 
 export default function CoursesPage() {
   const { courseProgress, totalXp, streak, enrollCourse } = useAppStore();
+  const { user } = useAuthStore();
   const router = useRouter();
+
+  // Khóa học: luôn yêu cầu Premium
+  if (!user?.isPremium) {
+    return <PremiumGate title="Khóa học — Premium" desc="Truy cập toàn bộ khóa học với hàng trăm bài học, quiz và lộ trình cá nhân hóa. Yêu cầu gói Premium." />;
+  }
 
   const enrolledCourses = COURSES.filter(c => courseProgress.find(p => p.courseId === c.id));
   const suggestedCourses = COURSES.filter(c => !courseProgress.find(p => p.courseId === c.id));
