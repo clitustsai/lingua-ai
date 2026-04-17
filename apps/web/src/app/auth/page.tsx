@@ -148,8 +148,6 @@ export default function AuthPage() {
     const { error } = await supabase.auth.signInWithOtp({ phone: formatted });
     setLoading(false);
     if (error) { setError(error.message); return; }
-    setStep("otp");
-    setCountdown(60);
   };
 
   const verifyOtp = async () => {
@@ -309,21 +307,8 @@ export default function AuthPage() {
                   <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.08)" }} />
                 </div>
 
-                {/* Method toggle */}
-                <div className="flex gap-1 p-1 rounded-2xl" style={{ background: "rgba(0,0,0,0.3)" }}>
-                  {(["email","phone"] as Method[]).map(m => (
-                    <button key={m} onClick={() => switchMethod(m)}
-                      className={cn("flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-semibold transition-all",
-                        method === m ? "bg-white/10 text-white" : "text-white/40 hover:text-white/60")}>
-                      {m === "email" ? <Mail className="w-3.5 h-3.5" /> : <Phone className="w-3.5 h-3.5" />}
-                      {m === "email" ? "Email" : "Số điện thoại"}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Fields */}
-                {method === "email" ? (
-                  <form onSubmit={submitEmail} className="flex flex-col gap-3">
+                {/* Fields - Email only */}
+                <form onSubmit={submitEmail} className="flex flex-col gap-3">
                     {mode === "register" && (
                       <input value={name} onChange={e => setName(e.target.value)} placeholder="Tên hiển thị" className={inputCls} />
                     )}
@@ -336,8 +321,6 @@ export default function AuthPage() {
                         {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
                     </div>
-
-                    {/* Terms */}
                     <label className="flex items-start gap-2.5 cursor-pointer select-none mt-1">
                       <div onClick={() => { setAgreedToTerms(v => !v); setError(""); }}
                         className={cn("w-4 h-4 rounded-md border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all",
@@ -348,10 +331,8 @@ export default function AuthPage() {
                         Tôi đồng ý với <a href="/terms" target="_blank" className="text-primary-400 hover:text-primary-300 underline underline-offset-2">điều khoản sử dụng</a> của LinguaAI
                       </span>
                     </label>
-
                     {error && <p className="text-red-400 text-xs px-1">{error}</p>}
                     {successMsg && <p className="text-green-400 text-xs px-1">{successMsg}</p>}
-
                     <button type="submit" disabled={loading || !agreedToTerms}
                       className="w-full py-4 rounded-2xl font-bold text-white flex items-center justify-center gap-2 transition-all disabled:opacity-40 mt-1"
                       style={{ background: "linear-gradient(135deg,#7c3aed,#6366f1)", boxShadow: "0 4px 20px rgba(124,58,237,0.4)" }}>
@@ -359,41 +340,6 @@ export default function AuthPage() {
                       {loading ? "Đang xử lý..." : mode === "login" ? "Đăng nhập" : "Tạo tài khoản"}
                     </button>
                   </form>
-                ) : (
-                  <div className="flex flex-col gap-3">
-                    {mode === "register" && (
-                      <input value={name} onChange={e => setName(e.target.value)} placeholder="Tên hiển thị" className={inputCls} />
-                    )}
-                    <div className="flex gap-2">
-                      <div className="flex items-center px-3 rounded-2xl text-sm text-white/50 shrink-0"
-                        style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}>
-                        +84
-                      </div>
-                      <input value={phone} onChange={e => setPhone(e.target.value)} type="tel"
-                        placeholder="912 345 678" className={cn(inputCls, "flex-1")} />
-                    </div>
-
-                    <label className="flex items-start gap-2.5 cursor-pointer select-none">
-                      <div onClick={() => { setAgreedToTerms(v => !v); setError(""); }}
-                        className={cn("w-4 h-4 rounded-md border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all",
-                          agreedToTerms ? "bg-primary-600 border-primary-600" : "bg-transparent border-white/20 hover:border-primary-500")}>
-                        {agreedToTerms && <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 10 8"><path d="M1 4l3 3 5-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-                      </div>
-                      <span className="text-xs text-white/40 leading-relaxed">
-                        Tôi đồng ý với <a href="/terms" target="_blank" className="text-primary-400 hover:text-primary-300 underline underline-offset-2">điều khoản sử dụng</a>
-                      </span>
-                    </label>
-
-                    {error && <p className="text-red-400 text-xs px-1">{error}</p>}
-
-                    <button onClick={sendOtp} disabled={loading || !agreedToTerms}
-                      className="w-full py-4 rounded-2xl font-bold text-white flex items-center justify-center gap-2 transition-all disabled:opacity-40"
-                      style={{ background: "linear-gradient(135deg,#7c3aed,#6366f1)", boxShadow: "0 4px 20px rgba(124,58,237,0.4)" }}>
-                      {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Phone className="w-4 h-4" />}
-                      {loading ? "Đang gửi..." : "Gửi mã OTP"}
-                    </button>
-                  </div>
-                )}
               </div>
             )}
           </div>
