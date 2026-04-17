@@ -1,17 +1,19 @@
 "use client";
 import { useState } from "react";
-import { Loader2, Copy, Check, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/store/useAuthStore";
+import { Loader2, Copy, Check, Sparkles, ChevronDown, ChevronUp, Crown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const TOOLS = [
-  { id: "tiktok",    emoji: "🎬", label: "TikTok Script",      desc: "Viral video scripts for TikTok/Reels", placeholder: "e.g. How to make money online, Morning routine, Travel tips Vietnam" },
-  { id: "caption",   emoji: "🛍️", label: "Sales Caption",      desc: "High-converting captions for products", placeholder: "e.g. Handmade candles, Online course, Fashion clothing" },
-  { id: "email",     emoji: "📧", label: "Business Email",      desc: "Professional emails to foreign clients", placeholder: "e.g. Follow up after meeting, Request for quotation, Partnership proposal" },
-  { id: "reply",     emoji: "💬", label: "Customer Reply",      desc: "Reply to foreign customer messages", placeholder: "Paste the customer message here..." },
-  { id: "freelance", emoji: "💼", label: "Freelance Profile",   desc: "Upwork/Fiverr bio that gets hired", placeholder: "e.g. Web developer 3 years React, Graphic designer logo branding" },
-  { id: "product",   emoji: "📦", label: "Product Description", desc: "SEO product descriptions for e-commerce", placeholder: "e.g. Bamboo water bottle 500ml eco-friendly, Wireless earbuds noise cancelling" },
-  { id: "negotiate", emoji: "🤝", label: "Negotiation Script",  desc: "Scripts to negotiate salary/price/deals", placeholder: "e.g. Asking for 20% salary raise, Negotiating freelance rate with client" },
-  { id: "cv",        emoji: "📄", label: "CV & Cover Letter",   desc: "Professional CV summary in English", placeholder: "e.g. Marketing manager 5 years, Fresh graduate computer science" },
+  { id: "caption",   emoji: "🛍️", label: "Sales Caption",      desc: "Caption bán hàng thu hút", placeholder: "e.g. Nến thơm handmade, Khóa học online, Thời trang", premium: false },
+  { id: "email",     emoji: "📧", label: "Business Email",      desc: "Email chuyên nghiệp cho khách nước ngoài", placeholder: "e.g. Follow up sau meeting, Xin báo giá, Đề xuất hợp tác", premium: false },
+  { id: "reply",     emoji: "💬", label: "Customer Reply",      desc: "Trả lời tin nhắn khách hàng nước ngoài", placeholder: "Dán tin nhắn của khách vào đây...", premium: false },
+  { id: "product",   emoji: "📦", label: "Product Description", desc: "Mô tả sản phẩm SEO cho e-commerce", placeholder: "e.g. Bình nước tre 500ml thân thiện môi trường, Tai nghe không dây chống ồn", premium: false },
+  { id: "tiktok",    emoji: "🎬", label: "TikTok Script",       desc: "Script viral cho TikTok/Reels", placeholder: "e.g. Cách kiếm tiền online, Morning routine, Du lịch Việt Nam", premium: true },
+  { id: "freelance", emoji: "💼", label: "Freelance Profile",   desc: "Bio Upwork/Fiverr được thuê nhiều hơn", placeholder: "e.g. Web developer 3 năm React, Graphic designer logo branding", premium: true },
+  { id: "negotiate", emoji: "🤝", label: "Negotiation Script",  desc: "Script đàm phán lương/giá/hợp đồng", placeholder: "e.g. Xin tăng lương 20%, Thương lượng rate freelance với client", premium: true },
+  { id: "cv",        emoji: "📄", label: "CV & Cover Letter",   desc: "CV và thư xin việc tiếng Anh chuyên nghiệp", placeholder: "e.g. Marketing manager 5 năm, Fresh graduate computer science", premium: true },
 ];
 
 const LANGUAGES = ["English", "Vietnamese + English", "Japanese", "Korean", "Chinese", "French", "Spanish"];
@@ -138,6 +140,10 @@ function renderResult(toolId: string, data: any) {
 }
 
 export default function MoneyPage() {
+  const router = useRouter();
+  const { user } = useAuthStore();
+  const isPremium = user?.isPremium ?? false;
+
   const [activeTool, setActiveTool] = useState(TOOLS[0]);
   const [input, setInput] = useState("");
   const [language, setLanguage] = useState("English");
@@ -145,8 +151,10 @@ export default function MoneyPage() {
   const [result, setResult] = useState<any>(null);
   const [showLangPicker, setShowLangPicker] = useState(false);
 
+  const isLocked = activeTool.premium && !isPremium;
+
   const generate = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() || isLocked) return;
     setLoading(true);
     setResult(null);
     try {
@@ -178,10 +186,15 @@ export default function MoneyPage() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-5">
         {TOOLS.map(t => (
           <button key={t.id} onClick={() => selectTool(t)}
-            className={cn("flex flex-col items-center gap-1.5 p-3 rounded-2xl border text-center transition-all",
+            className={cn("flex flex-col items-center gap-1.5 p-3 rounded-2xl border text-center transition-all relative",
               activeTool.id === t.id
                 ? "border-primary-500 bg-primary-900/30"
                 : "border-gray-700 bg-gray-800/60 hover:border-gray-600")}>
+            {t.premium && !isPremium && (
+              <span className="absolute top-1.5 right-1.5 text-yellow-400">
+                <Crown className="w-3 h-3" />
+              </span>
+            )}
             <span className="text-2xl">{t.emoji}</span>
             <span className={cn("text-xs font-medium leading-tight", activeTool.id === t.id ? "text-white" : "text-gray-400")}>{t.label}</span>
           </button>
@@ -192,8 +205,15 @@ export default function MoneyPage() {
       <div className="rounded-2xl p-4 mb-4" style={{ background: "rgba(26,16,53,0.8)", border: "1px solid rgba(139,92,246,0.2)" }}>
         <div className="flex items-center gap-2 mb-3">
           <span className="text-2xl">{activeTool.emoji}</span>
-          <div>
-            <p className="text-white font-semibold text-sm">{activeTool.label}</p>
+          <div className="flex-1">
+            <div className="flex items-center gap-2">
+              <p className="text-white font-semibold text-sm">{activeTool.label}</p>
+              {activeTool.premium && !isPremium && (
+                <span className="flex items-center gap-1 text-xs bg-yellow-900/40 text-yellow-400 px-2 py-0.5 rounded-full border border-yellow-700/30">
+                  <Crown className="w-3 h-3" /> Premium
+                </span>
+              )}
+            </div>
             <p className="text-gray-500 text-xs">{activeTool.desc}</p>
           </div>
         </div>
@@ -201,43 +221,52 @@ export default function MoneyPage() {
         <textarea
           value={input}
           onChange={e => setInput(e.target.value)}
-          placeholder={activeTool.placeholder}
+          placeholder={isLocked ? "Nâng cấp Premium để dùng tính năng này..." : activeTool.placeholder}
+          disabled={isLocked}
           rows={3}
-          className="w-full rounded-xl px-3 py-2.5 text-sm text-white placeholder-gray-500 border border-gray-700 focus:outline-none focus:border-primary-500 resize-none mb-3"
+          className="w-full rounded-xl px-3 py-2.5 text-sm text-white placeholder-gray-500 border border-gray-700 focus:outline-none focus:border-primary-500 resize-none mb-3 disabled:opacity-40 disabled:cursor-not-allowed"
           style={{ background: "rgba(15,10,30,0.8)" }}
         />
 
-        <div className="flex items-center gap-2">
-          {/* Language picker */}
-          <div className="relative">
-            <button onClick={() => setShowLangPicker(!showLangPicker)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-gray-700 bg-gray-800 text-xs text-gray-300 hover:border-gray-600 transition-colors">
-              🌐 {language}
-              {showLangPicker ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-            </button>
-            {showLangPicker && (
-              <div className="absolute bottom-full mb-1 left-0 rounded-xl overflow-hidden shadow-2xl z-10"
-                style={{ background: "#1a1035", border: "1px solid rgba(139,92,246,0.3)" }}>
-                {LANGUAGES.map(l => (
-                  <button key={l} onClick={() => { setLanguage(l); setShowLangPicker(false); }}
-                    className={cn("block w-full text-left px-4 py-2 text-xs transition-colors hover:bg-primary-900/30",
-                      language === l ? "text-primary-300 bg-primary-900/20" : "text-gray-300")}>
-                    {l}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <button onClick={generate} disabled={loading || !input.trim()}
-            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold text-white transition-all disabled:opacity-50"
-            style={{ background: "linear-gradient(135deg,#7c3aed,#6366f1)" }}>
-            {loading
-              ? <><Loader2 className="w-4 h-4 animate-spin" /> Đang tạo...</>
-              : <><Sparkles className="w-4 h-4" /> Tạo ngay</>
-            }
+        {isLocked ? (
+          <button onClick={() => router.push("/premium")}
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90"
+            style={{ background: "linear-gradient(135deg,#f59e0b,#f97316)", boxShadow: "0 4px 20px rgba(245,158,11,0.3)" }}>
+            <Crown className="w-4 h-4" /> Nâng cấp Premium để dùng
           </button>
-        </div>
+        ) : (
+          <div className="flex items-center gap-2">
+            {/* Language picker */}
+            <div className="relative">
+              <button onClick={() => setShowLangPicker(!showLangPicker)}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-gray-700 bg-gray-800 text-xs text-gray-300 hover:border-gray-600 transition-colors">
+                🌐 {language}
+                {showLangPicker ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+              </button>
+              {showLangPicker && (
+                <div className="absolute bottom-full mb-1 left-0 rounded-xl overflow-hidden shadow-2xl z-10"
+                  style={{ background: "#1a1035", border: "1px solid rgba(139,92,246,0.3)" }}>
+                  {LANGUAGES.map(l => (
+                    <button key={l} onClick={() => { setLanguage(l); setShowLangPicker(false); }}
+                      className={cn("block w-full text-left px-4 py-2 text-xs transition-colors hover:bg-primary-900/30",
+                        language === l ? "text-primary-300 bg-primary-900/20" : "text-gray-300")}>
+                      {l}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <button onClick={generate} disabled={loading || !input.trim()}
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold text-white transition-all disabled:opacity-50"
+              style={{ background: "linear-gradient(135deg,#7c3aed,#6366f1)" }}>
+              {loading
+                ? <><Loader2 className="w-4 h-4 animate-spin" /> Đang tạo...</>
+                : <><Sparkles className="w-4 h-4" /> Tạo ngay</>
+              }
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Loading */}

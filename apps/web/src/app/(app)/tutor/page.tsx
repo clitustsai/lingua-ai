@@ -1,7 +1,7 @@
 "use client";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useAppStore } from "@/store/useAppStore";
-import { Send, Mic, MicOff, Sparkles, Plus, Zap, BookOpen, Loader2 } from "lucide-react";
+import { Send, Mic, MicOff, Sparkles, Plus, Zap, BookOpen, Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import { speakText } from "@/components/VoiceButton";
 import { cn } from "@/lib/utils";
 
@@ -21,6 +21,29 @@ type TutorMsg = {
   encouragement?: string;
 };
 
+const LESSON_TOPICS = [
+  { emoji: "👋", label: "Chào hỏi cơ bản", prompt: "Teach me basic greetings and introductions" },
+  { emoji: "🛒", label: "Mua sắm", prompt: "Teach me vocabulary and phrases for shopping" },
+  { emoji: "🍜", label: "Nhà hàng & Đồ ăn", prompt: "Teach me how to order food at a restaurant" },
+  { emoji: "✈️", label: "Du lịch", prompt: "Teach me travel phrases and airport vocabulary" },
+  { emoji: "💼", label: "Công việc & Phỏng vấn", prompt: "Teach me professional English for job interviews" },
+  { emoji: "🏥", label: "Sức khỏe & Bệnh viện", prompt: "Teach me medical vocabulary and health phrases" },
+  { emoji: "📞", label: "Giao tiếp điện thoại", prompt: "Teach me how to have phone conversations professionally" },
+  { emoji: "🏠", label: "Nhà ở & Thuê nhà", prompt: "Teach me vocabulary for renting and describing a home" },
+  { emoji: "💰", label: "Tài chính & Ngân hàng", prompt: "Teach me banking and financial vocabulary" },
+  { emoji: "🎓", label: "Học thuật & Trường học", prompt: "Teach me academic English for school and university" },
+  { emoji: "💻", label: "Công nghệ & IT", prompt: "Teach me tech vocabulary and IT English" },
+  { emoji: "🤝", label: "Đàm phán & Thuyết phục", prompt: "Teach me negotiation phrases and persuasive language" },
+  { emoji: "😊", label: "Cảm xúc & Tâm trạng", prompt: "Teach me how to express emotions and feelings" },
+  { emoji: "🌍", label: "Văn hóa & Xã hội", prompt: "Teach me cultural topics and social conversation" },
+  { emoji: "📰", label: "Tin tức & Thời sự", prompt: "Teach me vocabulary for discussing news and current events" },
+  { emoji: "🎮", label: "Giải trí & Sở thích", prompt: "Teach me vocabulary about hobbies and entertainment" },
+  { emoji: "👨‍👩‍👧", label: "Gia đình & Mối quan hệ", prompt: "Teach me vocabulary about family and relationships" },
+  { emoji: "🚗", label: "Giao thông & Đi lại", prompt: "Teach me transportation and directions vocabulary" },
+  { emoji: "📝", label: "Viết email & Văn phòng", prompt: "Teach me how to write professional emails and office communication" },
+  { emoji: "🎤", label: "Thuyết trình & Public Speaking", prompt: "Teach me phrases for presentations and public speaking" },
+];
+
 export default function TutorPage() {
   const { settings, tutorMemory, addFlashcard, incrementMessages, incrementWords, checkAchievements } = useAppStore();
   const [msgs, setMsgs] = useState<TutorMsg[]>([]);
@@ -29,19 +52,19 @@ export default function TutorPage() {
   const [isListening, setIsListening] = useState(false);
   const [autoFlashcards, setAutoFlashcards] = useState<any[]>([]);
   const [showAutoFC, setShowAutoFC] = useState(false);
+  const [showTopics, setShowTopics] = useState(true);
   const bottomRef = useRef<HTMLDivElement>(null);
   const recRef = useRef<any>(null);
   const historyRef = useRef<{ role: string; content: string }[]>([]);
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [msgs]);
 
-  // Start with tutor greeting
   useEffect(() => {
     const greeting: TutorMsg = {
       id: "0", role: "tutor",
-      text: `Hello! I'm your personal ${settings.targetLanguage.name} tutor. I'll teach you actively — asking questions, giving exercises, and testing you. Ready? Let's start! 🎓`,
-      translation: `Xin chào! Tôi là gia sư ${settings.targetLanguage.name} cá nhân của bạn. Tôi sẽ dạy chủ động — đặt câu hỏi, cho bài tập và kiểm tra bạn. Sẵn sàng chưa?`,
-      exercise: `First, tell me: What do you want to learn today? (Answer in ${settings.targetLanguage.name} if you can!)`,
+      text: `Hello! I'm your personal ${settings.targetLanguage.name} tutor. Choose a lesson topic below or just start chatting! 🎓`,
+      translation: `Xin chào! Tôi là gia sư ${settings.targetLanguage.name} của bạn. Chọn chủ đề bài học bên dưới hoặc bắt đầu chat ngay!`,
+      exercise: `What topic would you like to learn today?`,
       exerciseType: "open",
     };
     setMsgs([greeting]);
@@ -52,6 +75,7 @@ export default function TutorPage() {
     const content = (text ?? input).trim();
     if (!content || loading) return;
     setInput("");
+    setShowTopics(false);
     const userMsg: TutorMsg = { id: Date.now().toString(), role: "user", text: content };
     setMsgs(prev => [...prev, userMsg]);
     historyRef.current.push({ role: "user", content });
@@ -87,7 +111,6 @@ export default function TutorPage() {
       checkAchievements();
       if (settings.autoSpeak !== false) speakText(data.reply, settings.targetLanguage.code, settings.speechRate);
 
-      // Auto-generate flashcards every 5 tutor messages
       if (historyRef.current.filter(m => m.role === "assistant").length % 5 === 0) {
         generateAutoFlashcards();
       }
@@ -150,12 +173,37 @@ export default function TutorPage() {
           </h1>
           <p className="text-xs text-gray-500 mt-0.5">Dạy chủ động · Kiểm tra · Sửa lỗi</p>
         </div>
-        <button onClick={generateAutoFlashcards}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-colors"
-          style={{ background: "rgba(139,92,246,0.2)", border: "1px solid rgba(139,92,246,0.3)", color: "#c4b5fd" }}>
-          <BookOpen className="w-3.5 h-3.5" /> Tạo flashcard
-        </button>
+        <div className="flex items-center gap-2">
+          <button onClick={() => setShowTopics(v => !v)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-colors"
+            style={{ background: "rgba(99,102,241,0.2)", border: "1px solid rgba(99,102,241,0.3)", color: "#a5b4fc" }}>
+            <BookOpen className="w-3.5 h-3.5" /> Bài học
+            {showTopics ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+          </button>
+          <button onClick={generateAutoFlashcards}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-colors"
+            style={{ background: "rgba(139,92,246,0.2)", border: "1px solid rgba(139,92,246,0.3)", color: "#c4b5fd" }}>
+            <Zap className="w-3.5 h-3.5" /> Flashcard
+          </button>
+        </div>
       </div>
+
+      {/* Lesson topics panel */}
+      {showTopics && (
+        <div className="px-4 pt-3 pb-2 shrink-0 border-b border-white/5" style={{ background: "rgba(15,10,30,0.95)" }}>
+          <p className="text-xs text-gray-500 mb-2 font-semibold uppercase tracking-wide">Chọn chủ đề bài học</p>
+          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+            {LESSON_TOPICS.map(t => (
+              <button key={t.label} onClick={() => send(t.prompt)}
+                className="flex flex-col items-center gap-1 px-3 py-2 rounded-xl border border-gray-700 bg-gray-800/60 hover:border-primary-500 hover:bg-primary-900/20 transition-all shrink-0 text-center"
+                style={{ minWidth: 72 }}>
+                <span className="text-xl">{t.emoji}</span>
+                <span className="text-xs text-gray-400 leading-tight" style={{ maxWidth: 64 }}>{t.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Auto flashcard popup */}
       {showAutoFC && autoFlashcards.length > 0 && (
@@ -190,7 +238,6 @@ export default function TutorPage() {
               {m.role === "user" ? "U" : "🎓"}
             </div>
             <div className={cn("flex flex-col gap-1.5 max-w-[78%]", m.role === "user" ? "items-end" : "items-start")}>
-              {/* Main bubble */}
               <div className={cn("px-4 py-3 rounded-2xl text-sm leading-relaxed",
                 m.role === "user"
                   ? "bg-primary-600 text-white rounded-tr-sm"
@@ -211,7 +258,6 @@ export default function TutorPage() {
                 )}
               </div>
 
-              {/* Correction */}
               {m.correction && (
                 <div className="flex gap-2 px-3 py-2 rounded-xl text-xs w-full"
                   style={{ background: "rgba(234,179,8,0.1)", border: "1px solid rgba(234,179,8,0.25)" }}>
@@ -220,7 +266,6 @@ export default function TutorPage() {
                 </div>
               )}
 
-              {/* Exercise */}
               {m.exercise && (
                 <div className="flex gap-2 px-3 py-2.5 rounded-xl text-xs w-full cursor-pointer hover:opacity-90 transition-opacity"
                   style={{ background: "rgba(99,102,241,0.15)", border: "1px solid rgba(99,102,241,0.3)" }}
@@ -230,7 +275,6 @@ export default function TutorPage() {
                 </div>
               )}
 
-              {/* Encouragement */}
               {m.encouragement && (
                 <p className="text-xs text-green-400 px-1">✨ {m.encouragement}</p>
               )}
