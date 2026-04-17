@@ -22,9 +22,9 @@ const SKILL_MODES = [
 ];
 
 const DIFFICULTY = [
-  { id: "easy",   label: "Dễ",    emoji: "🌱", exercises: 10 },
-  { id: "medium", label: "Vừa",   emoji: "🔥", exercises: 15 },
-  { id: "hard",   label: "Khó",   emoji: "💎", exercises: 20 },
+  { id: "easy",   label: "Dễ",    emoji: "🌱", exercises: 5 },
+  { id: "medium", label: "Vừa",   emoji: "🔥", exercises: 8 },
+  { id: "hard",   label: "Khó",   emoji: "💎", exercises: 10 },
 ];
 
 const LESSON_TOPICS = [
@@ -68,6 +68,7 @@ export default function HomeworkPage() {
   const [elapsed, setElapsed] = useState(0);
   const [timerActive, setTimerActive] = useState(false);
   const [streak, setStreak] = useState(0);
+  const [error, setError] = useState<string | null>(null);
   const timerRef = useRef<any>(null);
 
   useEffect(() => {
@@ -83,7 +84,7 @@ export default function HomeworkPage() {
 
   const generate = async () => {
     setLoading(true); setHomework(null); setAnswers({}); setGradeResult(null);
-    setElapsed(0); setTimerActive(false); setShowHints({});
+    setElapsed(0); setTimerActive(false); setShowHints({}); setError(null);
     try {
       const res = await fetch("/api/homework", {
         method: "POST",
@@ -101,8 +102,14 @@ export default function HomeworkPage() {
         }),
       });
       const data = await res.json();
+      if (!data.exercises?.length) {
+        setError("AI không tạo được bài tập. Thử lại nhé!");
+        return;
+      }
       setHomework(data);
       setTimerActive(true);
+    } catch {
+      setError("Lỗi kết nối. Vui lòng thử lại!");
     } finally { setLoading(false); }
   };
 
@@ -247,6 +254,15 @@ export default function HomeworkPage() {
         </div>
       )}
 
+      {/* Error */}
+      {error && !loading && (
+        <div className="rounded-2xl p-5 text-center" style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)" }}>
+          <p className="text-red-400 text-sm mb-3">{error}</p>
+          <button onClick={generate} className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-sm font-medium transition-colors">
+            Thử lại
+          </button>
+        </div>
+      )}
       {/* Exercises */}
       {homework && !gradeResult && (
         <div className="flex flex-col gap-4">

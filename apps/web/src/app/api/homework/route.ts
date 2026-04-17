@@ -6,12 +6,8 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const { action } = body;
-
-    if (action === "generate") {
-      return await generateHomework(body);
-    } else if (action === "grade") {
-      return await gradeHomework(body);
-    }
+    if (action === "generate") return await generateHomework(body);
+    if (action === "grade") return await gradeHomework(body);
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (e) {
     console.error(e);
@@ -22,91 +18,109 @@ export async function POST(req: NextRequest) {
 async function generateHomework(body: any) {
   const { targetLanguage, nativeLanguage, level, weakAreas, skill, difficulty, count, topic } = body;
 
-  const topicLine = topic ? `Topic focus: ${topic}` : "Topic: general mixed topics";
-  const weakLine = weakAreas?.length ? `Student weak areas: ${weakAreas.join(", ")}` : "";
+  // Limit count to avoid token overflow
+  const safeCount = Math.min(count ?? 10, 10);
+  const topicLine = topic ? `Topic: ${topic}` : "Topic: general";
+  const weakLine = weakAreas?.length ? `Weak areas: ${weakAreas.slice(0, 3).join(", ")}` : "";
 
-  const systemPrompt = `You are an AI language teacher creating personalized exercises.
-Generate exactly ${count} exercises for a ${level} student learning ${targetLanguage} (native: ${nativeLanguage}).
-Skill focus: ${skill}. Difficulty: ${difficulty}. ${topicLine}. ${weakLine}
+  const prompt = `Create ${safeCount} language exercises for a ${level} student learning ${targetLanguage} (native: ${nativeLanguage}).
+Skill: ${skill}. Difficulty: ${difficulty}. ${topicLine}. ${weakLine}
 
-Return JSON:
+Return ONLY valid JSON in this exact format:
 {
-  "title": "lesson title in ${nativeLanguage}",
+  "title": "short lesson title in ${nativeLanguage}",
   "exercises": [
     {
       "id": "1",
-      "type": "multiple-choice | fill-blank | translation | short-answer",
-      "instruction": "brief instruction in ${nativeLanguage}",
-      "question": "the exercise question",
+      "type": "multiple-choice",
+      "instruction": "Chọn đáp án đúng",
+      "question": "question text",
       "answer": "correct answer",
-      "hint": "optional hint in ${nativeLanguage}",
+      "hint": "optional hint",
       "points": 5,
-      "options": ["A","B","C","D"] // only for multiple-choice
+      "options": ["option A", "option B", "option C", "option D"]
     }
   ]
 }
 
-Rules:
-- Mix exercise types: ~40% multiple-choice, ~30% fill-blank, ~30% translation/short-answer
-- Questions must match the skill (${skill}) and topic
-- Difficulty ${difficulty}: easy=simple vocab/grammar, medium=sentences, hard=complex structures
-- Points: multiple-choice=5, fill-blank=7, translation/short-answer=10
-- All instructions in ${nativeLanguage}, questions in ${targetLanguage} or mixed`;
+Mix types: use multiple-choice for ~60%, fill-blank for ~40%.
+For fill-blank: no options field, answer is the missing word/phrase.
+Keep questions short and clear. Return exactly ${safeCount} exercises.`;
 
   const completion = await groq.chat.completions.create({
-    model: "llama-3.3-70b-versatile",
-    messages: [{ role: "user", content: systemPrompt }],
+    model: "llama-3.1-8b-instant",
+    messages: [{ role: "user", content: prompt }],
     response_format: { type: "json_object" },
-    temperature: 0.7,
-    max_tokens: 4000,
+    temperature: 0.6,
+    max_tokens: 3000,
   });
 
   const raw = completion.choices[0].message.content || "{}";
   let result: any = {};
-  try { result = JSON.parse(raw); } catch { result = { title: "Bài tập", exercises: [] }; }
+  try {
+    result = JSON.parse(raw);
+  } catch {
+    // Try to extract JSON from response
+    const match = raw.match(/\{[\s\S]*\}/);
+    if (match) {
+      try { result = JSON.parse(match[0]); } catch { result = {}; }
+    }
+  }
+
+  const exercises = Array.isArray(result.exercises) ? result.exercises : [];
+
+  // Ensure each exercise has required fields
+  const cleaned = exercises.map((ex: any, i: number) => ({
+    id: ex.id ?? String(i + 1),
+    type: ex.type ?? "multiple-choice",
+    instruction: ex.instruction ?? "Trả lời câu hỏi",
+    question: ex.question ?? "",
+    answer: ex.answer ?? "",
+    hint: ex.hint ?? null,
+    points: ex.points ?? 5,
+    options: Array.isArray(ex.options) ? ex.options : undefined,
+  })).filter((ex: any) => ex.question);
 
   return NextResponse.json({
     title: result.title || "Bài tập hôm nay",
-    exercises: Array.isArray(result.exercises) ? result.exercises : [],
+    exercises: cleaned,
   });
 }
 
 async function gradeHomework(body: any) {
   const { targetLanguage, nativeLanguage, level, answers, timeSpent } = body;
 
-  const systemPrompt = `You are an AI language teacher grading student exercises.
-Student is learning ${targetLanguage} (native: ${nativeLanguage}), level: ${level}.
-Time spent: ${timeSpent}s.
+  const prompt = `Grade these ${targetLanguage} language exercises for a ${level} student (native: ${nativeLanguage}).
 
-Grade each answer and return JSON:
+Answers:
+${JSON.stringify(answers, null, 2)}
+
+Return ONLY valid JSON:
 {
   "results": [
     {
       "id": "exercise id",
-      "correct": true/false,
-      "score": points earned (0 to max points),
+      "correct": true,
+      "score": 5,
       "feedback": "brief feedback in ${nativeLanguage}",
-      "correction": "correct answer if wrong, null if correct"
+      "correction": null
     }
   ],
-  "totalScore": 0-100,
-  "grade": "A/B/C/D/F",
-  "xpEarned": number,
-  "overallFeedback": "encouraging overall comment in ${nativeLanguage}",
+  "totalScore": 85,
+  "grade": "B",
+  "xpEarned": 42,
+  "overallFeedback": "encouraging comment in ${nativeLanguage}",
   "nextFocus": "what to study next in ${nativeLanguage}"
 }
 
-Answers to grade:
-${JSON.stringify(answers, null, 2)}
-
-Be lenient with minor spelling/accent errors. Focus on meaning and structure.`;
+Be lenient with minor spelling errors. grade: A(90+), B(75+), C(60+), D(50+), F(<50).`;
 
   const completion = await groq.chat.completions.create({
-    model: "llama-3.3-70b-versatile",
-    messages: [{ role: "user", content: systemPrompt }],
+    model: "llama-3.1-8b-instant",
+    messages: [{ role: "user", content: prompt }],
     response_format: { type: "json_object" },
     temperature: 0.3,
-    max_tokens: 3000,
+    max_tokens: 2000,
   });
 
   const raw = completion.choices[0].message.content || "{}";
@@ -121,7 +135,7 @@ Be lenient with minor spelling/accent errors. Focus on meaning and structure.`;
     totalScore,
     grade,
     xpEarned: result.xpEarned ?? Math.floor(totalScore / 2),
-    overallFeedback: result.overallFeedback ?? "",
+    overallFeedback: result.overallFeedback ?? "Làm tốt lắm!",
     nextFocus: result.nextFocus ?? "",
   });
 }
