@@ -138,6 +138,8 @@ export default function AuthPage() {
     if (error) { setError(error.message); setOauthLoading(null); }
   };
 
+  const [otpEmail, setOtpEmail] = useState("");
+
   const sendOtp = async () => {
     if (!phone.trim()) { setError("Vui lòng nhập số điện thoại"); return; }
     if (!agreedToTerms) { setError("Vui lòng đồng ý điều khoản"); return; }
@@ -160,7 +162,7 @@ export default function AuthPage() {
     if (data.user) {
       const user: AuthUser = {
         id: data.user.id,
-        name: data.user.user_metadata?.full_name || phone,
+        name: data.user.user_metadata?.full_name || name || phone,
         email: data.user.email || "",
         avatar: AVATARS[Math.floor(Math.random() * AVATARS.length)],
         createdAt: data.user.created_at,
@@ -255,7 +257,7 @@ export default function AuthPage() {
                     <Phone className="w-6 h-6 text-primary-400" />
                   </div>
                   <p className="text-white font-bold text-lg">Nhập mã OTP</p>
-                  <p className="text-white/40 text-sm mt-1">Mã 6 số đã gửi đến <span className="text-white/70">{phone}</span></p>
+                  <p className="text-white/40 text-sm mt-1">Mã 6 số đã gửi qua SMS đến <span className="text-white/70">{phone.startsWith("+") ? phone : "+84" + phone.replace(/^0/, "")}</span></p>
                 </div>
                 <OtpInput value={otp} onChange={setOtp} />
                 {error && <p className="text-red-400 text-xs text-center">{error}</p>}
