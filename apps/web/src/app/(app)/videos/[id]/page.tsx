@@ -9,6 +9,77 @@ import { cn } from "@/lib/utils";
 
 type Tab = "script" | "quiz" | "vocab" | "grammar";
 
+function FillBlanks({ items }: { items: { sentence: string; answer: string; options: string[] }[] }) {
+  const [selected, setSelected] = useState<Record<number, string>>({});
+  const [checked, setChecked] = useState(false);
+
+  const score = items.filter((it, i) => selected[i] === it.answer).length;
+
+  return (
+    <div className="rounded-xl p-4" style={{ background: "rgba(26,16,53,0.8)", border: "1px solid rgba(99,102,241,0.3)" }}>
+      <p className="text-primary-300 font-bold text-sm mb-1">✏️ Fill in the blanks</p>
+      <p className="text-gray-500 text-xs mb-4">Chọn từ đúng để điền vào chỗ trống</p>
+
+      <div className="flex flex-col gap-4">
+        {items.map((it, i) => {
+          const parts = it.sentence.split("___");
+          const isCorrect = checked && selected[i] === it.answer;
+          const isWrong = checked && selected[i] && selected[i] !== it.answer;
+          return (
+            <div key={i}>
+              <p className="text-gray-200 text-sm leading-relaxed mb-2">
+                {parts[0]}
+                <span className={cn("inline-block min-w-[60px] text-center px-2 py-0.5 rounded-lg border mx-1 font-semibold text-sm transition-colors",
+                  isCorrect ? "border-green-500 bg-green-900/30 text-green-300"
+                  : isWrong ? "border-red-500 bg-red-900/30 text-red-300"
+                  : selected[i] ? "border-primary-500 bg-primary-900/30 text-white"
+                  : "border-gray-600 bg-gray-800 text-gray-500")}>
+                  {selected[i] || "___"}
+                </span>
+                {parts[1]}
+              </p>
+              {!checked && (
+                <div className="flex flex-wrap gap-2">
+                  {it.options.map(opt => (
+                    <button key={opt} onClick={() => setSelected(p => ({ ...p, [i]: opt }))}
+                      className={cn("px-3 py-1.5 rounded-lg border text-xs font-medium transition-all",
+                        selected[i] === opt
+                          ? "border-primary-500 bg-primary-900/30 text-white"
+                          : "border-gray-700 bg-gray-800 text-gray-400 hover:border-gray-500")}>
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {checked && isWrong && (
+                <p className="text-xs text-green-400 mt-1">✅ Đáp án đúng: <span className="font-bold">{it.answer}</span></p>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {!checked ? (
+        <button onClick={() => setChecked(true)}
+          disabled={Object.keys(selected).length < items.length}
+          className="mt-4 w-full py-2.5 rounded-xl bg-primary-600 hover:bg-primary-500 disabled:opacity-40 text-white text-sm font-semibold transition-colors">
+          Kiểm tra
+        </button>
+      ) : (
+        <div className="mt-4 flex items-center justify-between">
+          <p className="text-sm font-bold" style={{ color: score === items.length ? "#10b981" : "#f59e0b" }}>
+            {score}/{items.length} đúng {score === items.length ? "🎉" : ""}
+          </p>
+          <button onClick={() => { setSelected({}); setChecked(false); }}
+            className="px-4 py-2 rounded-xl border border-gray-700 text-gray-400 hover:border-gray-600 text-xs transition-colors">
+            Làm lại
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function VideoDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
@@ -344,6 +415,11 @@ export default function VideoDetailPage() {
                     )}
                   </div>
                 ))}
+
+                {/* Fill in the blanks */}
+                {lessonData.fillBlanks?.length > 0 && (
+                  <FillBlanks items={lessonData.fillBlanks} />
+                )}
               </div>
             )}
           </>

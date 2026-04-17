@@ -2,8 +2,9 @@
 import { useAppStore } from "@/store/useAppStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { SUPPORTED_LANGUAGES, LEVELS, CONVERSATION_TOPICS } from "@ai-lang/shared";
-import { Volume2, Target, Sun, Moon, Camera, Check, X, Pencil, LogOut } from "lucide-react";
+import { Volume2, Target, Sun, Moon, Camera, Check, X, Pencil, LogOut, HelpCircle, MessageCircle, ChevronRight, BookOpen } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { NotificationToggle } from "@/components/NotificationManager";
 import { useState, useRef } from "react";
@@ -291,6 +292,26 @@ export default function SettingsPage() {
           <p>Native: {settings.nativeLanguage.flag} {settings.nativeLanguage.name}</p>
           <p>Topic: {CONVERSATION_TOPICS.find(t => t.id === settings.conversationTopic)?.emoji} {CONVERSATION_TOPICS.find(t => t.id === settings.conversationTopic)?.label ?? "Free Talk"}</p>
         </div>
+
+        {/* Hỗ trợ */}
+        <div className="rounded-2xl overflow-hidden" style={{ background: "rgba(26,16,53,0.8)", border: "1px solid rgba(139,92,246,0.15)" }}>
+          <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide px-4 pt-4 pb-2">Hỗ trợ</p>
+          {[
+            { icon: HelpCircle, label: "Trung tâm trợ giúp", href: "/help" },
+            { icon: MessageCircle, label: "Liên hệ hỗ trợ", href: "mailto:support@linguaai.app" },
+            { icon: BookOpen, label: "Blog LinguaAI", href: "/blog" },
+          ].map(({ icon: Icon, label, href }, i, arr) => (
+            <Link key={label} href={href}
+              className={cn("flex items-center gap-3 px-4 py-3.5 hover:bg-white/5 transition-colors",
+                i < arr.length - 1 ? "border-b border-white/5" : "")}>
+              <Icon className="w-5 h-5 text-gray-400 shrink-0" />
+              <span className="flex-1 text-sm text-gray-200">{label}</span>
+              <ChevronRight className="w-4 h-4 text-gray-600" />
+            </Link>
+          ))}
+        </div>
+
+        <p className="text-center text-xs text-gray-700 pb-2">LinguaAI v1.0 · <Link href="/terms" className="hover:text-gray-500 transition-colors">Điều khoản</Link></p>
       </div>
     </div>
   );

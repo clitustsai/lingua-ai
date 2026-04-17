@@ -30,6 +30,10 @@ Return JSON:
   "grammar": [
     { "point": "Grammar Point Name in English", "explanation": "explanation in ${nativeLanguage}", "examples": ["English example 1", "English example 2"], "tip": "memory tip in ${nativeLanguage}" }
   ],
+  "fillBlanks": [
+    { "sentence": "Hi, my name ___ Sarah.", "answer": "is", "options": ["is","are","am","be"] },
+    { "sentence": "They ___ happy, too.", "answer": "are", "options": ["is","are","am","was"] }
+  ],
   "keyPhrases": ["useful English phrase 1", "useful English phrase 2", "useful English phrase 3", "useful English phrase 4"]
 }`
       }],
