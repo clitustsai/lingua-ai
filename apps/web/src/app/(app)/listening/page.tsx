@@ -1,9 +1,11 @@
 "use client";
 import { useState, useRef } from "react";
 import { useAppStore } from "@/store/useAppStore";
+import { useAuthStore } from "@/store/useAuthStore";
 import { Loader2, Volume2, RefreshCw, CheckCircle2, XCircle } from "lucide-react";
 import { speakText } from "@/components/VoiceButton";
 import { cn } from "@/lib/utils";
+import PremiumGate from "@/components/PremiumGate";
 
 interface ListeningData {
   sentence: string;
@@ -15,6 +17,8 @@ interface ListeningData {
 
 export default function ListeningPage() {
   const { settings } = useAppStore();
+  const { user } = useAuthStore();
+  if (!user?.isPremium) return <PremiumGate title="Listening — Premium" desc="Luyện nghe với bài tập AI tạo ra theo trình độ của bạn. Yêu cầu gói Premium." />;
   const [data, setData] = useState<ListeningData | null>(null);
   const [loading, setLoading] = useState(false);
   const [answers, setAnswers] = useState<Record<number, string>>({});

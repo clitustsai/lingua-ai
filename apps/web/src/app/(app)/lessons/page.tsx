@@ -1,10 +1,12 @@
 "use client";
 import { useState } from "react";
 import { useAppStore } from "@/store/useAppStore";
+import { useAuthStore } from "@/store/useAuthStore";
 import { CONVERSATION_TOPICS } from "@ai-lang/shared";
 import { Loader2, BookOpen, ChevronDown, ChevronUp, Plus, Volume2, Star, Zap, Target } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { speakText } from "@/components/VoiceButton";
+import PremiumGate from "@/components/PremiumGate";
 
 interface Vocab { word: string; translation: string; example: string; pronunciation?: string; romanization?: string; }
 interface DialogueLine { speaker: string; text: string; translation: string; }
@@ -38,6 +40,8 @@ type Tab = "vocab" | "grammar" | "dialogue" | "exercises";
 
 export default function LessonsPage() {
   const { settings, addFlashcard, incrementLessons, checkAchievements } = useAppStore();
+  const { user } = useAuthStore();
+  if (!user?.isPremium) return <PremiumGate title="Lessons — Premium" desc="Bài học AI cá nhân hóa theo chủ đề và trình độ của bạn. Yêu cầu gói Premium." />;
   const [selectedTopic, setSelectedTopic] = useState(LESSON_TOPICS[0]);
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [loading, setLoading] = useState(false);
