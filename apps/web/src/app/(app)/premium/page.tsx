@@ -138,7 +138,7 @@ export default function PremiumPage() {
               <button onClick={() => !plan.ctaDisabled && setPayItem(plan)} disabled={plan.ctaDisabled}
                 className={cn("w-full py-3 rounded-xl font-bold text-sm transition-all", plan.ctaDisabled ? "bg-gray-800 text-gray-500 cursor-default" : "text-white hover:opacity-90 active:scale-95")}
                 style={!plan.ctaDisabled ? { background: `linear-gradient(135deg, ${plan.color}, ${plan.color}cc)` } : {}}>
-                {plan.ctaDisabled ? "Dang dung" : plan.cta + " ->"}
+                {plan.ctaDisabled ? "Dang dung" : plan.cta}
               </button>
             </div>
           ))}
@@ -232,7 +232,7 @@ export default function PremiumPage() {
                 <button onClick={() => { setSelectedCourse(null); setPayItem(selectedCourse); }}
                   className="flex-1 py-3 rounded-xl font-bold text-white text-sm"
                   style={{ background: `linear-gradient(135deg, ${selectedCourse.color}, ${selectedCourse.color}cc)` }}>
-                  Mua {formatVND(selectedCourse.price)} ->
+                  Mua {formatVND(selectedCourse.price)}
                 </button>
                 <button onClick={() => setSelectedCourse(null)} className="px-4 py-3 rounded-xl border border-gray-700 text-gray-400 text-sm">Dong</button>
               </div>
