@@ -82,7 +82,6 @@ function PayModal({ item, onClose }: { item: PayItem; onClose: () => void }) {
 
 export default function PremiumPage() {
   const [selectedCourse, setSelectedCourse] = useState<typeof COURSES[0] | null>(null);
-  const [tab, setTab] = useState<"plans" | "courses">("plans");
   const [payItem, setPayItem] = useState<PayItem | null>(null);
 
   return (
@@ -151,19 +150,12 @@ export default function PremiumPage() {
         <div className="flex flex-col gap-4">
           {COURSES.map(course => (
             <div key={course.id} className="rounded-2xl overflow-hidden" style={{ background: "rgba(26,16,53,0.8)", border: "1px solid rgba(139,92,246,0.15)" }}>
-              <div className="relative aspect-video bg-gray-900 cursor-pointer" onClick={() => setSelectedCourse(course)}>
+              <div className="relative aspect-video bg-gray-900">
                 <div className="absolute inset-0 opacity-40" style={{ background: `linear-gradient(135deg, ${course.color}60, transparent)` }} />
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-                  <span className="text-2xl font-bold text-white">{course.emoji}</span>
-                  <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
-                    <Play className="w-4 h-4 text-white" />
-                    <span className="text-white text-sm font-medium">Xem preview</span>
-                  </div>
+                  <span className="text-4xl font-bold text-white">{course.emoji}</span>
                 </div>
-                {course.locked
-                  ? <div className="absolute top-3 right-3 flex items-center gap-1 bg-black/60 text-yellow-400 text-xs px-2 py-1 rounded-lg"><Lock className="w-3 h-3" /> Premium</div>
-                  : <div className="absolute top-3 right-3 bg-green-600 text-white text-xs px-2 py-1 rounded-lg font-medium">Free preview</div>
-                }
+                <div className="absolute top-3 right-3 flex items-center gap-1 bg-black/60 text-yellow-400 text-xs px-2 py-1 rounded-lg"><Lock className="w-3 h-3" /> Premium</div>
               </div>
               <div className="p-4">
                 <div className="flex items-start justify-between gap-2 mb-2">
@@ -207,34 +199,6 @@ export default function PremiumPage() {
                 style={{ background: "linear-gradient(135deg,#f59e0b,#f97316)" }}>
                 Mua Bundle
               </button>
-            </div>
-          </div>
-        </div>
-      )}
-      {selectedCourse && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
-          style={{ background: "rgba(0,0,0,0.8)", backdropFilter: "blur(8px)" }} onClick={() => setSelectedCourse(null)}>
-          <div className="w-full max-w-lg rounded-3xl overflow-hidden"
-            style={{ background: "#0f0a1e", border: "1px solid rgba(139,92,246,0.3)" }} onClick={e => e.stopPropagation()}>
-            <div className="aspect-video relative">
-              <iframe className="w-full h-full"
-                src={`https://www.youtube-nocookie.com/embed/${selectedCourse.preview}?autoplay=1&rel=0`}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
-              <button onClick={() => setSelectedCourse(null)} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 flex items-center justify-center text-white">
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            <div className="p-5">
-              <h3 className="text-white font-bold text-lg mb-1">{selectedCourse.title}</h3>
-              <p className="text-gray-400 text-sm mb-4">{selectedCourse.lessons} bai - {selectedCourse.videos} video - {selectedCourse.level}</p>
-              <div className="flex gap-3">
-                <button onClick={() => { setSelectedCourse(null); setPayItem(selectedCourse); }}
-                  className="flex-1 py-3 rounded-xl font-bold text-white text-sm"
-                  style={{ background: `linear-gradient(135deg, ${selectedCourse.color}, ${selectedCourse.color}cc)` }}>
-                  Mua {formatVND(selectedCourse.price)}
-                </button>
-                <button onClick={() => setSelectedCourse(null)} className="px-4 py-3 rounded-xl border border-gray-700 text-gray-400 text-sm">Dong</button>
-              </div>
             </div>
           </div>
         </div>
