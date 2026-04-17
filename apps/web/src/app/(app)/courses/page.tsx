@@ -3,9 +3,8 @@ import { useAppStore } from "@/store/useAppStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { COURSES } from "@ai-lang/shared";
 import { useRouter } from "next/navigation";
-import { BookOpen, ChevronRight, Star, Flame, Trophy } from "lucide-react";
+import { BookOpen, ChevronRight, Star, Flame, Trophy, Crown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import PremiumGate from "@/components/PremiumGate";
 
 const CATEGORIES = ["Tất cả", "Chứng chỉ", "Kỹ năng", "Giao tiếp", "Ngôn ngữ"];
 
@@ -13,11 +12,7 @@ export default function CoursesPage() {
   const { courseProgress, totalXp, streak, enrollCourse } = useAppStore();
   const { user } = useAuthStore();
   const router = useRouter();
-
-  // Khóa học: luôn yêu cầu Premium
-  if (!user?.isPremium) {
-    return <PremiumGate title="Khóa học — Premium" desc="Truy cập toàn bộ khóa học với hàng trăm bài học, quiz và lộ trình cá nhân hóa. Yêu cầu gói Premium." />;
-  }
+  const isPremium = user?.isPremium ?? false;
 
   const enrolledCourses = COURSES.filter(c => courseProgress.find(p => p.courseId === c.id));
   const suggestedCourses = COURSES.filter(c => !courseProgress.find(p => p.courseId === c.id));
@@ -55,6 +50,17 @@ export default function CoursesPage() {
       </div>
 
       <div className="px-5 space-y-8 pb-6">
+        {/* Free notice */}
+        {!isPremium && (
+          <div className="flex items-center justify-between px-3 py-2.5 rounded-xl"
+            style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)" }}>
+            <p className="text-xs text-yellow-300">1 khóa học miễn phí · Nâng cấp để mở tất cả</p>
+            <button onClick={() => router.push("/premium")}
+              className="flex items-center gap-1 text-xs bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-300 px-2.5 py-1 rounded-lg transition-colors shrink-0">
+              <Crown className="w-3 h-3" /> Premium
+            </button>
+          </div>
+        )}
         {/* My courses */}
         {enrolledCourses.length > 0 && (
           <section>
@@ -96,13 +102,19 @@ export default function CoursesPage() {
             <ChevronRight className="w-4 h-4 text-gray-600" />
           </div>
           <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-            {COURSES.map(course => {
+            {COURSES.map((course, idx) => {
               const enrolled = !!courseProgress.find(p => p.courseId === course.id);
               const pct = getProgress(course.id);
+              const isLocked = !isPremium && idx >= 1;
               return (
-                <button key={course.id} onClick={() => router.push(`/courses/${course.id}`)}
+                <button key={course.id} onClick={() => isLocked ? router.push("/premium") : router.push(`/courses/${course.id}`)}
                   className="shrink-0 w-44 rounded-2xl overflow-hidden text-left relative"
                   style={{ background: course.color }}>
+                  {isLocked && (
+                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-10 rounded-2xl">
+                      <Crown className="w-7 h-7 text-yellow-400" />
+                    </div>
+                  )}
                   <div className="p-4 pb-3">
                     <div className="text-4xl mb-3">{course.emoji}</div>
                     <p className="text-white font-bold text-sm leading-tight">{course.title}</p>
@@ -140,10 +152,17 @@ export default function CoursesPage() {
                 {catCourses.map(course => {
                   const enrolled = !!courseProgress.find(p => p.courseId === course.id);
                   const pct = getProgress(course.id);
+                  const courseIdx = COURSES.findIndex(c => c.id === course.id);
+                  const isLocked = !isPremium && courseIdx >= 1;
                   return (
-                    <button key={course.id} onClick={() => router.push(`/courses/${course.id}`)}
-                      className="flex items-center gap-4 rounded-2xl p-4 text-left transition-all hover:opacity-90"
+                    <button key={course.id} onClick={() => isLocked ? router.push("/premium") : router.push(`/courses/${course.id}`)}
+                      className="flex items-center gap-4 rounded-2xl p-4 text-left transition-all hover:opacity-90 relative overflow-hidden"
                       style={{ background: course.color }}>
+                      {isLocked && (
+                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-10">
+                          <Crown className="w-6 h-6 text-yellow-400" />
+                        </div>
+                      )}
                       <div className="text-4xl shrink-0">{course.emoji}</div>
                       <div className="flex-1 min-w-0">
                         <p className="text-white font-bold text-sm">{course.title}</p>

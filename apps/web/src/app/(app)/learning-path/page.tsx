@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/store/useAppStore";
 import { useAuthStore } from "@/store/useAuthStore";
-import { Loader2, Sparkles, Target, ChevronRight, CheckCircle2, RotateCcw, BookOpen, Mic, Headphones, Star, Flame } from "lucide-react";
+import { Loader2, Sparkles, Target, ChevronRight, CheckCircle2, RotateCcw, BookOpen, Mic, Headphones, Star, Flame, Crown } from "lucide-react";
 import { speakText } from "@/components/VoiceButton";
 import { cn } from "@/lib/utils";
 import { LEVELS } from "@ai-lang/shared";
@@ -23,6 +23,7 @@ export default function LearningPathPage() {
   const router = useRouter();
   const { settings, learningPath, pathDaysDone, setLearningPath, markPathDay, clearLearningPath, incrementWords, checkAchievements } = useAppStore();
   const { user } = useAuthStore();
+  const isPremium = user?.isPremium ?? false;
 
   // Onboarding state
   const [step, setStep] = useState<"onboard" | "generating" | "path" | "day">("onboard");
@@ -384,22 +385,27 @@ export default function LearningPathPage() {
         {(learningPath.days ?? []).map((day: any, i: number) => {
           const done = pathDaysDone.includes(i + 1);
           const isToday = i === doneDays;
+          const isLocked = !isPremium && i >= 3;
           return (
-            <button key={i} onClick={() => openDay(i)}
+            <button key={i} onClick={() => isLocked ? router.push("/premium") : openDay(i)}
               className={cn("flex items-center gap-3 p-3 rounded-xl border text-left transition-all",
-                done ? "border-green-600/30 bg-green-900/10"
+                isLocked ? "border-yellow-700/30 bg-yellow-900/10 opacity-70"
+                  : done ? "border-green-600/30 bg-green-900/10"
                   : isToday ? "border-primary-500 bg-primary-900/20"
                   : "border-gray-700 bg-gray-800 hover:border-gray-600")}>
               <div className={cn("w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold shrink-0",
-                done ? "bg-green-600" : isToday ? "bg-primary-600" : "bg-gray-700")}>
-                {done ? "✓" : i + 1}
+                isLocked ? "bg-yellow-900/40" : done ? "bg-green-600" : isToday ? "bg-primary-600" : "bg-gray-700")}>
+                {isLocked ? <Crown className="w-4 h-4 text-yellow-400" /> : done ? "✓" : i + 1}
               </div>
               <div className="flex-1 min-w-0">
-                <p className={cn("text-sm font-medium", done ? "text-gray-400" : "text-white")}>{day.theme}</p>
+                <p className={cn("text-sm font-medium", done ? "text-gray-400" : isLocked ? "text-gray-500" : "text-white")}>{day.theme}</p>
                 <p className="text-xs text-gray-500 capitalize">{day.focus}</p>
               </div>
-              {isToday && !done && (
+              {isToday && !done && !isLocked && (
                 <span className="text-xs bg-primary-600/30 text-primary-300 px-2 py-0.5 rounded-full shrink-0">Hôm nay</span>
+              )}
+              {isLocked && (
+                <span className="text-xs bg-yellow-900/30 text-yellow-400 px-2 py-0.5 rounded-full shrink-0">Premium</span>
               )}
               <ChevronRight className="w-4 h-4 text-gray-600 shrink-0" />
             </button>
