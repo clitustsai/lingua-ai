@@ -4,9 +4,10 @@ import { useRouter } from "next/navigation";
 import { useAppStore } from "@/store/useAppStore";
 import { useAuthStore, isTrialActive } from "@/store/useAuthStore";
 import { SUPPORTED_LANGUAGES, LEVELS } from "@ai-lang/shared";
-import { Loader2, Sparkles, Target, ChevronRight, CheckCircle2, RotateCcw, BookOpen, Mic, Headphones, Star, Flame, Crown, Lock } from "lucide-react";
+import { Loader2, Sparkles, Target, ChevronRight, CheckCircle2, RotateCcw, BookOpen, Mic, Headphones, Star, Flame } from "lucide-react";
 import { speakText } from "@/components/VoiceButton";
 import { cn } from "@/lib/utils";
+import PremiumGate from "@/components/PremiumGate";
 
 const GOALS = [
   { id: "travel", label: "Du lịch", emoji: "✈️", desc: "Giao tiếp khi đi du lịch" },
@@ -24,27 +25,9 @@ export default function LearningPathPage() {
   const { settings, learningPath, pathDaysDone, setLearningPath, markPathDay, clearLearningPath, incrementWords, checkAchievements } = useAppStore();
   const { user } = useAuthStore();
 
-  const trialOk = user ? (user.isPremium || isTrialActive(user.createdAt)) : false;
-  if (!trialOk) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center gap-5">
-        <div className="w-20 h-20 rounded-3xl bg-yellow-500/20 flex items-center justify-center">
-          <Lock className="w-10 h-10 text-yellow-400" />
-        </div>
-        <div>
-          <h2 className="text-white font-black text-xl mb-2">Lộ trình AI — Premium</h2>
-          <p className="text-gray-400 text-sm leading-relaxed">
-            Tính năng này yêu cầu gói Premium.<br />
-            {user && !isTrialActive(user.createdAt) && "Thời gian dùng thử 10 ngày của bạn đã hết."}
-          </p>
-        </div>
-        <button onClick={() => router.push("/premium")}
-          className="flex items-center gap-2 px-6 py-3 rounded-2xl font-bold text-white transition-all hover:opacity-90"
-          style={{ background: "linear-gradient(135deg,#f59e0b,#f97316)" }}>
-          <Crown className="w-5 h-5" /> Nâng cấp Premium
-        </button>
-      </div>
-    );
+  // Lộ trình AI: luôn yêu cầu Premium
+  if (!user?.isPremium) {
+    return <PremiumGate title="Lộ trình AI — Premium" desc="Lộ trình học cá nhân hóa bởi AI theo mục tiêu của bạn. Yêu cầu gói Premium." />;
   }
 
   // Onboarding state

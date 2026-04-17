@@ -3,16 +3,18 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
 import type { AuthUser } from "@/store/useAuthStore";
+import { isTrialActive } from "@/store/useAuthStore";
 import { createClient } from "@/lib/supabase";
 import Sidebar from "@/components/Sidebar";
 import NotificationManager from "@/components/NotificationManager";
 import BottomNav from "@/components/BottomNav";
 import WelcomePopup from "@/components/WelcomePopup";
+import PremiumGate from "@/components/PremiumGate";
 
 const AVATARS = ["🦊","🐼","🦁","🐯","🦋","🐸","🦄","🐙","🦅","🐬","🌟","🎭"];
 
 export default function AppLayoutClient({ children }: { children: React.ReactNode }) {
-  const { isLoggedIn, login, theme } = useAuthStore();
+  const { isLoggedIn, login, theme, user } = useAuthStore();
   const router = useRouter();
   const [hydrated, setHydrated] = useState(false);
 
@@ -65,6 +67,19 @@ export default function AppLayoutClient({ children }: { children: React.ReactNod
           </div>
           <p className="text-gray-500 text-sm">Đang tải...</p>
         </div>
+      </div>
+    );
+  }
+
+  // Hết trial và chưa premium → khóa toàn bộ app
+  const trialExpired = user && !user.isPremium && !isTrialActive(user.createdAt);
+  if (trialExpired) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4" style={{ background: "#0f0a1e" }}>
+        <PremiumGate
+          title="Thời gian dùng thử đã hết"
+          desc="10 ngày dùng thử miễn phí của bạn đã kết thúc. Nâng cấp Premium để tiếp tục học không giới hạn."
+        />
       </div>
     );
   }
