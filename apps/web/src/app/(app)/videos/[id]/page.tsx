@@ -86,6 +86,13 @@ export default function VideoDetailPage() {
   const { settings, addFlashcard, incrementLessons, checkAchievements } = useAppStore();
 
   const video = VIDEO_LESSONS.find(v => v.id === id);
+
+  // Map video language name to speech code
+  const VIDEO_LANG_CODE: Record<string, string> = {
+    English: "en", Japanese: "ja", Korean: "ko", Chinese: "zh",
+    French: "fr", Spanish: "es", German: "de",
+  };
+  const videoLangCode = video ? (VIDEO_LANG_CODE[video.language] ?? settings.targetLanguage.code) : settings.targetLanguage.code;
   const [lessonData, setLessonData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [tab, setTab] = useState<Tab>("script");
@@ -105,7 +112,6 @@ export default function VideoDetailPage() {
     if (isEnglish) {
       setRealVideoId(video.youtubeId);
     } else {
-      // Try to fetch real video ID
       setVideoLoading(true);
       const query = `${video.title} ${video.language} lesson`;
       fetch(`/api/youtube-search?q=${encodeURIComponent(query)}`)
@@ -114,29 +120,29 @@ export default function VideoDetailPage() {
         .catch(() => {})
         .finally(() => setVideoLoading(false));
     }
-    generateLesson();
-  }, [id]);
 
-  const generateLesson = async () => {
-    if (!video) return;
+    // Generate lesson inline to avoid stale closure
     setLoading(true);
-    try {
-      const res = await fetch("/api/video-lesson", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          videoId: video.youtubeId,
-          title: video.title,
-          topic: video.topic,
-          videoLanguage: video.language,
-          targetLanguage: settings.targetLanguage.name,
-          nativeLanguage: settings.nativeLanguage.name,
-          level: video.level,
-        }),
-      });
-      setLessonData(await res.json());
-    } finally { setLoading(false); }
-  };
+    setLessonData(null);
+    fetch("/api/video-lesson", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        videoId: video.youtubeId,
+        title: video.title,
+        topic: video.topic,
+        videoLanguage: video.language,
+        targetLanguage: settings.targetLanguage.name,
+        nativeLanguage: settings.nativeLanguage.name,
+        level: video.level,
+      }),
+    })
+      .then(r => r.json())
+      .then(data => setLessonData(data))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   const saveWord = (word: string, def: string, example: string) => {
     addFlashcard({ id: Date.now().toString(), word, translation: def, example, language: settings.targetLanguage.code });
@@ -245,15 +251,38 @@ export default function VideoDetailPage() {
             <Loader2 className="w-8 h-8 text-primary-400 animate-spin" />
             <p className="text-gray-400 text-sm">AI đang tạo nội dung bài học...</p>
           </div>
-        ) : !lessonData ? null : (
-
+        ) : !lessonData || lessonData.error ? (
+          <div className="flex flex-col items-center justify-center py-16 gap-3">
+            <p className="text-gray-400 text-sm">Không thể tải nội dung bài học</p>
+            <button onClick={() => {
+              setLoading(true);
+              setLessonData(null);
+              fetch("/api/video-lesson", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  videoId: video.youtubeId,
+                  title: video.title,
+                  topic: video.topic,
+                  videoLanguage: video.language,
+                  targetLanguage: settings.targetLanguage.name,
+                  nativeLanguage: settings.nativeLanguage.name,
+                  level: video.level,
+                }),
+              }).then(r => r.json()).then(setLessonData).catch(() => {}).finally(() => setLoading(false));
+            }}
+              className="px-4 py-2 rounded-xl bg-primary-600 hover:bg-primary-500 text-white text-sm font-semibold transition-colors">
+              Thử lại
+            </button>
+          </div>
+        ) : (
           <>
             {/* ── SCRIPT TAB ── */}
             {tab === "script" && (
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
-                    <button onClick={() => speakText(lessonData.script, settings.targetLanguage.code)}
+                    <button onClick={() => speakText(lessonData.script, videoLangCode)}
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs transition-colors">
                       <Volume2 className="w-3.5 h-3.5" /> Nghe
                     </button>
@@ -283,7 +312,7 @@ export default function VideoDetailPage() {
                     <div className="flex flex-col gap-2">
                       {lessonData.keyPhrases.map((p: string, i: number) => (
                         <div key={i} className="flex items-center gap-2">
-                          <button onClick={() => speakText(p, settings.targetLanguage.code)}
+                          <button onClick={() => speakText(p, videoLangCode)}
                             className="p-1 rounded text-gray-600 hover:text-primary-400 transition-colors">
                             <Volume2 className="w-3.5 h-3.5" />
                           </button>
@@ -369,7 +398,7 @@ export default function VideoDetailPage() {
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 flex-wrap mb-1">
-                          <button onClick={() => speakText(v.word, settings.targetLanguage.code)}
+                          <button onClick={() => speakText(v.word, videoLangCode)}
                             className="text-white font-bold text-base hover:text-primary-300 transition-colors">
                             {v.word}
                           </button>
@@ -401,7 +430,7 @@ export default function VideoDetailPage() {
                     <p className="text-gray-300 text-sm mb-3">{g.explanation}</p>
                     {g.examples?.map((ex: string, j: number) => (
                       <div key={j} className="flex items-center gap-2 mb-1.5">
-                        <button onClick={() => speakText(ex, settings.targetLanguage.code)}
+                        <button onClick={() => speakText(ex, videoLangCode)}
                           className="p-1 rounded text-gray-600 hover:text-primary-400 transition-colors shrink-0">
                           <Volume2 className="w-3.5 h-3.5" />
                         </button>
