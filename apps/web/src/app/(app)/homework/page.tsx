@@ -22,9 +22,32 @@ const SKILL_MODES = [
 ];
 
 const DIFFICULTY = [
-  { id: "easy",   label: "Dễ",    emoji: "🌱", exercises: 5 },
-  { id: "medium", label: "Vừa",   emoji: "🔥", exercises: 8 },
-  { id: "hard",   label: "Khó",   emoji: "💎", exercises: 10 },
+  { id: "easy",   label: "Dễ",    emoji: "🌱", exercises: 10 },
+  { id: "medium", label: "Vừa",   emoji: "🔥", exercises: 15 },
+  { id: "hard",   label: "Khó",   emoji: "💎", exercises: 20 },
+];
+
+const LESSON_TOPICS = [
+  { emoji: "👋", label: "Chào hỏi",        topic: "greetings and introductions" },
+  { emoji: "🛒", label: "Mua sắm",          topic: "shopping vocabulary and phrases" },
+  { emoji: "🍜", label: "Nhà hàng",         topic: "ordering food at a restaurant" },
+  { emoji: "✈️", label: "Du lịch",          topic: "travel and airport vocabulary" },
+  { emoji: "💼", label: "Phỏng vấn",        topic: "job interview English" },
+  { emoji: "🏥", label: "Sức khỏe",         topic: "medical and health vocabulary" },
+  { emoji: "📞", label: "Điện thoại",       topic: "phone conversation skills" },
+  { emoji: "🏠", label: "Nhà ở",            topic: "housing and renting vocabulary" },
+  { emoji: "💰", label: "Tài chính",        topic: "banking and financial vocabulary" },
+  { emoji: "🎓", label: "Học thuật",        topic: "academic English for school" },
+  { emoji: "💻", label: "Công nghệ",        topic: "technology and IT vocabulary" },
+  { emoji: "🤝", label: "Đàm phán",         topic: "negotiation and persuasion phrases" },
+  { emoji: "😊", label: "Cảm xúc",          topic: "expressing emotions and feelings" },
+  { emoji: "🌍", label: "Văn hóa",          topic: "culture and social conversation" },
+  { emoji: "📰", label: "Thời sự",          topic: "news and current events vocabulary" },
+  { emoji: "🎮", label: "Giải trí",         topic: "hobbies and entertainment" },
+  { emoji: "👨‍👩‍👧", label: "Gia đình",    topic: "family and relationships" },
+  { emoji: "🚗", label: "Giao thông",       topic: "transportation and directions" },
+  { emoji: "📝", label: "Email văn phòng",  topic: "professional email writing" },
+  { emoji: "🎤", label: "Thuyết trình",     topic: "presentations and public speaking" },
 ];
 
 const GRADE_COLORS: Record<string, string> = {
@@ -41,6 +64,7 @@ export default function HomeworkPage() {
   const [showHints, setShowHints] = useState<Record<string, boolean>>({});
   const [skill, setSkill] = useState(SKILL_MODES[0]);
   const [difficulty, setDifficulty] = useState(DIFFICULTY[1]);
+  const [topic, setTopic] = useState<string | null>(null);
   const [elapsed, setElapsed] = useState(0);
   const [timerActive, setTimerActive] = useState(false);
   const [streak, setStreak] = useState(0);
@@ -73,6 +97,7 @@ export default function HomeworkPage() {
           skill: skill.id,
           difficulty: difficulty.id,
           count: difficulty.exercises,
+          topic: topic ?? undefined,
         }),
       });
       const data = await res.json();
@@ -169,6 +194,28 @@ export default function HomeworkPage() {
             </div>
           </div>
 
+          {/* Topic selector */}
+          <div>
+            <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-3">Chủ đề bài học <span className="text-gray-700 normal-case font-normal">(tuỳ chọn)</span></p>
+            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+              <button onClick={() => setTopic(null)}
+                className={cn("flex flex-col items-center gap-1 px-3 py-2 rounded-xl border transition-all shrink-0",
+                  topic === null ? "border-primary-500 bg-primary-900/30" : "border-gray-700 bg-gray-800/60 hover:border-gray-600")}>
+                <span className="text-xl">🎯</span>
+                <span className={cn("text-xs leading-tight", topic === null ? "text-white" : "text-gray-400")}>Tự do</span>
+              </button>
+              {LESSON_TOPICS.map(t => (
+                <button key={t.topic} onClick={() => setTopic(t.topic)}
+                  className={cn("flex flex-col items-center gap-1 px-3 py-2 rounded-xl border transition-all shrink-0",
+                    topic === t.topic ? "border-primary-500 bg-primary-900/30" : "border-gray-700 bg-gray-800/60 hover:border-gray-600")}
+                  style={{ minWidth: 64 }}>
+                  <span className="text-xl">{t.emoji}</span>
+                  <span className={cn("text-xs leading-tight text-center", topic === t.topic ? "text-white" : "text-gray-400")} style={{ maxWidth: 60 }}>{t.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Info card */}
           <div className="rounded-2xl p-4 flex items-center gap-3"
             style={{ background: "rgba(234,179,8,0.08)", border: "1px solid rgba(234,179,8,0.2)" }}>
@@ -176,8 +223,8 @@ export default function HomeworkPage() {
             <div>
               <p className="text-white font-semibold text-sm">{skill.label} · {difficulty.label}</p>
               <p className="text-gray-400 text-xs">{skill.desc} · {difficulty.exercises} câu · Level {settings.level}</p>
-              <p className="text-gray-500 text-xs">{settings.targetLanguage.flag} {settings.targetLanguage.name}</p>
-            </div>
+              {topic && <p className="text-primary-400 text-xs mt-0.5">📌 {LESSON_TOPICS.find(t => t.topic === topic)?.label}</p>}
+              <p className="text-gray-500 text-xs">{settings.targetLanguage.flag} {settings.targetLanguage.name}</p>            </div>
           </div>
 
           <button onClick={generate}
