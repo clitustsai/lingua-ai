@@ -23,16 +23,22 @@ Requirements:
 - Include at least 8-10 key vocabulary words
 - Create 5-6 comprehension questions of different types (factual, inferential, opinion)
 
+IMPORTANT LANGUAGE RULES:
+- "passage" MUST be written entirely in ${targetLanguage}
+- "vocabulary.word" and "vocabulary.example" MUST be in ${targetLanguage}
+- "questions.question" MUST be written in ${targetLanguage} (the language being learned)
+- "translation", "vocabulary.translation", "questions.answer" should be in ${nativeLanguage} to help the learner understand
+
 Return JSON:
 {
-  "title": "engaging passage title",
-  "passage": "the full reading passage with ${lengthGuide}",
+  "title": "engaging title in ${targetLanguage}",
+  "passage": "the full reading passage in ${targetLanguage}",
   "translation": "complete translation in ${nativeLanguage}",
   "vocabulary": [
-    {"word":"word in ${targetLanguage}","translation":"meaning in ${nativeLanguage}","example":"example sentence from the passage"}
+    {"word":"word in ${targetLanguage}","translation":"meaning in ${nativeLanguage}","example":"example sentence in ${targetLanguage}"}
   ],
   "questions": [
-    {"question":"question in ${nativeLanguage}","answer":"detailed answer in ${nativeLanguage}","type":"comprehension"}
+    {"question":"question in ${targetLanguage}","answer":"detailed answer in ${nativeLanguage}","type":"comprehension"}
   ]
 }
 
