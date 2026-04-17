@@ -1,18 +1,14 @@
 "use client";
 import { useState } from "react";
-import { Heart, Copy, Check, ExternalLink, Coffee, Zap, Star, Crown, Rocket, Gift } from "lucide-react";
+import { Heart, Copy, Check, Coffee, Zap, Star, Crown, Rocket, Gift } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { cn } from "@/lib/utils";
 
 // Thông tin thanh toán thật
 const BANK_INFO = {
-  bankName: "ACB / MoMo / ZaloPay",
-  accountNumber: "0906857331",
+  bankName: "ACB",
+  accountNumber: "26996867",
   accountName: "THAI TUAN KIET",
-  acbNumber: "26996867",
-  qrMomo: "/qr-momo.png",
-  qrZalopay: "/qr-zalopay.png",
-  qrAcb: "/qr-acb.png",
   qrUrl: (amount: number, note: string) =>
     `https://img.vietqr.io/image/ACB-26996867-compact2.png?amount=${amount}&addInfo=${encodeURIComponent(note)}&accountName=THAI%20TUAN%20KIET`,
 };
@@ -143,9 +139,8 @@ export default function DonatePage() {
           <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-3">Chuyển khoản ngân hàng</p>
           <div className="flex flex-col gap-2">
             {[
-              { label: "Ví / Ngân hàng", value: "MoMo · ZaloPay · ACB" },
-              { label: "Số điện thoại", value: BANK_INFO.accountNumber, copyId: "acc" },
-              { label: "STK ACB", value: BANK_INFO.acbNumber, copyId: "acb" },
+              { label: "Ngân hàng", value: "ACB" },
+              { label: "STK ACB", value: BANK_INFO.accountNumber, copyId: "acb" },
               { label: "Chủ tài khoản", value: BANK_INFO.accountName },
               { label: "Số tiền", value: `${finalAmount.toLocaleString("vi-VN")} VND`, copyId: "amount" },
               { label: "Nội dung CK", value: note, copyId: "note" },
@@ -168,58 +163,21 @@ export default function DonatePage() {
 
           {showQR && (
             <div className="mt-4 animate-fade-in-scale">
-              <div className="grid grid-cols-3 gap-2">
-                {[
-                  { src: `https://img.vietqr.io/image/MOMO-${BANK_INFO.accountNumber}-compact2.png?accountName=THAI+TUAN+KIET`, label: "MoMo", color: "#ae00ff", acct: BANK_INFO.accountNumber },
-                  { src: `https://img.vietqr.io/image/ZALOPAY-${BANK_INFO.accountNumber}-compact2.png?accountName=THAI+TUAN+KIET`, label: "ZaloPay", color: "#0068ff", acct: BANK_INFO.accountNumber },
-                  { src: `https://img.vietqr.io/image/ACB-${BANK_INFO.acbNumber}-compact2.png?accountName=THAI+TUAN+KIET`, label: "ACB", color: "#0066cc", acct: BANK_INFO.acbNumber },
-                ].map(q => (
-                  <div key={q.label} className="flex flex-col items-center gap-1.5">
-                    <div className="bg-white p-1.5 rounded-xl w-full">
-                      <img src={q.src} alt={q.label} className="w-full rounded-lg"
-                        onError={e => {
-                          const img = e.target as HTMLImageElement;
-                          img.style.display = "none";
-                          const fb = img.parentElement?.querySelector(".qr-fb") as HTMLElement;
-                          if (fb) fb.style.display = "flex";
-                        }}
-                      />
-                      <div className="qr-fb" style={{ display: "none", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 76, gap: 4 }}>
-                        <span className="text-xl font-black" style={{ color: q.color }}>{q.label[0]}</span>
-                        <span className="text-xs text-gray-500">{q.acct}</span>
-                      </div>
-                    </div>
-                    <p className="text-xs font-bold" style={{ color: q.color }}>{q.label}</p>
+              <div className="flex justify-center">
+                <div className="flex flex-col items-center gap-1.5">
+                  <div className="bg-white p-2 rounded-2xl w-44">
+                    <img src={`https://img.vietqr.io/image/ACB-${BANK_INFO.accountNumber}-compact2.png?amount=${finalAmount}&addInfo=${encodeURIComponent(note)}&accountName=THAI+TUAN+KIET`}
+                      alt="ACB QR" className="w-full rounded-xl" />
                   </div>
-                ))}
+                  <p className="text-sm font-bold text-blue-400">ACB Bank</p>
+                  <p className="text-xs text-gray-500">{BANK_INFO.accountNumber}</p>
+                </div>
               </div>
-              <p className="text-xs text-gray-500 text-center mt-2">Quét bằng MoMo, ZaloPay, ACB hoặc app ngân hàng bất kỳ</p>
+              <p className="text-xs text-gray-500 text-center mt-2">Quét bằng app ngân hàng bất kỳ</p>
             </div>
           )}
         </div>
 
-        {/* MoMo */}
-        <div className="rounded-2xl p-4" style={{ background: "rgba(26,16,53,0.8)", border: "1px solid rgba(139,92,246,0.15)" }}>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
-                style={{ background: "rgba(174,0,255,0.15)" }}>
-                💜
-              </div>
-              <div>
-                <p className="text-white font-medium text-sm">MoMo</p>
-                <p className="text-gray-500 text-xs">0906 857 331 · THAI TUAN KIET</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <CopyBtn text="0906857331" id="momo" />
-              <a href="https://me.momo.vn/linguaai" target="_blank" rel="noopener noreferrer"
-                className="p-1.5 rounded-lg text-gray-500 hover:text-primary-400 transition-colors">
-                <ExternalLink className="w-3.5 h-3.5" />
-              </a>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Thank you message */}
