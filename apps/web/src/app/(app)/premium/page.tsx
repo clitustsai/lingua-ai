@@ -6,7 +6,6 @@ import { cn } from "@/lib/utils";
 const OWNER = { acb: "26996867", name: "THAI TUAN KIET" };
 
 const PLANS = [
-  { id: "basic", name: "Free", price: 0, period: "", color: "#6b7280", emoji: "FREE", cta: "Dang dung", ctaDisabled: true, features: ["Chat AI co ban (20 tin/ngay)", "Flashcards khong gioi han", "Video lessons", "Grammar checker", "Streak & achievements"] },
   { id: "basic", name: "Free", price: 0, period: "", color: "#6b7280", emoji: "FREE", cta: "Dang dung", ctaDisabled: true, features: ["Chat AI co ban (20 tin/ngay)", "Flashcards khong gioi han", "Grammar checker", "Streak & achievements", "Dung thu 10 ngay mien phi"] },
   { id: "pro", name: "Pro", price: 199000, priceUSD: 8, period: "/thang", color: "#8b5cf6", emoji: "PRO", cta: "Mua Pro", ctaDisabled: false, popular: true, highlight: "Pho bien nhat", features: ["Chat AI khong gioi han", "Video Lessons + Script AI", "Lo trinh AI ca nhan hoa", "Khoa hoc day du (100+ bai)", "Listening & Lessons AI", "Quiz & Vocab tu video", "AI Tutor ca nhan hoa", "Pronunciation scoring", "AI Kiem Tien tools", "Uu tien ho tro"] },
   { id: "lifetime", name: "Lifetime", price: 999000, priceUSD: 39, period: " mot lan", color: "#f59e0b", emoji: "VIP", cta: "Mua Lifetime", ctaDisabled: false, badge: "Tiet kiem nhat", features: ["Tat ca tinh nang Pro", "Video Lessons khong gioi han", "Tat ca khoa hoc tuong lai", "Truy cap vinh vien", "1-on-1 AI coaching session", "Badge VIP tren profile", "Uu tien tinh nang moi", "Ho tro uu tien 24/7"] },
