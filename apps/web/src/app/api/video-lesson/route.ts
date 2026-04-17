@@ -4,37 +4,43 @@ const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 export async function POST(req: NextRequest) {
   try {
-    const { videoId, title, topic, targetLanguage, nativeLanguage, level } = await req.json();
+    const { videoId, title, topic, targetLanguage, nativeLanguage, level, videoLanguage } = await req.json();
+
+    // videoLanguage = ngôn ngữ của video (Chinese, Japanese, English...)
+    // targetLanguage = ngôn ngữ user đang học (từ settings)
+    // nativeLanguage = tiếng mẹ đẻ của user
+    const lessonLang = videoLanguage || targetLanguage;
 
     const completion = await groq.chat.completions.create({
       model: "llama-3.3-70b-versatile",
       messages: [{
         role: "user",
-        content: `Create a complete English language lesson for a video titled "${title}" about "${topic}" for a ${level} learner whose native language is ${nativeLanguage}.
+        content: `Create a complete language lesson for a video titled "${title}" about "${topic}".
+The video teaches ${lessonLang}. The learner's level is ${level} and their native language is ${nativeLanguage}.
 
 IMPORTANT RULES:
-- "script", "keyPhrases", "vocabulary.word", "vocabulary.example", "grammar.examples" MUST be in ${targetLanguage} (English)
+- "script", "keyPhrases", "vocabulary.word", "vocabulary.example", "grammar.examples" MUST be in ${lessonLang} (the language being taught)
 - "scriptTranslation", "vocabulary.definition", "grammar.explanation", "grammar.tip", "quiz.question", "quiz.options", "quiz.explanation" should be in ${nativeLanguage} to help the learner understand
-- Quiz questions should test comprehension of the English content
+- Quiz questions should test comprehension of the ${lessonLang} content
+- fillBlanks sentences must use ${lessonLang} words/characters
 
 Return JSON:
 {
-  "script": "natural English script 3-4 paragraphs teaching the topic clearly",
+  "script": "natural ${lessonLang} script 3-4 paragraphs teaching the topic clearly",
   "scriptTranslation": "full translation in ${nativeLanguage}",
   "quiz": [
-    { "question": "English comprehension question (e.g. 'Which tense do we use for habits?')", "options": ["option A in English","option B","option C","option D"], "correct": 0, "explanation": "brief explanation in ${nativeLanguage}" }
+    { "question": "question in ${nativeLanguage} testing ${lessonLang} content", "options": ["option A in ${lessonLang}","option B","option C","option D"], "correct": 0, "explanation": "brief explanation in ${nativeLanguage}" }
   ],
   "vocabulary": [
-    { "word": "English word", "pronunciation": "[IPA]", "partOfSpeech": "noun/verb/adj", "definition": "meaning in ${nativeLanguage}", "example": "example sentence in English", "level": "A1/A2/B1/B2/C1" }
+    { "word": "${lessonLang} word", "pronunciation": "[pronunciation/pinyin/romaji]", "partOfSpeech": "noun/verb/adj", "definition": "meaning in ${nativeLanguage}", "example": "example sentence in ${lessonLang}", "level": "A1/A2/B1/B2/C1" }
   ],
   "grammar": [
-    { "point": "Grammar Point Name in English", "explanation": "explanation in ${nativeLanguage}", "examples": ["English example 1", "English example 2"], "tip": "memory tip in ${nativeLanguage}" }
+    { "point": "Grammar Point Name", "explanation": "explanation in ${nativeLanguage}", "examples": ["${lessonLang} example 1", "${lessonLang} example 2"], "tip": "memory tip in ${nativeLanguage}" }
   ],
   "fillBlanks": [
-    { "sentence": "Hi, my name ___ Sarah.", "answer": "is", "options": ["is","are","am","be"] },
-    { "sentence": "They ___ happy, too.", "answer": "are", "options": ["is","are","am","was"] }
+    { "sentence": "sentence with ___ blank in ${lessonLang}", "answer": "correct word in ${lessonLang}", "options": ["opt1","opt2","opt3","opt4"] }
   ],
-  "keyPhrases": ["useful English phrase 1", "useful English phrase 2", "useful English phrase 3", "useful English phrase 4"]
+  "keyPhrases": ["useful ${lessonLang} phrase 1", "useful ${lessonLang} phrase 2", "useful ${lessonLang} phrase 3", "useful ${lessonLang} phrase 4"]
 }`
       }],
       response_format: { type: "json_object" },

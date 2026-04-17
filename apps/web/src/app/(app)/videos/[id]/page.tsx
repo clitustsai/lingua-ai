@@ -128,6 +128,7 @@ export default function VideoDetailPage() {
           videoId: video.youtubeId,
           title: video.title,
           topic: video.topic,
+          videoLanguage: video.language,
           targetLanguage: settings.targetLanguage.name,
           nativeLanguage: settings.nativeLanguage.name,
           level: video.level,
