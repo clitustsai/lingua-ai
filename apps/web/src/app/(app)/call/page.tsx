@@ -9,13 +9,24 @@ const LANG_MAP: Record<string, string> = {
   fr: "fr-FR", es: "es-ES", de: "de-DE", vi: "vi-VN",
 };
 
+"use client";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { useAppStore } from "@/store/useAppStore";
+import { Phone, PhoneOff, Mic, MicOff, Volume2, VolumeX, Camera, CameraOff, Star, AlertCircle, ChevronDown, Sparkles } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+const LANG_MAP: Record<string, string> = {
+  en: "en-US", ja: "ja-JP", ko: "ko-KR", zh: "zh-CN",
+  fr: "fr-FR", es: "es-ES", de: "de-DE", vi: "vi-VN",
+};
+
 const ROLEPLAY_MODES = [
-  { id: "native",    emoji: "🌍", label: "Nguoi ban xu",     desc: "Chat tu nhien nhu ban be",    persona: "native",      color: "#8b5cf6" },
-  { id: "interview", emoji: "💼", label: "Job Interview",    desc: "Luyen phong van xin viec",    persona: "interviewer", color: "#3b82f6" },
-  { id: "dating",    emoji: "💕", label: "Dating",           desc: "Luyen noi chuyen lam quen",   persona: "friend",      color: "#ec4899" },
-  { id: "travel",    emoji: "✈️", label: "Travel English",   desc: "San bay, khach san, du lich", persona: "customer",    color: "#10b981" },
-  { id: "business",  emoji: "📊", label: "Business Meeting", desc: "Hop, thuyet trinh, dam phan", persona: "interviewer", color: "#f59e0b" },
-  { id: "tutor",     emoji: "🎓", label: "AI Teacher",       desc: "Giao vien day ngu phap",      persona: "tutor",       color: "#06b6d4" },
+  { id: "native",    emoji: "🌍", label: "Người bản xứ",     desc: "Chat tự nhiên như bạn bè",    persona: "native",      color: "#8b5cf6" },
+  { id: "interview", emoji: "💼", label: "Job Interview",    desc: "Luyện phỏng vấn xin việc",    persona: "interviewer", color: "#3b82f6" },
+  { id: "dating",    emoji: "💕", label: "Dating",           desc: "Luyện nói chuyện làm quen",   persona: "friend",      color: "#ec4899" },
+  { id: "travel",    emoji: "✈️", label: "Travel English",   desc: "Sân bay, khách sạn, du lịch", persona: "customer",    color: "#10b981" },
+  { id: "business",  emoji: "📊", label: "Business Meeting", desc: "Họp, thuyết trình, đàm phán", persona: "interviewer", color: "#f59e0b" },
+  { id: "tutor",     emoji: "🎓", label: "AI Teacher",       desc: "Giáo viên dạy ngữ pháp",      persona: "tutor",       color: "#06b6d4" },
 ];
 
 type CallState = "idle" | "connecting" | "listening" | "thinking" | "speaking" | "ended";
