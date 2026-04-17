@@ -54,8 +54,14 @@ For fill-blank: question has a blank (___), answer is the missing ${targetLangua
 Return exactly ${safeCount} exercises.`;
 
   const completion = await groq.chat.completions.create({
-    model: "llama-3.1-8b-instant",
-    messages: [{ role: "user", content: prompt }],
+    model: "llama-3.3-70b-versatile",
+    messages: [
+      {
+        role: "system",
+        content: `You are a ${targetLanguage} language exercise generator. You MUST write all questions, answer options, and fill-in-the-blank sentences in ${targetLanguage} ONLY. Never use ${nativeLanguage} in questions or answers. Only instructions and hints can be in ${nativeLanguage}.`,
+      },
+      { role: "user", content: prompt },
+    ],
     response_format: { type: "json_object" },
     temperature: 0.6,
     max_tokens: 3000,
