@@ -4,9 +4,8 @@ import { useRouter } from "next/navigation";
 import { useAppStore } from "@/store/useAppStore";
 import { useAuthStore, isTrialActive } from "@/store/useAuthStore";
 import { VIDEO_LESSONS, CATEGORIES } from "@/lib/videoLessons";
-import { Play, Search, X, ExternalLink } from "lucide-react";
+import { Play, Search, X, ExternalLink, Crown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import PremiumGate from "@/components/PremiumGate";
 function formatDuration(sec: number) {
   const m = Math.floor(sec / 60);
   const s = sec % 60;
@@ -52,11 +51,8 @@ export default function VideosPage() {
   const router = useRouter();
   const { settings } = useAppStore();
   const { user } = useAuthStore();
+  const isPremium = user?.isPremium ?? false;
 
-  // Video Lessons: luôn yêu cầu Premium (không free trial)
-  if (!user?.isPremium) {
-    return <PremiumGate title="Video Lessons — Premium" desc="Truy cập hàng trăm video bài học với script AI, quiz và vocab. Yêu cầu gói Premium." />;
-  }
   const [category, setCategory] = useState("all");
   const [search, setSearch] = useState("");
   const [previewId, setPreviewId] = useState<string | null>(null);
@@ -108,41 +104,65 @@ export default function VideosPage() {
         ))}
       </div>
 
+      {/* Free/premium notice */}
+      {!isPremium && filtered.length > 3 && (
+        <div className="mb-4 px-3 py-2.5 rounded-xl flex items-center justify-between gap-3"
+          style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)" }}>
+          <p className="text-xs text-yellow-300">3 video miễn phí · Nâng cấp để xem tất cả</p>
+          <button onClick={() => router.push("/premium")}
+            className="flex items-center gap-1 text-xs bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-300 px-2.5 py-1 rounded-lg transition-colors shrink-0">
+            <Crown className="w-3 h-3" /> Premium
+          </button>
+        </div>
+      )}
+
       {/* Video grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {filtered.map(v => (
-          <div key={v.id} className="rounded-2xl overflow-hidden transition-all hover:scale-[1.02] hover:shadow-2xl group"
+        {filtered.map((v, idx) => {
+          const isLocked = !isPremium && idx >= 3;
+          return (
+          <div key={v.id} className="rounded-2xl overflow-hidden transition-all hover:scale-[1.02] hover:shadow-2xl group relative"
             style={{ background: "rgba(26,16,53,0.8)", border: "1px solid rgba(139,92,246,0.15)" }}>
 
             {/* Thumbnail card */}
             <div className={cn("relative aspect-video overflow-hidden bg-gradient-to-br cursor-pointer", CAT_GRADIENT[v.category] ?? "from-gray-900 to-gray-800")}
-              onClick={() => router.push(`/videos/${v.id}`)}>
+              onClick={() => isLocked ? router.push("/premium") : router.push(`/videos/${v.id}`)}>
               <div className="absolute inset-0 opacity-10"
                 style={{ backgroundImage: "radial-gradient(circle at 20% 50%, white 1px, transparent 1px)", backgroundSize: "30px 30px" }} />
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-                <span className="text-4xl opacity-60 group-hover:opacity-90 group-hover:scale-110 transition-all duration-300">{CAT_ICON[v.category]}</span>
-                <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/30 transition-colors">
-                  <Play className="w-4 h-4 text-white ml-0.5" />
+              {isLocked ? (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/60 backdrop-blur-sm">
+                  <div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                    <Crown className="w-5 h-5 text-yellow-400" />
+                  </div>
+                  <span className="text-xs text-yellow-300 font-semibold">Premium</span>
                 </div>
-              </div>
+              ) : (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+                  <span className="text-4xl opacity-60 group-hover:opacity-90 group-hover:scale-110 transition-all duration-300">{CAT_ICON[v.category]}</span>
+                  <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/30 transition-colors">
+                    <Play className="w-4 h-4 text-white ml-0.5" />
+                  </div>
+                </div>
+              )}
               <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded font-mono">
                 {formatDuration(v.durationSec)}
               </div>
               <div className="absolute top-2 left-2 text-xs px-2 py-0.5 rounded-full font-medium bg-black/40 text-white backdrop-blur-sm">
                 {CAT_ICON[v.category]} {v.category}
               </div>
-              {/* YouTube link */}
-              <a href={`https://www.youtube.com/watch?v=${v.youtubeId}`}
-                target="_blank" rel="noopener noreferrer"
-                onClick={e => e.stopPropagation()}
-                className="absolute top-2 right-2 p-1.5 rounded-lg bg-red-600/80 hover:bg-red-600 text-white transition-colors"
-                title="Watch on YouTube">
-                <ExternalLink className="w-3 h-3" />
-              </a>
+              {!isLocked && (
+                <a href={`https://www.youtube.com/watch?v=${v.youtubeId}`}
+                  target="_blank" rel="noopener noreferrer"
+                  onClick={e => e.stopPropagation()}
+                  className="absolute top-2 right-2 p-1.5 rounded-lg bg-red-600/80 hover:bg-red-600 text-white transition-colors"
+                  title="Watch on YouTube">
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              )}
             </div>
 
             {/* Info */}
-            <div className="p-3 cursor-pointer" onClick={() => router.push(`/videos/${v.id}`)}>
+            <div className="p-3 cursor-pointer" onClick={() => isLocked ? router.push("/premium") : router.push(`/videos/${v.id}`)}>
               <h3 className="text-white font-semibold text-sm leading-tight mb-1.5 line-clamp-2">{v.title}</h3>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
@@ -160,7 +180,8 @@ export default function VideosPage() {
               </div>
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
 
       {filtered.length === 0 && (
