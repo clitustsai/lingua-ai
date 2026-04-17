@@ -88,6 +88,9 @@ export default function AuthPage() {
   const [showPw, setShowPw] = useState(false);
   const [otp, setOtp] = useState("");
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [forgotMode, setForgotMode] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotSent, setForgotSent] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [oauthLoading, setOauthLoading] = useState<string | null>(null);
@@ -168,6 +171,18 @@ export default function AuthPage() {
       login(user);
       router.push("/dashboard");
     }
+  };
+
+  const submitForgot = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!forgotEmail.trim()) { setError("Vui lòng nhập email"); return; }
+    setLoading(true); setError("");
+    const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail.trim().toLowerCase(), {
+      redirectTo: `${window.location.origin}/auth/reset`,
+    });
+    setLoading(false);
+    if (error) { setError(error.message); return; }
+    setForgotSent(true);
   };
 
   const submitEmail = async (e: React.FormEvent) => {
@@ -308,6 +323,35 @@ export default function AuthPage() {
                 </div>
 
                 {/* Fields - Email only */}
+                {forgotMode ? (
+                  /* Forgot password */
+                  <div className="flex flex-col gap-4">
+                    <button onClick={() => { setForgotMode(false); setForgotSent(false); setError(""); }}
+                      className="flex items-center gap-1.5 text-white/50 hover:text-white text-xs transition-colors w-fit">
+                      ← Quay lại đăng nhập
+                    </button>
+                    {forgotSent ? (
+                      <div className="rounded-2xl p-4 text-center" style={{ background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.3)" }}>
+                        <p className="text-2xl mb-2">📧</p>
+                        <p className="text-white font-bold text-sm mb-1">Đã gửi email!</p>
+                        <p className="text-gray-400 text-xs">Kiểm tra hộp thư của bạn và làm theo hướng dẫn để đặt lại mật khẩu.</p>
+                      </div>
+                    ) : (
+                      <form onSubmit={submitForgot} className="flex flex-col gap-3">
+                        <p className="text-white/60 text-xs">Nhập email để nhận link đặt lại mật khẩu</p>
+                        <input value={forgotEmail} onChange={e => setForgotEmail(e.target.value)}
+                          type="email" placeholder="Email của bạn" className={inputCls} autoFocus />
+                        {error && <p className="text-red-400 text-xs">{error}</p>}
+                        <button type="submit" disabled={loading}
+                          className="w-full py-4 rounded-2xl font-bold text-white flex items-center justify-center gap-2 transition-all disabled:opacity-40"
+                          style={{ background: "linear-gradient(135deg,#7c3aed,#6366f1)" }}>
+                          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                          {loading ? "Đang gửi..." : "Gửi link đặt lại mật khẩu"}
+                        </button>
+                      </form>
+                    )}
+                  </div>
+                ) : (
                 <form onSubmit={submitEmail} className="flex flex-col gap-3">
                     {mode === "register" && (
                       <input value={name} onChange={e => setName(e.target.value)} placeholder="Tên hiển thị" className={inputCls} />
@@ -339,7 +383,14 @@ export default function AuthPage() {
                       {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
                       {loading ? "Đang xử lý..." : mode === "login" ? "Đăng nhập" : "Tạo tài khoản"}
                     </button>
+                    {mode === "login" && (
+                      <button type="button" onClick={() => { setForgotMode(true); setError(""); setForgotEmail(email); }}
+                        className="text-center text-xs text-primary-400 hover:text-primary-300 transition-colors">
+                        Quên mật khẩu?
+                      </button>
+                    )}
                   </form>
+                )}
               </div>
             )}
           </div>
