@@ -81,7 +81,7 @@ function PayModal({ item, onClose }: { item: PayItem; onClose: () => void }) {
 }
 
 export default function PremiumPage() {
-  const [selectedCourse, setSelectedCourse] = useState<typeof COURSES[0] | null>(null);
+  const [tab, setTab] = useState<"plans" | "courses">("plans");
   const [payItem, setPayItem] = useState<PayItem | null>(null);
 
   return (
