@@ -1,21 +1,45 @@
 "use client";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useAppStore } from "@/store/useAppStore";
+import { useAuthStore } from "@/store/useAuthStore";
 import ChatMessage from "@/components/ChatMessage";
 import { speakText } from "@/components/VoiceButton";
 import PronunciationScore from "@/components/PronunciationScore";
 import WordOfDay from "@/components/WordOfDay";
-import { Trash2, Plus, Mic, Send, Save, ChevronDown } from "lucide-react";
+import { Trash2, Plus, Mic, Send, Save, ChevronDown, Crown } from "lucide-react";
 import { CHAT_SCENARIOS } from "@ai-lang/shared";
 import type { Message } from "@ai-lang/shared";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 const LANG_MAP: Record<string, string> = {
   en:"en-US", ja:"ja-JP", ko:"ko-KR", zh:"zh-CN",
   fr:"fr-FR", es:"es-ES", de:"de-DE", vi:"vi-VN",
 };
 
+const DAILY_LIMIT = 50;
+
+function getDailyCount(): number {
+  if (typeof window === "undefined") return 0;
+  const today = new Date().toISOString().slice(0, 10);
+  const stored = localStorage.getItem("chat-daily");
+  if (!stored) return 0;
+  try {
+    const { date, count } = JSON.parse(stored);
+    return date === today ? count : 0;
+  } catch { return 0; }
+}
+
+function incrementDailyCount(): number {
+  const today = new Date().toISOString().slice(0, 10);
+  const count = getDailyCount() + 1;
+  localStorage.setItem("chat-daily", JSON.stringify({ date: today, count }));
+  return count;
+}
+
 export default function ChatPage() {
+  const router = useRouter();
+  const { user } = useAuthStore();
   const {
     messages, addMessage, updateMessage, clearMessages, settings,
     isLoading, setLoading, addFlashcard,
@@ -23,6 +47,7 @@ export default function ChatPage() {
   } = useAppStore();
 
   const [input, setInput] = useState("");
+  const [dailyCount, setDailyCount] = useState(0);
   const [newWords, setNewWords] = useState<string[]>([]);
   const [lastVoice, setLastVoice] = useState<{ transcript: string; confidence: number } | null>(null);
   const [isListening, setIsListening] = useState(false);
@@ -88,9 +113,21 @@ export default function ChatPage() {
 
   const sendMessageRef = useRef<(text?: string) => void>(() => {});
 
+  useEffect(() => { setDailyCount(getDailyCount()); }, []);
+
   const sendMessage = useCallback(async (text?: string) => {
     const content = (text ?? input).trim();
     if (!content || isLoadingRef.current) return;
+
+    // Kiểm tra giới hạn 50 chat/ngày cho free user
+    if (!user?.isPremium && getDailyCount() >= DAILY_LIMIT) {
+      addMessage({
+        id: Date.now().toString(), role: "assistant",
+        content: `Bạn đã dùng hết ${DAILY_LIMIT} tin nhắn hôm nay. Nâng cấp Premium để chat không giới hạn! 🚀`,
+        timestamp: new Date(),
+      });
+      return;
+    }
     const userMsg: Message = {
       id: Date.now().toString(), role: "user", content, timestamp: new Date(),
     };
@@ -144,6 +181,7 @@ export default function ChatPage() {
       }
       incrementMessages();
       checkAchievements();
+      if (!user?.isPremium) setDailyCount(incrementDailyCount());
 
       if (settingsRef.current.autoSpeak !== false) {
         speakText(reply, settingsRef.current.targetLanguage.code, settingsRef.current.speechRate);
@@ -314,6 +352,23 @@ export default function ChatPage() {
 
       {/* ── Input area ── */}
       <div className="border-t border-white/5 px-4 pt-3 pb-4 shrink-0" style={{ background: "rgba(15,10,30,0.95)" }}>
+        {/* Daily limit indicator */}
+        {!user?.isPremium && (
+          <div className="flex items-center justify-between mb-2 px-1">
+            <span className="text-xs text-gray-600">
+              {dailyCount >= DAILY_LIMIT
+                ? <span className="text-red-400">Hết lượt hôm nay</span>
+                : <span>{DAILY_LIMIT - dailyCount} tin nhắn còn lại hôm nay</span>
+              }
+            </span>
+            {dailyCount >= DAILY_LIMIT && (
+              <button onClick={() => router.push("/premium")}
+                className="flex items-center gap-1 text-xs text-yellow-400 hover:text-yellow-300 transition-colors">
+                <Crown className="w-3 h-3" /> Nâng cấp
+              </button>
+            )}
+          </div>
+        )}
         <div className="flex gap-2 items-end">
           <input
             ref={inputRef}
