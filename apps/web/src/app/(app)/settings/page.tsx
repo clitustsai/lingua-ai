@@ -298,7 +298,7 @@ export default function SettingsPage() {
           <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide px-4 pt-4 pb-2">Hỗ trợ</p>
           {[
             { icon: HelpCircle, label: "Trung tâm trợ giúp", href: "/help" },
-            { icon: MessageCircle, label: "Liên hệ hỗ trợ", href: "mailto:support@linguaai.app" },
+            { icon: MessageCircle, label: "Liên hệ hỗ trợ", href: "/contact" },
             { icon: BookOpen, label: "Blog LinguaAI", href: "/blog" },
           ].map(({ icon: Icon, label, href }, i, arr) => (
             <Link key={label} href={href}
