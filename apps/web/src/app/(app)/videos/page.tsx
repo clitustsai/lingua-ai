@@ -2,8 +2,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/store/useAppStore";
+import { useAuthStore, isTrialActive } from "@/store/useAuthStore";
 import { VIDEO_LESSONS, CATEGORIES } from "@/lib/videoLessons";
-import { Play, Search, X, ExternalLink } from "lucide-react";
+import { Play, Search, X, ExternalLink, Crown, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 function formatDuration(sec: number) {
@@ -50,6 +51,31 @@ const PREVIEW_IDS: Record<string, string> = {
 export default function VideosPage() {
   const router = useRouter();
   const { settings } = useAppStore();
+  const { user } = useAuthStore();
+
+  // Premium gate: block nếu hết trial và chưa mua
+  const trialOk = user ? (user.isPremium || isTrialActive(user.createdAt)) : false;
+  if (!trialOk) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center gap-5">
+        <div className="w-20 h-20 rounded-3xl bg-yellow-500/20 flex items-center justify-center">
+          <Lock className="w-10 h-10 text-yellow-400" />
+        </div>
+        <div>
+          <h2 className="text-white font-black text-xl mb-2">Video Lessons — Premium</h2>
+          <p className="text-gray-400 text-sm leading-relaxed">
+            Tính năng này yêu cầu gói Premium.<br />
+            {user && !isTrialActive(user.createdAt) && "Thời gian dùng thử 10 ngày của bạn đã hết."}
+          </p>
+        </div>
+        <button onClick={() => router.push("/premium")}
+          className="flex items-center gap-2 px-6 py-3 rounded-2xl font-bold text-white transition-all hover:opacity-90"
+          style={{ background: "linear-gradient(135deg,#f59e0b,#f97316)" }}>
+          <Crown className="w-5 h-5" /> Nâng cấp Premium
+        </button>
+      </div>
+    );
+  }
   const [category, setCategory] = useState("all");
   const [search, setSearch] = useState("");
   const [previewId, setPreviewId] = useState<string | null>(null);

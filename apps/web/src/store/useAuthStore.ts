@@ -5,10 +5,19 @@ export type AuthUser = {
   id: string;
   name: string;
   email: string;
-  avatar: string; // emoji or URL
+  avatar: string;
   nickname?: string;
   createdAt: string;
+  isPremium?: boolean;
 };
+
+// Kiểm tra còn trong 10 ngày trial không
+export function isTrialActive(createdAt: string): boolean {
+  const created = new Date(createdAt).getTime();
+  const now = Date.now();
+  const days = (now - created) / (1000 * 60 * 60 * 24);
+  return days <= 10;
+}
 
 type AuthStore = {
   user: AuthUser | null;

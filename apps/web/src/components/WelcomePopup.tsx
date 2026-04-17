@@ -99,18 +99,25 @@ export default function WelcomePopup() {
 
           {/* Features */}
           {isNew && (
-            <div className="grid grid-cols-3 gap-2 w-full">
-              {[
-                { icon: Brain, label: "AI Tutor", color: "#8b5cf6" },
-                { icon: Zap, label: "Streak", color: "#f59e0b" },
-                { icon: Sparkles, label: "Video AI", color: "#10b981" },
-              ].map(({ icon: Icon, label, color }) => (
-                <div key={label} className="rounded-xl p-2.5 flex flex-col items-center gap-1"
-                  style={{ background: "rgba(15,10,30,0.6)", border: `1px solid ${color}30` }}>
-                  <Icon className="w-5 h-5" style={{ color }} />
-                  <span className="text-xs text-gray-400">{label}</span>
-                </div>
-              ))}
+            <div className="flex flex-col gap-2 w-full">
+              <div className="rounded-2xl px-4 py-3 text-center"
+                style={{ background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.3)" }}>
+                <p className="text-green-400 font-bold text-sm">🎁 Dùng thử miễn phí 10 ngày</p>
+                <p className="text-gray-400 text-xs mt-0.5">Truy cập hầu hết tính năng, trừ Video Lessons & Lộ trình AI</p>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { icon: Brain, label: "AI Tutor", color: "#8b5cf6" },
+                  { icon: Zap, label: "Streak", color: "#f59e0b" },
+                  { icon: Sparkles, label: "Grammar AI", color: "#10b981" },
+                ].map(({ icon: Icon, label, color }) => (
+                  <div key={label} className="rounded-xl p-2.5 flex flex-col items-center gap-1"
+                    style={{ background: "rgba(15,10,30,0.6)", border: `1px solid ${color}30` }}>
+                    <Icon className="w-5 h-5" style={{ color }} />
+                    <span className="text-xs text-gray-400">{label}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
