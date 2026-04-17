@@ -38,6 +38,7 @@ Respond ONLY with this JSON (no markdown):
 {
   "reply": "your natural response in ${targetLanguage}",
   "translation": "translation of reply in ${nativeLanguage}",
+  "userTranslation": "translation of the user's last message into ${nativeLanguage}",
   "correction": "if user made grammar/vocab mistakes: explain correction in ${nativeLanguage}. null if correct.",
   "betterWay": "if user's sentence was grammatically ok but unnatural: show a more natural way to say it in ${targetLanguage}, with brief note in ${nativeLanguage}. null if already natural.",
   "suggestions": ["3 short follow-up sentences the user could say next, in ${targetLanguage}"],
@@ -64,6 +65,7 @@ Respond ONLY with this JSON (no markdown):
     return NextResponse.json({
       reply,
       translation: result.translation ?? null,
+      userTranslation: result.userTranslation ?? null,
       correction: result.correction ?? null,
       betterWay: result.betterWay ?? null,
       suggestions: Array.isArray(result.suggestions) ? result.suggestions.slice(0, 3) : [],

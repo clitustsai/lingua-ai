@@ -129,6 +129,7 @@ type AppStore = {
 
   setSettings: (s: Partial<UserSettings>) => void;
   addMessage: (m: Message) => void;
+  updateMessage: (id: string, updates: Partial<Message>) => void;
   clearMessages: () => void;
   addFlashcard: (f: Flashcard) => void;
   removeFlashcard: (id: string) => void;
@@ -223,6 +224,9 @@ export const useAppStore = create<AppStore>()(
 
       setSettings: (s) => set((state) => ({ settings: { ...state.settings, ...s } })),
       addMessage: (m) => set((state) => ({ messages: [...state.messages, m] })),
+      updateMessage: (id, updates) => set((state) => ({
+        messages: state.messages.map(m => m.id === id ? { ...m, ...updates } : m)
+      })),
       clearMessages: () => set({ messages: [] }),
 
       addFlashcard: (f) => set((state) => {

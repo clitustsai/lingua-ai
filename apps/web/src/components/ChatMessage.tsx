@@ -62,9 +62,10 @@ export default function ChatMessage({ message, langCode = "en", onSuggestionClic
 
           <p className="whitespace-pre-wrap">{message.content}</p>
 
-          {/* Translation */}
-          {!isUser && message.translation && (
-            <p className="mt-2 text-xs text-gray-400 leading-relaxed border-t border-white/10 pt-2 italic">
+          {/* Translation - hiện cho cả user và AI */}
+          {message.translation && (
+            <p className={cn("mt-2 text-xs leading-relaxed border-t pt-2 italic",
+              isUser ? "border-white/20 text-white/60" : "border-white/10 text-gray-400")}>
               {message.translation}
             </p>
           )}

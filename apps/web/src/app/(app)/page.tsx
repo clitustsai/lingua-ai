@@ -17,7 +17,7 @@ const LANG_MAP: Record<string, string> = {
 
 export default function ChatPage() {
   const {
-    messages, addMessage, clearMessages, settings,
+    messages, addMessage, updateMessage, clearMessages, settings,
     isLoading, setLoading, addFlashcard,
     incrementWords, incrementMessages, saveSession, checkAchievements,
   } = useAppStore();
@@ -114,6 +114,12 @@ export default function ChatPage() {
       if (!res.ok || data.error) throw new Error(data.error || "API error");
 
       const reply = data.reply || "Sorry, I couldn't respond.";
+
+      // Cập nhật user message với translation
+      if (data.userTranslation) {
+        updateMessage(userMsg.id, { translation: data.userTranslation });
+      }
+
       addMessage({
         id: (Date.now() + 1).toString(),
         role: "assistant",
@@ -155,7 +161,7 @@ export default function ChatPage() {
     } finally {
       setLoading(false);
     }
-  }, [addMessage, setLoading, startListening, input, scenario]);
+  }, [addMessage, updateMessage, setLoading, startListening, input, scenario]);
 
   useEffect(() => { sendMessageRef.current = sendMessage; }, [sendMessage]);
 
