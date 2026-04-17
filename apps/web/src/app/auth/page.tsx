@@ -14,6 +14,7 @@ export default function AuthPage() {
   const { login, isLoggedIn } = useAuthStore();
   const [mode, setMode] = useState<"login" | "register">("login");
   const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
@@ -76,7 +77,7 @@ export default function AuthPage() {
         const { data, error } = await supabase.auth.signUp({
           email: email.trim().toLowerCase(),
           password,
-          options: { data: { full_name: name.trim(), avatar: AVATARS[Math.floor(Math.random() * AVATARS.length)] } },
+          options: { data: { full_name: name.trim(), phone: phone.trim(), avatar: AVATARS[Math.floor(Math.random() * AVATARS.length)] } },
         });
         if (error) throw error;
         if (data.user && !data.session) {
@@ -141,12 +142,12 @@ export default function AuthPage() {
         <div className="rounded-3xl p-6" style={{ background: "rgba(26,16,53,0.9)", border: "1px solid rgba(139,92,246,0.25)", backdropFilter: "blur(20px)" }}>
           {/* Tabs */}
           <div className="flex gap-1 p-1 rounded-2xl mb-6" style={{ background: "rgba(15,10,30,0.6)" }}>
-            <button onClick={() => { setMode("login"); setError(""); setSuccessMsg(""); setAgreedToTerms(false); }}
+            <button onClick={() => { setMode("login"); setError(""); setSuccessMsg(""); setAgreedToTerms(false); setPhone(""); }}
               className={cn("flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all",
                 mode === "login" ? "bg-primary-600 text-white shadow-lg" : "text-gray-400 hover:text-gray-200")}>
               Đăng nhập
             </button>
-            <button onClick={() => { setMode("register"); setError(""); setSuccessMsg(""); setAgreedToTerms(false); }}
+            <button onClick={() => { setMode("register"); setError(""); setSuccessMsg(""); setAgreedToTerms(false); setPhone(""); }}
               className={cn("flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all",
                 mode === "register" ? "bg-primary-600 text-white shadow-lg" : "text-gray-400 hover:text-gray-200")}>
               Đăng ký
@@ -208,6 +209,16 @@ export default function AuthPage() {
               />
             </div>
 
+            <div>
+              <label className="text-xs text-gray-400 font-medium mb-1.5 block">
+                Số điện thoại {mode === "login" && <span className="text-gray-600">(tùy chọn)</span>}
+              </label>
+              <input value={phone} onChange={e => setPhone(e.target.value)}
+                type="tel" placeholder="0912 345 678"
+                className="w-full rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 border border-gray-700 focus:outline-none focus:border-primary-500 transition-colors"
+                style={{ background: "rgba(15,10,30,0.8)" }}
+              />
+            </div>
             <div>
               <label className="text-xs text-gray-400 font-medium mb-1.5 block">Mật khẩu</label>
               <div className="relative">
