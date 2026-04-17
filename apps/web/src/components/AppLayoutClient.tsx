@@ -2,19 +2,42 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
+import type { AuthUser } from "@/store/useAuthStore";
+import { createClient } from "@/lib/supabase";
 import Sidebar from "@/components/Sidebar";
 import NotificationManager from "@/components/NotificationManager";
 import BottomNav from "@/components/BottomNav";
 
+const AVATARS = ["🦊","🐼","🦁","🐯","🦋","🐸","🦄","🐙","🦅","🐬","🌟","🎭"];
+
 export default function AppLayoutClient({ children }: { children: React.ReactNode }) {
-  const { isLoggedIn, theme } = useAuthStore();
+  const { isLoggedIn, login, theme } = useAuthStore();
   const router = useRouter();
-  // hydrated = zustand persist đã load xong từ localStorage
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     setHydrated(true);
   }, []);
+
+  // Sync Supabase session -> Zustand (handles OAuth redirect)
+  useEffect(() => {
+    if (!hydrated) return;
+    const supabase = createClient();
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        const u = session.user;
+        const meta = u.user_metadata || {};
+        const name = meta.full_name || meta.name || meta.user_name || u.email?.split("@")[0] || "User";
+        const avatar = meta.avatar_url || meta.picture || AVATARS[Math.floor(Math.random() * AVATARS.length)];
+        const stored = useAuthStore.getState().user;
+        // Only update if name/avatar differs (e.g. after OAuth)
+        if (!stored || stored.name === "Demo User" || stored.email !== u.email) {
+          const user: AuthUser = { id: u.id, name, email: u.email || "", avatar, createdAt: u.created_at };
+          login(user);
+        }
+      }
+    });
+  }, [hydrated]);
 
   useEffect(() => {
     if (hydrated) {
