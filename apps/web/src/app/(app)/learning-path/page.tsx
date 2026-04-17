@@ -2,12 +2,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/store/useAppStore";
-import { useAuthStore, isTrialActive } from "@/store/useAuthStore";
-import { SUPPORTED_LANGUAGES, LEVELS } from "@ai-lang/shared";
+import { useAuthStore } from "@/store/useAuthStore";
 import { Loader2, Sparkles, Target, ChevronRight, CheckCircle2, RotateCcw, BookOpen, Mic, Headphones, Star, Flame } from "lucide-react";
 import { speakText } from "@/components/VoiceButton";
 import { cn } from "@/lib/utils";
-import PremiumGate from "@/components/PremiumGate";
+import { LEVELS } from "@ai-lang/shared";
 
 const GOALS = [
   { id: "travel", label: "Du lịch", emoji: "✈️", desc: "Giao tiếp khi đi du lịch" },
@@ -24,11 +23,6 @@ export default function LearningPathPage() {
   const router = useRouter();
   const { settings, learningPath, pathDaysDone, setLearningPath, markPathDay, clearLearningPath, incrementWords, checkAchievements } = useAppStore();
   const { user } = useAuthStore();
-
-  // Lộ trình AI: luôn yêu cầu Premium
-  if (!user?.isPremium) {
-    return <PremiumGate title="Lộ trình AI — Premium" desc="Lộ trình học cá nhân hóa bởi AI theo mục tiêu của bạn. Yêu cầu gói Premium." />;
-  }
 
   // Onboarding state
   const [step, setStep] = useState<"onboard" | "generating" | "path" | "day">("onboard");
