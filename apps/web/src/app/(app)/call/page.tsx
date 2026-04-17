@@ -9,17 +9,6 @@ const LANG_MAP: Record<string, string> = {
   fr: "fr-FR", es: "es-ES", de: "de-DE", vi: "vi-VN",
 };
 
-"use client";
-import { useState, useRef, useEffect, useCallback } from "react";
-import { useAppStore } from "@/store/useAppStore";
-import { Phone, PhoneOff, Mic, MicOff, Volume2, VolumeX, Camera, CameraOff, Star, AlertCircle, ChevronDown, Sparkles } from "lucide-react";
-import { cn } from "@/lib/utils";
-
-const LANG_MAP: Record<string, string> = {
-  en: "en-US", ja: "ja-JP", ko: "ko-KR", zh: "zh-CN",
-  fr: "fr-FR", es: "es-ES", de: "de-DE", vi: "vi-VN",
-};
-
 const ROLEPLAY_MODES = [
   { id: "native",    emoji: "🌍", label: "Người bản xứ",     desc: "Chat tự nhiên như bạn bè",    persona: "native",      color: "#8b5cf6" },
   { id: "interview", emoji: "💼", label: "Job Interview",    desc: "Luyện phỏng vấn xin việc",    persona: "interviewer", color: "#3b82f6" },
@@ -148,7 +137,7 @@ export default function SpeakingRoomPage() {
         cameraStreamRef.current = stream;
         if (videoRef.current) { videoRef.current.srcObject = stream; videoRef.current.play(); }
         setCameraOn(true);
-      } catch { alert("Khong the bat camera"); }
+      } catch { alert("Không thể bật camera"); }
     }
   }, [cameraOn]);
 
@@ -170,25 +159,13 @@ export default function SpeakingRoomPage() {
       const data = await res.json();
       const reply = data.reply || "I see, tell me more.";
       historyRef.current.push({ role: "assistant", content: reply });
-
-      if (data.correction) {
-        setLiveCorrection(data.correction);
-        setTimeout(() => setLiveCorrection(null), 5000);
-      }
-      if (data.betterWay) {
-        setLiveFeedback(data.betterWay);
-        setTimeout(() => setLiveFeedback(null), 5000);
-      }
-
+      if (data.correction) { setLiveCorrection(data.correction); setTimeout(() => setLiveCorrection(null), 5000); }
+      if (data.betterWay) { setLiveFeedback(data.betterWay); setTimeout(() => setLiveFeedback(null), 5000); }
       setTurns(prev => [...prev, { role: "ai", text: reply, translation: data.translation, correction: data.correction }]);
       incrementMessages(); checkAchievements();
       setCallState("speaking");
-      speak(reply, () => {
-        if (callStateRef.current !== "ended") { setCallState("listening"); startListening(); }
-      });
-    } catch {
-      setCallState("listening"); startListening();
-    }
+      speak(reply, () => { if (callStateRef.current !== "ended") { setCallState("listening"); startListening(); } });
+    } catch { setCallState("listening"); startListening(); }
   }, [settings, mode, speak, startListening, incrementMessages, checkAchievements]);
 
   const startCall = useCallback(async () => {
@@ -230,8 +207,6 @@ export default function SpeakingRoomPage() {
 
   return (
     <div className="flex flex-col h-screen" style={{ background: "#0a0718" }}>
-
-      {/* Header */}
       <div className="flex items-center justify-between px-5 pt-8 pb-3 shrink-0">
         <div>
           <h1 className="text-white font-black text-lg flex items-center gap-2">
@@ -247,30 +222,46 @@ export default function SpeakingRoomPage() {
         )}
       </div>
 
-      {/* Camera / Avatar area */}
       <div className="flex-1 flex flex-col items-center justify-center gap-4 px-5 relative">
-
-        {/* Camera feed or AI avatar */}
         <div className="relative w-full max-w-sm">
-          {/* User camera */}
-          <div className={cn("w-full aspect-video rounded-3xl overflow-hidden relative",
-            cameraOn ? "bg-black" : "bg-gray-900")}
-            style={{ border: `2px solid ${mode.color}40` }}>
-            <video ref={videoRef} className={cn("w-full h-full object-cover", !cameraOn && "hidden")} muted playsInline />
-            {!cameraOn && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-                <div className="w-20 h-20 rounded-full flex items-center justify-center text-4xl"
-                  style={{ background: `${mode.color}20`, border: `2px solid ${mode.color}40` }}>
-                  {mode.emoji}
-                </div>
-                <p className="text-white font-bold">{mode.label}</p>
-                <p className="text-gray-500 text-xs">{mode.desc}</p>
+          <div className="w-full aspect-video rounded-3xl overflow-hidden relative"
+            style={{ background: "linear-gradient(135deg,#0f0a1e,#1a0533)", border: `2px solid ${mode.color}40` }}>
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+              {callState === "speaking" && (
+                <>
+                  <div className="absolute w-32 h-32 rounded-full animate-ping opacity-20" style={{ background: mode.color }} />
+                  <div className="absolute w-24 h-24 rounded-full animate-ping opacity-30" style={{ background: mode.color }} />
+                </>
+              )}
+              <div className="relative w-20 h-20 rounded-full flex items-center justify-center text-4xl z-10"
+                style={{
+                  background: `radial-gradient(circle, ${mode.color}40, ${mode.color}10)`,
+                  border: `3px solid ${mode.color}${callState === "speaking" ? "ff" : "60"}`,
+                  boxShadow: callState === "speaking" ? `0 0 30px ${mode.color}80` : "none",
+                  transition: "all 0.3s ease"
+                }}>
+                {mode.emoji}
               </div>
-            )}
-
-            {/* Status overlay */}
+              <div className="z-10 text-center">
+                <p className="text-white font-bold text-sm">{mode.label}</p>
+                <p className="text-gray-400 text-xs">{mode.desc}</p>
+              </div>
+              {callState === "speaking" && (
+                <div className="flex items-center gap-1 z-10">
+                  {[1,2,3,4,5].map(i => (
+                    <div key={i} className="w-1 rounded-full animate-bounce"
+                      style={{ height: `${8 + (i % 3) * 8}px`, background: mode.color, animationDelay: `${i * 0.1}s`, animationDuration: "0.6s" }} />
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium"
+              style={{ background: "rgba(0,0,0,0.6)" }}>
+              <div className={cn("w-2 h-2 rounded-full", callState === "speaking" ? "bg-green-400 animate-pulse" : "bg-gray-500")} />
+              <span className="text-white">AI</span>
+            </div>
             {isActive && (
-              <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium"
+              <div className="absolute top-3 right-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium"
                 style={{ background: "rgba(0,0,0,0.7)" }}>
                 <div className={cn("w-2 h-2 rounded-full",
                   callState === "listening" ? "bg-green-400 animate-pulse"
@@ -278,30 +269,34 @@ export default function SpeakingRoomPage() {
                   : callState === "thinking" ? "bg-yellow-400 animate-pulse"
                   : "bg-gray-500")} />
                 <span className="text-white">
-                  {callState === "listening" ? "Listening..." : callState === "speaking" ? "AI Speaking" : callState === "thinking" ? "Thinking..." : "Connecting"}
+                  {callState === "listening" ? "Listening..." : callState === "speaking" ? "Speaking" : callState === "thinking" ? "Thinking..." : "Connecting"}
                 </span>
               </div>
             )}
-
-            {/* Score badge */}
             {isActive && scoreCount > 0 && (
-              <div className="absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-bold"
+              <div className="absolute bottom-3 right-3 px-2 py-1 rounded-full text-xs font-bold"
                 style={{ background: "rgba(0,0,0,0.7)", color: avgScore >= 80 ? "#10b981" : avgScore >= 60 ? "#f59e0b" : "#ef4444" }}>
                 {avgScore}pts
               </div>
             )}
           </div>
 
-          {/* Live correction popup */}
+          <div className={cn("absolute bottom-3 right-3 w-24 aspect-video rounded-xl overflow-hidden transition-all",
+            cameraOn ? "opacity-100" : "opacity-0 pointer-events-none")}
+            style={{ border: "2px solid rgba(255,255,255,0.2)", background: "#000" }}>
+            <video ref={videoRef} className="w-full h-full object-cover" muted playsInline />
+            <div className="absolute bottom-1 left-1 text-white/70 font-medium" style={{ fontSize: "9px" }}>Bạn</div>
+          </div>
+
           {liveCorrection && (
-            <div className="absolute -bottom-2 left-0 right-0 mx-2 rounded-2xl px-3 py-2 flex items-start gap-2 animate-fade-in-up"
+            <div className="absolute -bottom-2 left-0 right-0 mx-2 rounded-2xl px-3 py-2 flex items-start gap-2"
               style={{ background: "rgba(234,179,8,0.15)", border: "1px solid rgba(234,179,8,0.4)" }}>
               <AlertCircle className="w-4 h-4 text-yellow-400 shrink-0 mt-0.5" />
               <p className="text-yellow-200 text-xs leading-relaxed">{liveCorrection}</p>
             </div>
           )}
           {liveFeedback && !liveCorrection && (
-            <div className="absolute -bottom-2 left-0 right-0 mx-2 rounded-2xl px-3 py-2 flex items-start gap-2 animate-fade-in-up"
+            <div className="absolute -bottom-2 left-0 right-0 mx-2 rounded-2xl px-3 py-2 flex items-start gap-2"
               style={{ background: "rgba(139,92,246,0.15)", border: "1px solid rgba(139,92,246,0.4)" }}>
               <Sparkles className="w-4 h-4 text-primary-400 shrink-0 mt-0.5" />
               <p className="text-primary-200 text-xs leading-relaxed">{liveFeedback}</p>
@@ -309,7 +304,6 @@ export default function SpeakingRoomPage() {
           )}
         </div>
 
-        {/* Transcript */}
         {turns.length > 0 && (
           <div className="w-full max-w-sm max-h-32 overflow-y-auto scrollbar-hide flex flex-col gap-1.5">
             {turns.slice(-3).map((t, i) => (
@@ -329,11 +323,9 @@ export default function SpeakingRoomPage() {
         )}
       </div>
 
-      {/* Controls */}
       <div className="px-5 pb-8 shrink-0">
         {!isActive ? (
           <div className="flex flex-col gap-3">
-            {/* Mode picker */}
             <button onClick={() => setShowModePicker(!showModePicker)}
               className="flex items-center justify-between w-full px-4 py-3 rounded-2xl transition-colors"
               style={{ background: "rgba(26,16,53,0.8)", border: `1px solid ${mode.color}40` }}>
@@ -365,7 +357,6 @@ export default function SpeakingRoomPage() {
               </div>
             )}
 
-            {/* Camera toggle */}
             <button onClick={toggleCamera}
               className={cn("flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-colors border",
                 cameraOn ? "border-primary-500 bg-primary-900/20 text-primary-300" : "border-gray-700 bg-gray-800 text-gray-400")}>
@@ -373,7 +364,6 @@ export default function SpeakingRoomPage() {
               {cameraOn ? "Camera đang bật" : "Bật camera (tùy chọn)"}
             </button>
 
-            {/* Start */}
             <button onClick={startCall}
               className="w-full flex items-center justify-center gap-3 py-5 rounded-3xl font-bold text-lg transition-all shadow-2xl"
               style={{ background: `linear-gradient(135deg, ${mode.color}, ${mode.color}cc)`, boxShadow: `0 8px 32px ${mode.color}40` }}>
@@ -403,13 +393,11 @@ export default function SpeakingRoomPage() {
                   muted ? "bg-red-600/30 ring-2 ring-red-500/50" : "bg-gray-800 hover:bg-gray-700")}>
                 {muted ? <MicOff className="w-6 h-6 text-red-400" /> : <Mic className="w-6 h-6 text-gray-300" />}
               </button>
-
               <button onClick={endCall}
                 className="w-20 h-20 rounded-full flex items-center justify-center shadow-2xl transition-all hover:scale-105"
                 style={{ background: "linear-gradient(135deg,#dc2626,#b91c1c)", boxShadow: "0 8px 32px rgba(220,38,38,0.5)" }}>
                 <PhoneOff className="w-8 h-8 text-white" />
               </button>
-
               <button onClick={() => setSpeakerOff(!speakerOff)}
                 className={cn("w-14 h-14 rounded-full flex items-center justify-center transition-all",
                   speakerOff ? "bg-gray-600/30 ring-2 ring-gray-500/50" : "bg-gray-800 hover:bg-gray-700")}>
@@ -425,4 +413,3 @@ export default function SpeakingRoomPage() {
     </div>
   );
 }
-
