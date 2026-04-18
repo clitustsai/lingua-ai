@@ -128,6 +128,9 @@ export function speakText(text: string, langCode: string, rate = 0.9) {
   window.speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
   u.lang = toLangTag(langCode);
-  u.rate = rate;
+  // Mobile browsers (iOS/Android) tend to speak faster — reduce rate
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  u.rate = isMobile ? Math.min(rate, 0.75) : rate;
+  u.pitch = 1;
   window.speechSynthesis.speak(u);
 }

@@ -244,12 +244,12 @@ export default function SettingsPage() {
         {/* Speech rate */}
         <div>
           <label className="block text-sm font-medium text-gray-400 mb-2 flex items-center gap-2">
-            <Volume2 className="w-4 h-4" /> Speech rate: <span className="text-white">{settings.speechRate ?? 0.9}x</span>
+            <Volume2 className="w-4 h-4" /> Tốc độ đọc: <span className="text-white">{settings.speechRate ?? 0.8}x</span>
           </label>
-          <input type="range" min={0.5} max={1.5} step={0.1} value={settings.speechRate ?? 0.9}
+          <input type="range" min={0.5} max={1.2} step={0.05} value={settings.speechRate ?? 0.8}
             onChange={(e) => setSettings({ speechRate: Number(e.target.value) })}
             className="w-full accent-primary-500" />
-          <div className="flex justify-between text-xs text-gray-600 mt-1"><span>0.5x slow</span><span>1.5x fast</span></div>
+          <div className="flex justify-between text-xs text-gray-600 mt-1"><span>0.5x chậm</span><span>1.2x nhanh</span></div>
         </div>
 
         {/* Toggles */}
