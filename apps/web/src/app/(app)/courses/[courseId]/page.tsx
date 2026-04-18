@@ -122,7 +122,13 @@ export default function CourseDetailPage() {
                 {unit.lessons.map((lesson, li) => {
                   const done = completedLessons.includes(lesson.id);
                   const Icon = TYPE_ICON[lesson.type] ?? BookOpen;
-                  const canAccess = isEnrolled && !isLocked;
+                  // Bài đầu tiên của unit đầu tiên luôn mở nếu đã enroll
+                  // Bài tiếp theo chỉ mở khi bài trước đã hoàn thành
+                  const allLessonsFlat: string[] = [];
+                  course.units.forEach(u => u.lessons.forEach(l => allLessonsFlat.push(l.id)));
+                  const lessonIdx = allLessonsFlat.indexOf(lesson.id);
+                  const prevLessonId = lessonIdx > 0 ? allLessonsFlat[lessonIdx - 1] : null;
+                  const canAccess = isEnrolled && !isLocked && (lessonIdx === 0 || prevLessonId === null || completedLessons.includes(prevLessonId));
 
                   return (
                     <button key={lesson.id}
@@ -133,13 +139,15 @@ export default function CourseDetailPage() {
                         canAccess ? "hover:bg-white/5" : "opacity-40 cursor-not-allowed"
                       )}>
                       <div className={cn("w-9 h-9 rounded-xl flex items-center justify-center shrink-0",
-                        done ? "bg-green-600/20" : "bg-gray-800")}>
+                        done ? "bg-green-600/20" : canAccess ? "bg-gray-800" : "bg-gray-900")}>
                         {done
                           ? <CheckCircle2 className="w-5 h-5 text-green-400" />
-                          : <Icon className={cn("w-4 h-4", TYPE_COLOR[lesson.type])} />}
+                          : canAccess
+                            ? <Icon className={cn("w-4 h-4", TYPE_COLOR[lesson.type])} />
+                            : <Lock className="w-4 h-4 text-gray-600" />}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className={cn("text-sm font-medium", done ? "text-gray-400" : "text-white")}>{lesson.title}</p>
+                        <p className={cn("text-sm font-medium", done ? "text-gray-400" : canAccess ? "text-white" : "text-gray-600")}>{lesson.title}</p>
                         <p className="text-xs text-gray-500 mt-0.5 capitalize">{lesson.type} · {lesson.durationMin} phút</p>
                       </div>
                       <div className="flex items-center gap-1 shrink-0">
