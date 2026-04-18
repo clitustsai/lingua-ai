@@ -6,14 +6,14 @@ import { Trophy, Flame, Star, Crown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const MOCK_USERS = [
-  { rank: 1, name: "Nguyen Minh Tuan", avatar: "🦁", xp: 4820, streak: 32, level: "B2" },
-  { rank: 2, name: "Tran Thi Lan Anh", avatar: "🦋", xp: 3950, streak: 21, level: "B1" },
-  { rank: 3, name: "Le Van Hung", avatar: "🐯", xp: 3210, streak: 18, level: "B1" },
-  { rank: 4, name: "Pham Thu Ha", avatar: "🦊", xp: 2780, streak: 14, level: "A2" },
-  { rank: 5, name: "Vo Duc Thanh", avatar: "🐺", xp: 2340, streak: 11, level: "A2" },
-  { rank: 6, name: "Hoang Thi Mai", avatar: "🦄", xp: 1980, streak: 9, level: "A1" },
-  { rank: 7, name: "Bui Quang Huy", avatar: "🐸", xp: 1650, streak: 7, level: "A1" },
-  { rank: 8, name: "Dang Thi Ngoc", avatar: "🌸", xp: 1320, streak: 5, level: "A1" },
+  { rank: 1, name: "Nguyễn Minh Tuấn", avatar: "🦁", xp: 4820, streak: 32, level: "B2" },
+  { rank: 2, name: "Trần Thị Lan Anh", avatar: "🦋", xp: 3950, streak: 21, level: "B1" },
+  { rank: 3, name: "Lê Văn Hùng", avatar: "🐯", xp: 3210, streak: 18, level: "B1" },
+  { rank: 4, name: "Phạm Thu Hà", avatar: "🦊", xp: 2780, streak: 14, level: "A2" },
+  { rank: 5, name: "Võ Đức Thành", avatar: "🐺", xp: 2340, streak: 11, level: "A2" },
+  { rank: 6, name: "Hoàng Thị Mai", avatar: "🦄", xp: 1980, streak: 9, level: "A1" },
+  { rank: 7, name: "Bùi Quang Huy", avatar: "🐸", xp: 1650, streak: 7, level: "A1" },
+  { rank: 8, name: "Đặng Thị Ngọc", avatar: "🌸", xp: 1320, streak: 5, level: "A1" },
 ];
 
 const LEVEL_THRESHOLDS = [
