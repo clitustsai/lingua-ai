@@ -1,15 +1,15 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { MessageCircle, LayoutDashboard, BookOpen, Phone, Gamepad2 } from "lucide-react";
+import { MessageCircle, LayoutDashboard, BookOpen, GraduationCap, Gamepad2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV = [
-  { href: "/dashboard", icon: LayoutDashboard, label: "Home" },
-  { href: "/",          icon: MessageCircle,   label: "Chat" },
-  { href: "/call",      icon: Phone,           label: "Call" },
-  { href: "/lessons",   icon: BookOpen,        label: "Learn" },
-  { href: "/minigame",  icon: Gamepad2,        label: "Games" },
+  { href: "/dashboard",  icon: LayoutDashboard, label: "Home" },
+  { href: "/",           icon: MessageCircle,   label: "Chat" },
+  { href: "/study-sets", icon: BookOpen,        label: "Bộ học tập" },
+  { href: "/lessons",    icon: GraduationCap,   label: "Learn" },
+  { href: "/minigame",   icon: Gamepad2,        label: "Games" },
 ];
 
 export default function BottomNav() {
