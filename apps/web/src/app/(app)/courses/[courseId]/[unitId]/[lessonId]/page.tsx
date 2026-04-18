@@ -367,6 +367,18 @@ export default function LessonPlayerPage() {
     setCompleted(true);
   };
 
+  // Find next lesson
+  const nextLesson = (() => {
+    let found = false;
+    for (const u of course?.units ?? []) {
+      for (const l of u.lessons) {
+        if (found) return { unitId: u.id, lessonId: l.id, title: l.title };
+        if (l.id === lessonId) found = true;
+      }
+    }
+    return null;
+  })();
+
   if (!course || !unit || !lesson) return <div className="p-6 text-white">Không tìm thấy bài học</div>;
 
   return (
@@ -407,10 +419,22 @@ export default function LessonPlayerPage() {
 
             <div className="mt-8">
               {completed || alreadyDone ? (
-                <button onClick={() => router.back()}
-                  className="w-full py-3.5 rounded-2xl bg-green-700/30 border border-green-600/40 text-green-300 font-bold flex items-center justify-center gap-2">
-                  <CheckCircle2 className="w-5 h-5" /> Hoàn thành · Quay lại
-                </button>
+                <div className="flex flex-col gap-3">
+                  <div className="w-full py-3 rounded-2xl bg-green-700/30 border border-green-600/40 text-green-300 font-bold text-center">
+                    ✅ Hoàn thành!
+                  </div>
+                  {nextLesson ? (
+                    <button onClick={() => router.push(`/courses/${courseId}/${nextLesson.unitId}/${nextLesson.lessonId}`)}
+                      className="w-full py-3.5 rounded-2xl bg-primary-600 hover:bg-primary-500 text-white font-bold flex items-center justify-center gap-2 transition-colors">
+                      Bài tiếp theo: {nextLesson.title} <ChevronRight className="w-5 h-5" />
+                    </button>
+                  ) : (
+                    <button onClick={() => router.push(`/courses/${courseId}`)}
+                      className="w-full py-3 rounded-2xl border border-gray-700 text-gray-400 hover:text-white text-sm font-medium transition-colors">
+                      Quay lại khóa học
+                    </button>
+                  )}
+                </div>
               ) : (
                 <button onClick={markDone}
                   className="w-full py-3.5 rounded-2xl bg-primary-600 hover:bg-primary-500 text-white font-bold flex items-center justify-center gap-2 transition-colors">

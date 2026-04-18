@@ -150,7 +150,14 @@ export default function ReadingPage() {
           <button onClick={() => setActiveLesson(null)} className="flex items-center gap-2 text-gray-400 hover:text-white text-sm transition-colors w-fit">
             ← Quay lại danh sách
           </button>
-          <ReadingContent data={activeLesson} settings={settings} addFlashcard={addFlashcard} incrementLessons={incrementLessons} checkAchievements={checkAchievements} />
+          <ReadingContent data={activeLesson} settings={settings} addFlashcard={addFlashcard} incrementLessons={incrementLessons} checkAchievements={checkAchievements}
+            onNext={() => {
+              const idx = READING_LESSONS.findIndex(l => l.id === activeLesson.id);
+              const next = READING_LESSONS[idx + 1];
+              if (next && (!next.locked || user?.isPremium)) setActiveLesson(next);
+              else setActiveLesson(null);
+            }}
+          />
         </div>
       )}
 
@@ -262,8 +269,8 @@ export default function ReadingPage() {
   );
 }
 
-function ReadingContent({ data, settings, addFlashcard, incrementLessons, checkAchievements }: {
-  data: any; settings: any; addFlashcard: any; incrementLessons: any; checkAchievements: any;
+function ReadingContent({ data, settings, addFlashcard, incrementLessons, checkAchievements, onNext }: {
+  data: any; settings: any; addFlashcard: any; incrementLessons: any; checkAchievements: any; onNext?: () => void;
 }) {
   const [showTranslation, setShowTranslation] = useState(false);
   const [showAnswers, setShowAnswers] = useState<Record<number, boolean>>({});
@@ -332,7 +339,15 @@ function ReadingContent({ data, settings, addFlashcard, incrementLessons, checkA
           ✅ Mark as Completed
         </button>
       ) : (
-        <div className="text-center py-3 text-green-400 text-sm">🎉 Great job! Lesson completed.</div>
+        <div className="flex flex-col gap-3">
+          <div className="text-center py-3 text-green-400 text-sm">🎉 Great job! Lesson completed.</div>
+          {onNext && (
+            <button onClick={onNext}
+              className="w-full py-3 bg-primary-600 hover:bg-primary-500 text-white rounded-xl text-sm font-medium transition-colors flex items-center justify-center gap-2">
+              Bài tiếp theo →
+            </button>
+          )}
+        </div>
       )}
     </div>
   );

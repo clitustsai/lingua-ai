@@ -93,7 +93,13 @@ export default function LearningPathPage() {
     markPathDay(activeDayIdx + 1);
     incrementWords(5);
     checkAchievements();
-    setStep("path");
+    // Auto go to next day if available
+    const nextIdx = activeDayIdx + 1;
+    if (learningPath && nextIdx < learningPath.days.length && (isPremium || nextIdx < 3)) {
+      setTimeout(() => openDay(nextIdx), 800);
+    } else {
+      setStep("path");
+    }
   };
 
   // ── Onboarding ──────────────────────────────────────────────────────────────
