@@ -96,6 +96,13 @@ export default function AuthPage() {
   const [oauthLoading, setOauthLoading] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState("");
   const [countdown, setCountdown] = useState(0);
+  const [captchaVerified, setCaptchaVerified] = useState(false);
+  const [captchaAnswer, setCaptchaAnswer] = useState("");
+  const [captchaQ] = useState(() => {
+    const a = Math.floor(Math.random() * 9) + 1;
+    const b = Math.floor(Math.random() * 9) + 1;
+    return { a, b, answer: String(a + b) };
+  });
 
   useEffect(() => { if (isLoggedIn) router.replace("/dashboard"); }, [isLoggedIn]);
 
@@ -190,10 +197,19 @@ export default function AuthPage() {
     if (!agreedToTerms) { setError("Vui lòng đồng ý điều khoản sử dụng"); return; }
     if (!email.trim() || !password.trim()) { setError("Vui lòng điền đầy đủ thông tin"); return; }
     if (password.length < 6) { setError("Mật khẩu tối thiểu 6 ký tự"); return; }
+    if (mode === "register") {
+      if (!name.trim()) { setError("Vui lòng nhập tên"); return; }
+      if (!/^[A-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠƯẠ-Ỹ]/.test(name.trim())) {
+        setError("Tên hiển thị phải bắt đầu bằng chữ hoa"); return;
+      }
+      if (!/[A-Z]/.test(password)) {
+        setError("Mật khẩu phải chứa ít nhất 1 chữ cái in hoa"); return;
+      }
+      if (!captchaVerified) { setError("Vui lòng xác nhận bạn không phải robot"); return; }
+    }
     setLoading(true);
     try {
       if (mode === "register") {
-        if (!name.trim()) { setError("Vui lòng nhập tên"); setLoading(false); return; }
         const { data, error } = await supabase.auth.signUp({
           email: email.trim().toLowerCase(), password,
           options: { data: { full_name: name.trim(), avatar: AVATARS[Math.floor(Math.random() * AVATARS.length)] } },
@@ -354,17 +370,43 @@ export default function AuthPage() {
                 ) : (
                 <form onSubmit={submitEmail} className="flex flex-col gap-3">
                     {mode === "register" && (
-                      <input value={name} onChange={e => setName(e.target.value)} placeholder="Tên hiển thị" className={inputCls} />
+                      <input value={name} onChange={e => setName(e.target.value)} placeholder="Tên hiển thị (bắt đầu bằng chữ hoa)" className={inputCls} />
                     )}
                     <input value={email} onChange={e => setEmail(e.target.value)} type="email" placeholder="Email" className={inputCls} />
                     <div className="relative">
                       <input value={password} onChange={e => setPassword(e.target.value)}
-                        type={showPw ? "text" : "password"} placeholder="Mật khẩu (tối thiểu 6 ký tự)" className={cn(inputCls, "pr-11")} />
+                        type={showPw ? "text" : "password"} placeholder={mode === "register" ? "Mật khẩu (tối thiểu 6 ký tự, có chữ hoa)" : "Mật khẩu (tối thiểu 6 ký tự)"} className={cn(inputCls, "pr-11")} />
                       <button type="button" onClick={() => setShowPw(!showPw)}
                         className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors">
                         {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
                     </div>
+                    {/* Captcha - chỉ hiện khi đăng ký */}
+                    {mode === "register" && (
+                      <div className="rounded-2xl px-4 py-3 flex items-center gap-3"
+                        style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)" }}>
+                        <div className="flex-1">
+                          <p className="text-white/50 text-xs mb-1.5">Xác nhận bạn không phải robot:</p>
+                          <p className="text-white font-semibold text-sm">{captchaQ.a} + {captchaQ.b} = ?</p>
+                        </div>
+                        {captchaVerified ? (
+                          <div className="flex items-center gap-1.5 text-green-400 text-xs font-medium">
+                            <CheckCircle2 className="w-4 h-4" /> Đã xác nhận
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            <input value={captchaAnswer}
+                              onChange={e => {
+                                setCaptchaAnswer(e.target.value);
+                                if (e.target.value === captchaQ.answer) setCaptchaVerified(true);
+                              }}
+                              placeholder="?" maxLength={2}
+                              className="w-14 text-center rounded-xl px-2 py-2 text-sm text-white border border-white/10 bg-white/5 focus:outline-none focus:border-primary-500"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    )}
                     <label className="flex items-start gap-2.5 cursor-pointer select-none mt-1">
                       <div onClick={() => { setAgreedToTerms(v => !v); setError(""); }}
                         className={cn("w-4 h-4 rounded-md border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all",

@@ -491,21 +491,31 @@ export default function VideoDetailPage() {
             <div className="mt-6">
               <h2 className="text-white font-bold text-lg mb-3">Keep Listening</h2>
               <div className="flex flex-col gap-3">
-                {VIDEO_LESSONS.filter(v => v.id !== id && v.category === video.category).slice(0, 3).map(v => (
-                  <button key={v.id} onClick={() => router.push(`/videos/${v.id}`)}
-                    className="flex items-center gap-3 p-3 rounded-xl text-left transition-colors hover:bg-white/5"
-                    style={{ background: "rgba(26,16,53,0.6)", border: "1px solid rgba(139,92,246,0.1)" }}>
-                    <img src={`https://i.ytimg.com/vi/${v.youtubeId}/hqdefault.jpg`} alt={v.title}
-                      className="w-20 h-12 object-cover rounded-lg shrink-0"
-                      onError={(e) => { (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${v.youtubeId}/0.jpg`; }}
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-white text-sm font-medium line-clamp-2">{v.title}</p>
-                      <p className="text-gray-500 text-xs mt-0.5">{v.flag.length === 2 ? v.flag.toUpperCase().split("").map((c: string) => String.fromCodePoint(0x1F1E6 + c.charCodeAt(0) - 65)).join("") : v.flag} {v.teacher} · {v.level}</p>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-gray-600 shrink-0" />
-                  </button>
-                ))}
+                {VIDEO_LESSONS.filter(v => v.id !== id && v.category === video.category).slice(0, 3).map(v => {
+                  const currentIdx = VIDEO_LESSONS.findIndex(x => x.id === id);
+                  const vIdx = VIDEO_LESSONS.findIndex(x => x.id === v.id);
+                  const isNextLocked = vIdx > currentIdx && !completed;
+                  return (
+                    <button key={v.id}
+                      onClick={() => !isNextLocked && router.push(`/videos/${v.id}`)}
+                      disabled={isNextLocked}
+                      className={cn("flex items-center gap-3 p-3 rounded-xl text-left transition-colors",
+                        isNextLocked ? "opacity-50 cursor-not-allowed" : "hover:bg-white/5")}
+                      style={{ background: "rgba(26,16,53,0.6)", border: "1px solid rgba(139,92,246,0.1)" }}>
+                      <img src={`https://i.ytimg.com/vi/${v.youtubeId}/hqdefault.jpg`} alt={v.title}
+                        className="w-20 h-12 object-cover rounded-lg shrink-0"
+                        onError={(e) => { (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${v.youtubeId}/0.jpg`; }}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-white text-sm font-medium line-clamp-2">{v.title}</p>
+                        <p className="text-gray-500 text-xs mt-0.5">{v.flag.length === 2 ? v.flag.toUpperCase().split("").map((c: string) => String.fromCodePoint(0x1F1E6 + c.charCodeAt(0) - 65)).join("") : v.flag} {v.teacher} · {v.level}</p>
+                      </div>
+                      {isNextLocked
+                        ? <span className="text-xs text-gray-600 shrink-0">Xem video trước</span>
+                        : <ChevronRight className="w-4 h-4 text-gray-600 shrink-0" />}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
