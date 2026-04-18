@@ -141,8 +141,8 @@ export default function PremiumPage() {
             </div>
           ))}
           <div className="rounded-2xl p-4 text-center" style={{ background: "rgba(16,185,129,0.05)", border: "1px solid rgba(16,185,129,0.2)" }}>
-            <p className="text-green-400 font-semibold text-sm">Hoan tien 7 ngay neu khong hai long</p>
-            <p className="text-gray-500 text-xs mt-1">Lien he ACB: {OWNER.acb}</p>
+            <p className="text-green-400 font-semibold text-sm">Ho�n ti?n 7 ng�y n?u kh�ng h�i l�ng</p>
+            <p className="text-gray-500 text-xs mt-1">Li�n h?: support@linguaai.app</p>
           </div>
         </div>
       )}
