@@ -38,7 +38,7 @@ export default function LeaderboardPage() {
   const nextLevel = LEVEL_THRESHOLDS[LEVEL_THRESHOLDS.indexOf(myLevel) + 1];
   const progressToNext = nextLevel ? ((myXp - myLevel.min) / (nextLevel.min - myLevel.min)) * 100 : 100;
 
-  const myEntry = { rank: 0, name: user?.name || "Ban", avatar: user?.avatar || "⭐", xp: myXp, streak, level: "A1", isMe: true };
+  const myEntry = { rank: 0, name: user?.name || "Bạn", avatar: user?.avatar || "⭐", xp: myXp, streak, level: "A1", isMe: true };
   const allUsers = [...MOCK_USERS, { ...myEntry, rank: MOCK_USERS.length + 1 }]
     .sort((a, b) => b.xp - a.xp)
     .map((u, i) => ({ ...u, rank: i + 1 }));
@@ -53,9 +53,9 @@ export default function LeaderboardPage() {
         <div className="absolute top-0 right-0 w-48 h-48 rounded-full opacity-20 blur-3xl pointer-events-none"
           style={{ background: "radial-gradient(circle,#f59e0b,transparent)" }} />
         <h1 className="text-2xl font-black text-white flex items-center gap-2 relative z-10">
-          <Trophy className="w-6 h-6 text-yellow-400" /> Bang xep hang
+          <Trophy className="w-6 h-6 text-yellow-400" /> Bảng xếp hạng
         </h1>
-        <p className="text-gray-400 text-sm mt-1 relative z-10">Top hoc vien tuan nay</p>
+        <p className="text-gray-400 text-sm mt-1 relative z-10">Top học viên tuần này</p>
       </div>
 
       <div className="px-5 pb-8 space-y-5">
@@ -64,12 +64,12 @@ export default function LeaderboardPage() {
           style={{ background: "rgba(20,12,40,0.95)", border: `1px solid ${myLevel.color}40`, boxShadow: `0 4px 20px ${myLevel.color}20` }}>
           <div className="flex items-center justify-between mb-3">
             <div>
-              <p className="text-xs text-gray-500 mb-0.5">Cap do cua ban</p>
+              <p className="text-xs text-gray-500 mb-0.5">Cấp độ của bạn</p>
               <p className="text-white font-black text-lg" style={{ color: myLevel.color }}>{myLevel.level}</p>
             </div>
             <div className="text-right">
               <p className="text-2xl font-black text-white">{myXp.toLocaleString()}</p>
-              <p className="text-xs text-gray-500">XP tong</p>
+              <p className="text-xs text-gray-500">XP tổng</p>
             </div>
           </div>
           {nextLevel && (
@@ -78,7 +78,7 @@ export default function LeaderboardPage() {
                 <div className="h-2 rounded-full transition-all duration-700"
                   style={{ width: `${progressToNext}%`, background: `linear-gradient(90deg,${myLevel.color},${nextLevel.color})` }} />
               </div>
-              <p className="text-xs text-gray-600 mt-1.5">{nextLevel.min - myXp} XP nua de len {nextLevel.level}</p>
+              <p className="text-xs text-gray-600 mt-1.5">{nextLevel.min - myXp} XP nữa để lên {nextLevel.level}</p>
             </>
           )}
         </div>
@@ -89,7 +89,7 @@ export default function LeaderboardPage() {
             <button key={t} onClick={() => setTab(t)}
               className={cn("flex-1 py-2 rounded-xl text-sm font-semibold transition-all",
                 tab === t ? "bg-primary-600 text-white" : "text-gray-400")}>
-              {t === "week" ? "Tuan nay" : "Tat ca"}
+              {t === "week" ? "Tuần này" : "Tất cả"}
             </button>
           ))}
         </div>
@@ -136,7 +136,7 @@ export default function LeaderboardPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className={cn("text-sm font-semibold truncate", isMe ? "text-primary-300" : "text-white")}>
-                    {u.name} {isMe && "(Ban)"}
+                    {u.name} {isMe && "(Bạn)"}
                   </p>
                   <div className="flex items-center gap-2 mt-0.5">
                     <span className="flex items-center gap-0.5 text-xs text-orange-400">
@@ -156,13 +156,13 @@ export default function LeaderboardPage() {
 
         {/* How to earn XP */}
         <div className="rounded-2xl p-4" style={{ background: "rgba(20,12,40,0.8)", border: "1px solid rgba(139,92,246,0.15)" }}>
-          <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-3">Cach kiem XP</p>
+          <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-3">Cách kiếm XP</p>
           <div className="grid grid-cols-2 gap-2">
             {[
-              { action: "Hoan thanh bai hoc", xp: "+20 XP" },
-              { action: "Chat voi AI", xp: "+5 XP" },
-              { action: "Streak hang ngay", xp: "+10 XP" },
-              { action: "Hoan thanh quiz", xp: "+15 XP" },
+              { action: "Hoàn thành bài học", xp: "+20 XP" },
+              { action: "Chat với AI", xp: "+5 XP" },
+              { action: "Streak hàng ngày", xp: "+10 XP" },
+              { action: "Hoàn thành quiz", xp: "+15 XP" },
             ].map(({ action, xp }) => (
               <div key={action} className="flex items-center justify-between px-3 py-2 rounded-xl"
                 style={{ background: "rgba(139,92,246,0.08)" }}>
