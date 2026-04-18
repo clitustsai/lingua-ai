@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useAppStore } from "@/store/useAppStore";
 import { useAuthStore, isTrialActive } from "@/store/useAuthStore";
 import { VIDEO_LESSONS, CATEGORIES } from "@/lib/videoLessons";
-import { Play, Search, X, ExternalLink, Crown } from "lucide-react";
+import { Play, Search, X, ExternalLink, Crown, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 function formatDuration(sec: number) {
   const m = Math.floor(sec / 60);
@@ -50,6 +50,7 @@ const PREVIEW_IDS: Record<string, string> = {
 export default function VideosPage() {
   const router = useRouter();
   const { settings } = useAppStore();
+  const { completedVideos } = useAppStore();
   const { user } = useAuthStore();
   const isPremium = user?.isPremium ?? false;
 
@@ -119,7 +120,12 @@ export default function VideosPage() {
       {/* Video grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {filtered.map((v, idx) => {
-          const isLocked = !isPremium && idx >= 3;
+          // Video bị lock nếu: premium lock HOẶC chưa xem video trước (idx > 0 và video trước chưa completed)
+          const prevVideo = idx > 0 ? filtered[idx - 1] : null;
+          const prevCompleted = prevVideo ? completedVideos.includes(prevVideo.id) : true;
+          const isPremiumLocked = !isPremium && idx >= 3;
+          const isSequenceLocked = !isPremiumLocked && idx > 0 && !prevCompleted;
+          const isLocked = isPremiumLocked || isSequenceLocked;
           return (
           <div key={v.id} className="rounded-2xl overflow-hidden transition-all hover:scale-[1.02] hover:shadow-2xl group relative"
             style={{ background: "rgba(26,16,53,0.8)", border: "1px solid rgba(139,92,246,0.15)" }}>
@@ -131,10 +137,15 @@ export default function VideosPage() {
                 style={{ backgroundImage: "radial-gradient(circle at 20% 50%, white 1px, transparent 1px)", backgroundSize: "30px 30px" }} />
               {isLocked ? (
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/60 backdrop-blur-sm">
-                  <div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center">
-                    <Crown className="w-5 h-5 text-yellow-400" />
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center"
+                    style={{ background: isPremiumLocked ? "rgba(245,158,11,0.2)" : "rgba(100,100,100,0.3)" }}>
+                    {isPremiumLocked
+                      ? <Crown className="w-5 h-5 text-yellow-400" />
+                      : <Lock className="w-5 h-5 text-gray-400" />}
                   </div>
-                  <span className="text-xs text-yellow-300 font-semibold">Premium</span>
+                  <span className="text-xs font-semibold" style={{ color: isPremiumLocked ? "#fcd34d" : "#9ca3af" }}>
+                    {isPremiumLocked ? "Premium" : "Xem video trước"}
+                  </span>
                 </div>
               ) : (
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">

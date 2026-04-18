@@ -159,7 +159,8 @@ type AppStore = {
   setNotifications: (enabled: boolean) => void;
   claimStreakReward: (day: number) => void;
   setUsername: (name: string) => void;
-  addCommunityPost: (post: CommunityPost) => void;
+  completedVideos: string[];
+  addCompletedVideo: (videoId: string) => void;
   likePost: (id: string) => void;
   addComment: (postId: string, comment: CommunityComment) => void;
   addCorrection: (postId: string, correction: CommunityCorrection) => void;
@@ -394,7 +395,15 @@ export const useAppStore = create<AppStore>()(
 
       setUsername: (name) => set({ username: name }),
 
-      addCommunityPost: (post) => set((state) => ({
+      completedVideos: [],
+
+      addCompletedVideo: (videoId) => set((state) => ({
+        completedVideos: state.completedVideos.includes(videoId)
+          ? state.completedVideos
+          : [...state.completedVideos, videoId],
+      })),
+
+      addCommunityPost: (post: CommunityPost) => set((state) => ({
         communityPosts: [post, ...state.communityPosts].slice(0, 100),
       })),
       likePost: (id) => set((state) => ({

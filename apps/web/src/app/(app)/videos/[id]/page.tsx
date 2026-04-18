@@ -84,6 +84,7 @@ export default function VideoDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const { settings, addFlashcard, incrementLessons, checkAchievements } = useAppStore();
+  const { addCompletedVideo } = useAppStore();
 
   const video = VIDEO_LESSONS.find(v => v.id === id);
 
@@ -153,6 +154,7 @@ export default function VideoDetailPage() {
     setCompleted(true);
     incrementLessons();
     checkAchievements();
+    if (video) addCompletedVideo(video.id);
   };
 
   const quizScore = lessonData?.quiz
