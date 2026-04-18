@@ -161,6 +161,7 @@ type AppStore = {
   setUsername: (name: string) => void;
   completedVideos: string[];
   addCompletedVideo: (videoId: string) => void;
+  addCommunityPost: (post: CommunityPost) => void;
   likePost: (id: string) => void;
   addComment: (postId: string, comment: CommunityComment) => void;
   addCorrection: (postId: string, correction: CommunityCorrection) => void;
