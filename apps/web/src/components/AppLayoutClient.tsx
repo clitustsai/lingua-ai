@@ -26,20 +26,33 @@ export default function AppLayoutClient({ children }: { children: React.ReactNod
   useEffect(() => {
     if (!hydrated) return;
     const supabase = createClient();
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        const u = session.user;
-        const meta = u.user_metadata || {};
-        const name = meta.full_name || meta.name || meta.user_name || u.email?.split("@")[0] || "User";
-        const avatar = meta.avatar_url || meta.picture || AVATARS[Math.floor(Math.random() * AVATARS.length)];
-        const stored = useAuthStore.getState().user;
-        // Only update if name/avatar differs (e.g. after OAuth)
-        if (!stored || stored.name === "Demo User" || stored.email !== u.email) {
-          const user: AuthUser = { id: u.id, name, email: u.email || "", avatar, createdAt: u.created_at };
-          login(user);
-        }
+
+    const syncUser = (u: any) => {
+      if (!u) return;
+      const meta = u.user_metadata || {};
+      const name = (meta.full_name || meta.name || meta.user_name || "").trim()
+        || (u.email?.split("@")[0] || "User");
+      const avatar = meta.avatar_url || meta.picture || AVATARS[Math.floor(Math.random() * AVATARS.length)];
+      const stored = useAuthStore.getState().user;
+      const needsUpdate = !stored
+        || stored.email !== u.email
+        || stored.name === "Demo User"
+        || stored.name === stored.email?.split("@")[0];
+      if (needsUpdate) {
+        const user: AuthUser = { id: u.id, name, email: u.email || "", avatar, createdAt: u.created_at };
+        login(user);
       }
+    };
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) syncUser(session.user);
     });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) syncUser(session.user);
+    });
+
+    return () => subscription.unsubscribe();
   }, [hydrated]);
 
   useEffect(() => {
