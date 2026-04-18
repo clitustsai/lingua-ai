@@ -32,6 +32,7 @@ const nav = [
   { href: "/video",         icon: Youtube,         label: "Video Sub" },
   { href: "/ocr",           icon: Camera,          label: "Quét ảnh" },
   { href: "/flashcards",    icon: BookOpen,        label: "Flashcards" },
+  { href: "/study-sets",    icon: BookOpen,        label: "Bộ học tập" },
   { href: "/review",        icon: RotateCcw,       label: "Review" },
   { href: "/saved",         icon: Bookmark,        label: "Câu hay" },
   { href: "/lessons",       icon: GraduationCap,   label: "Lessons" },
