@@ -2,7 +2,7 @@
 import { useAppStore } from "@/store/useAppStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { SUPPORTED_LANGUAGES, LEVELS, CONVERSATION_TOPICS } from "@ai-lang/shared";
-import { Volume2, Target, Sun, Moon, Camera, Check, X, Pencil, LogOut, HelpCircle, MessageCircle, ChevronRight, BookOpen } from "lucide-react";
+import { Volume2, Target, Sun, Moon, Camera, Check, X, Pencil, LogOut, HelpCircle, MessageCircle, ChevronRight, BookOpen, Crown, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -154,16 +154,32 @@ export default function SettingsPage() {
         <div>
           <label className="block text-sm font-medium text-gray-400 mb-2">Language I want to learn</label>
           <div className="grid grid-cols-2 gap-2">
-            {SUPPORTED_LANGUAGES.map((lang) => (
-              <button key={lang.code} onClick={() => setSettings({ targetLanguage: lang })}
-                className={cn("flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm transition-colors",
-                  settings.targetLanguage.code === lang.code
-                    ? "border-primary-500 bg-primary-600/20 text-white"
-                    : "border-gray-700 bg-gray-800 text-gray-400 hover:border-gray-600")}>
-                <span>{lang.flag}</span><span>{lang.name}</span>
-              </button>
-            ))}
+            {SUPPORTED_LANGUAGES.map((lang, idx) => {
+              // English (index 0) là free, còn lại lock Premium
+              const isLocked = idx > 0 && !user?.isPremium;
+              const isSelected = settings.targetLanguage.code === lang.code;
+              return (
+                <button key={lang.code}
+                  onClick={() => isLocked ? router.push("/premium") : setSettings({ targetLanguage: lang })}
+                  className={cn("flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm transition-colors relative",
+                    isSelected
+                      ? "border-primary-500 bg-primary-600/20 text-white"
+                      : isLocked
+                        ? "border-gray-700 bg-gray-800/40 text-gray-600 cursor-pointer"
+                        : "border-gray-700 bg-gray-800 text-gray-400 hover:border-gray-600")}>
+                  <span>{lang.flag}</span>
+                  <span className="flex-1 text-left">{lang.name}</span>
+                  {isLocked && <Crown className="w-3.5 h-3.5 text-yellow-500 shrink-0" />}
+                </button>
+              );
+            })}
           </div>
+          {!user?.isPremium && (
+            <p className="text-xs text-gray-600 mt-2 flex items-center gap-1">
+              <Crown className="w-3 h-3 text-yellow-600" />
+              Nâng cấp Premium để học Japanese, Korean, Chinese và nhiều ngôn ngữ khác
+            </p>
+          )}
         </div>
 
         {/* Native language */}
