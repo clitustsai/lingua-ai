@@ -196,6 +196,38 @@ export default function SkillsPage() {
             </div>
           )}
 
+          {/* Adaptive recommendations */}
+          {tutorMemory.weakAreas?.length > 0 && (
+            <div className="rounded-2xl p-4" style={{ background: "linear-gradient(135deg,rgba(124,58,237,0.2),rgba(99,102,241,0.1))", border: "1px solid rgba(139,92,246,0.3)" }}>
+              <p className="text-xs text-primary-300 font-semibold mb-3">🤖 AI gợi ý học hôm nay</p>
+              <div className="flex flex-col gap-2">
+                {tutorMemory.weakAreas.slice(0, 3).map((area, i) => {
+                  const links: Record<string, { href: string; label: string; emoji: string }> = {
+                    grammar: { href: "/grammar", label: "Luyện Grammar", emoji: "📐" },
+                    vocabulary: { href: "/flashcards", label: "Ôn Flashcard", emoji: "📚" },
+                    speaking: { href: "/pronunciation", label: "Luyện phát âm", emoji: "🎤" },
+                    listening: { href: "/listening", label: "Luyện nghe", emoji: "🎧" },
+                    fluency: { href: "/tutor", label: "Chat với AI Tutor", emoji: "💬" },
+                  };
+                  const key = Object.keys(links).find(k => area.toLowerCase().includes(k)) ?? "fluency";
+                  const link = links[key];
+                  return (
+                    <a key={i} href={link.href}
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all hover:bg-white/10"
+                      style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(139,92,246,0.2)" }}>
+                      <span className="text-xl">{link.emoji}</span>
+                      <div className="flex-1">
+                        <p className="text-white text-sm font-medium">{link.label}</p>
+                        <p className="text-gray-500 text-xs">Cải thiện: {area}</p>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-gray-600" />
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           <button onClick={analyze} disabled={loading}
             className="w-full py-3 rounded-xl border border-gray-700 text-gray-400 hover:border-primary-500 hover:text-primary-300 text-sm font-medium transition-colors flex items-center justify-center gap-2">
             {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Đang phân tích...</> : <><RefreshCw className="w-4 h-4" /> Phân tích lại</>}

@@ -21,6 +21,7 @@ function motivationMessage(streak: number, wordsToday: number, goal: number, lan
 }
 
 export default function DashboardPage() {
+  const { tutorMemory, skillScore } = useAppStore();
   const {
     streak, stats, flashcards, totalMessages, settings,
     weeklyHistory, achievements, checkAchievements,
@@ -212,6 +213,42 @@ export default function DashboardPage() {
             })}
           </div>
         </div>
+
+        {/* ── AI GỢI Ý HÔM NAY ── */}
+        {tutorMemory.weakAreas?.length > 0 && (
+          <div className="rounded-2xl p-4"
+            style={{ background: "rgba(20,12,40,0.95)", border: "1px solid rgba(139,92,246,0.2)" }}>
+            <div className="flex items-center gap-2 mb-3">
+              <Sparkles className="w-4 h-4 text-primary-400" />
+              <p className="text-sm font-semibold text-white">AI gợi ý học hôm nay</p>
+            </div>
+            <div className="flex flex-col gap-2">
+              {tutorMemory.weakAreas.slice(0, 2).map((area, i) => {
+                const map: Record<string, { href: string; emoji: string; label: string }> = {
+                  grammar: { href: "/grammar", emoji: "📐", label: "Luyện Grammar" },
+                  vocabulary: { href: "/flashcards", emoji: "📚", label: "Ôn từ vựng" },
+                  speaking: { href: "/pronunciation", emoji: "🎤", label: "Luyện phát âm" },
+                  listening: { href: "/listening", emoji: "🎧", label: "Luyện nghe" },
+                  fluency: { href: "/tutor", emoji: "💬", label: "Chat AI Tutor" },
+                };
+                const key = Object.keys(map).find(k => area.toLowerCase().includes(k)) ?? "fluency";
+                const item = map[key];
+                return (
+                  <button key={i} onClick={() => router.push(item.href)}
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all hover:bg-white/5"
+                    style={{ background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.15)" }}>
+                    <span className="text-xl">{item.emoji}</span>
+                    <div className="flex-1">
+                      <p className="text-white text-sm font-medium">{item.label}</p>
+                      <p className="text-gray-500 text-xs">Điểm yếu: {area}</p>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-gray-600" />
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* ── PREMIUM BANNER (nếu chưa premium) ── */}
         {!user?.isPremium && (

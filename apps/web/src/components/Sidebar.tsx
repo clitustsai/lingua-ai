@@ -5,7 +5,7 @@ import {
   MessageCircle, BookOpen, Settings, Brain, Flame,
   GraduationCap, CheckSquare, History, LayoutDashboard,
   Languages, BookMarked, Headphones, Mic2, RotateCcw,
-  Compass, Youtube, Sparkles, Camera, TrendingUp, Bookmark, Share2, Phone, Users, Wand2, Globe, Target, Video, DollarSign, Banknote, Heart, Crown, Gamepad2, Star, PenLine,
+  Compass, Youtube, Sparkles, Camera, TrendingUp, Bookmark, Share2, Phone, Users, Wand2, Globe, Target, Video, DollarSign, Banknote, Heart, Crown, Gamepad2, Star, PenLine, Trophy,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/useAppStore";
@@ -29,6 +29,7 @@ const nav = [
   { href: "/courses",       icon: Compass,         label: "Khóa học" },
   { href: "/learning-path", icon: BookMarked,      label: "Lộ trình AI" },
   { href: "/skills",        icon: TrendingUp,      label: "Kỹ năng" },
+  { href: "/leaderboard",   icon: Trophy,          label: "Bảng xếp hạng" },
   { href: "/video",         icon: Youtube,         label: "Video Sub" },
   { href: "/ocr",           icon: Camera,          label: "Quét ảnh" },
   { href: "/flashcards",    icon: BookOpen,        label: "Flashcards" },
