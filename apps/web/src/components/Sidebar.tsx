@@ -5,7 +5,7 @@ import {
   MessageCircle, BookOpen, Settings, Brain, Flame,
   GraduationCap, CheckSquare, History, LayoutDashboard,
   Languages, BookMarked, Headphones, Mic2, RotateCcw,
-  Compass, Youtube, Sparkles, Camera, TrendingUp, Bookmark, Share2, Phone, Users, Wand2, Globe, Target, Video, DollarSign, Banknote, Heart, Crown, Gamepad2, Star, PenLine, Trophy,
+  Compass, Youtube, Sparkles, Camera, TrendingUp, Bookmark, Share2, Phone, Users, Wand2, Globe, Target, Video, DollarSign, Banknote, Heart, Crown, Gamepad2, Star, PenLine, Trophy, Award,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/useAppStore";
@@ -60,6 +60,7 @@ export default function Sidebar() {
     { href: "/premium",       icon: Crown,           label: tr.premium },
     { href: "/minigame",      icon: Gamepad2,        label: tr.miniGames },
     { href: "/reviews",       icon: Star,            label: tr.reviews },
+  { href: "/certificate",   icon: Award,           label: "Chứng chỉ" },
     { href: "/history",       icon: History,         label: tr.history },
     { href: "/settings",      icon: Settings,        label: tr.settings },
   ];

@@ -9,6 +9,7 @@ import Sidebar from "@/components/Sidebar";
 import NotificationManager from "@/components/NotificationManager";
 import BottomNav from "@/components/BottomNav";
 import WelcomePopup from "@/components/WelcomePopup";
+import ExitGuard from "@/components/ExitGuard";
 import PremiumGate from "@/components/PremiumGate";
 
 const AVATARS = ["🦊","🐼","🦁","🐯","🦋","🐸","🦄","🐙","🦅","🐬","🌟","🎭"];
@@ -106,6 +107,7 @@ export default function AppLayoutClient({ children }: { children: React.ReactNod
       </main>
       <BottomNav />
       <WelcomePopup />
+      <ExitGuard />
     </div>
   );
 }
