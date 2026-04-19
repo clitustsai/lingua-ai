@@ -337,6 +337,7 @@ export default function LessonPlayerPage() {
   const [lessonData, setLessonData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [completed, setCompleted] = useState(false);
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
 
   const prog = courseProgress.find(p => p.courseId === courseId);
   const alreadyDone = prog?.completedLessons.includes(lessonId) ?? false;
@@ -382,10 +383,11 @@ export default function LessonPlayerPage() {
   if (!course || !unit || !lesson) return <div className="p-6 text-white">Không tìm thấy bài học</div>;
 
   return (
+    <>
     <div className="min-h-screen" style={{ background: "#0f0a1e" }}>
       {/* Header */}
       <div className="px-5 pt-10 pb-4 flex items-center gap-3" style={{ background: "rgba(26,16,53,0.8)", borderBottom: "1px solid rgba(139,92,246,0.15)" }}>
-        <button onClick={() => router.back()} className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors">
+        <button onClick={() => setShowExitConfirm(true)} className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors">
           <ArrowLeft className="w-5 h-5 text-white" />
         </button>
         <div className="flex-1 min-w-0">
@@ -446,5 +448,24 @@ export default function LessonPlayerPage() {
         )}
       </div>
     </div>
+    {showExitConfirm && (
+      <div className="fixed inset-0 z-50 flex items-end justify-center pb-8 px-4"
+        style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}>
+        <div className="w-full max-w-sm rounded-3xl p-6 text-center"
+          style={{ background: "rgba(20,12,40,0.98)", border: "1px solid rgba(139,92,246,0.3)" }}>
+          <p className="text-white font-bold text-lg mb-5">Bạn có chắc chắn muốn thoát không?</p>
+          <button onClick={() => setShowExitConfirm(false)}
+            className="w-full py-4 rounded-2xl font-bold text-white mb-3 text-base"
+            style={{ background: "linear-gradient(135deg,#3b82f6,#2563eb)" }}>
+            Tiếp tục học
+          </button>
+          <button onClick={() => { setShowExitConfirm(false); router.back(); }}
+            className="w-full py-2 text-white font-bold text-base">
+            Thoát Bài Học
+          </button>
+        </div>
+      </div>
+    )}
+    </>
   );
 }

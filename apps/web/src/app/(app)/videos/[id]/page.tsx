@@ -104,6 +104,7 @@ export default function VideoDetailPage() {
   const [completed, setCompleted] = useState(false);
   const [realVideoId, setRealVideoId] = useState<string | null>(null);
   const [videoLoading, setVideoLoading] = useState(false);
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
 
   // For English use stored ID; for others fetch real ID via YouTube API
   const isEnglish = video?.language === "English";
@@ -171,14 +172,14 @@ export default function VideoDetailPage() {
   ];
 
   return (
+    <>
     <div className="max-w-2xl" style={{ background: "#0f0a1e", minHeight: "100vh" }}>
       {/* Back button */}
       <div className="px-4 pt-8 pb-2">
-        <button onClick={() => router.back()} className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm">
+        <button onClick={() => setShowExitConfirm(true)} className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm">
           <ArrowLeft className="w-4 h-4" /> Back
         </button>
       </div>
-
       {/* Video player */}
       <div className="mx-4 mb-0">
         {videoLoading ? (
@@ -522,5 +523,24 @@ export default function VideoDetailPage() {
         )}
       </div>
     </div>
+    {showExitConfirm && (
+      <div className="fixed inset-0 z-50 flex items-end justify-center pb-8 px-4"
+        style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}>
+        <div className="w-full max-w-sm rounded-3xl p-6 text-center"
+          style={{ background: "rgba(20,12,40,0.98)", border: "1px solid rgba(139,92,246,0.3)" }}>
+          <p className="text-white font-bold text-lg mb-5">Bạn có chắc chắn muốn thoát không?</p>
+          <button onClick={() => setShowExitConfirm(false)}
+            className="w-full py-4 rounded-2xl font-bold text-white mb-3 text-base"
+            style={{ background: "linear-gradient(135deg,#3b82f6,#2563eb)" }}>
+            Tiếp tục học
+          </button>
+          <button onClick={() => { setShowExitConfirm(false); router.back(); }}
+            className="w-full py-2 text-white font-bold text-base">
+            Thoát Bài Học
+          </button>
+        </div>
+      </div>
+    )}
+    </>
   );
 }
