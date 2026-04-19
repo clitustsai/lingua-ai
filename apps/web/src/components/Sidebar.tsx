@@ -24,6 +24,7 @@ export default function Sidebar() {
     { href: "/call",          icon: Phone,           label: tr.voiceCall },
     { href: "/tutor",         icon: Sparkles,        label: tr.aiTutor },
     { href: "/homework",      icon: GraduationCap,   label: tr.aiTeacher },
+  { href: "/generate-lesson", icon: Sparkles,      label: "Tạo bài học AI" },
     { href: "/solve",         icon: Sparkles,        label: tr.solveExercise },
     { href: "/videos",        icon: Youtube,         label: tr.videoLessons },
     { href: "/partners",      icon: Users,           label: tr.partners },

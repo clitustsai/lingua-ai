@@ -18,10 +18,13 @@ export default function NotificationManager() {
     const studiedToday = stats.date === today && stats.messagesCount > 0;
     const hour = new Date().getHours();
     if (!studiedToday && hour >= 9 && hour <= 21) {
+      const lessonsToday = stats.date === today ? (stats as any).lessonsCompleted ?? 0 : 0;
       const msgs = [
-        `🔥 Streak ${streak} ngày! Đừng để mất nhé — học ${settings.targetLanguage.name} ngay hôm nay!`,
-        `📚 Hôm nay bạn chưa học. Chỉ cần 5 phút thôi!`,
+        streak >= 7
+          ? `🔥 ${streak} ngày streak! Đừng để mất — học ${settings.targetLanguage.name} ngay!`
+          : `📚 Hôm nay bạn chưa học. Chỉ cần 5 phút thôi!`,
         `🎯 Mục tiêu hôm nay: ${settings.dailyGoal ?? 5} từ. Bắt đầu nào!`,
+        `💡 AI Teacher đang chờ bạn — học bài mới hôm nay nhé!`,
       ];
       setBanner(msgs[Math.floor(Math.random() * msgs.length)]);
     }
