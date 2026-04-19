@@ -1,9 +1,9 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAppStore } from "@/store/useAppStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useRouter } from "next/navigation";
-import { Sparkles, Loader2, Copy, Check, ChevronDown, RotateCcw, Crown, AlertCircle } from "lucide-react";
+import { Sparkles, Loader2, Copy, Check, ChevronDown, RotateCcw, Crown, AlertCircle, Camera, ImagePlus, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const DAILY_LIMIT = 80;
@@ -67,33 +67,54 @@ export default function SolvePage() {
   const { user } = useAuthStore();
   const router = useRouter();
   const isPremium = user?.isPremium ?? false;
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   const [grade, setGrade] = useState<typeof GRADES[0] | null>(null);
   const [type, setType] = useState(TYPES[0]);
   const [question, setQuestion] = useState("");
   const [loading, setLoading] = useState(false);
+  const [ocrLoading, setOcrLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [showExplain, setShowExplain] = useState(false);
   const [remaining, setRemaining] = useState(DAILY_LIMIT);
   const [showLimitModal, setShowLimitModal] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-  useEffect(() => {
-    setRemaining(getRemainingUses());
-  }, []);
+  useEffect(() => { setRemaining(getRemainingUses()); }, []);
 
   const canUse = isPremium || remaining > 0;
+
+  // Handle image upload → OCR
+  const handleImage = async (file: File) => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const base64 = (e.target?.result as string).split(",")[1];
+      setImagePreview(e.target?.result as string);
+      setOcrLoading(true);
+      try {
+        const res = await fetch("/api/ocr", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ image: base64 }),
+        });
+        const data = await res.json();
+        if (data.text) setQuestion(prev => prev ? prev + "\n" + data.text : data.text);
+      } catch { /* ignore */ }
+      finally { setOcrLoading(false); }
+    };
+    reader.readAsDataURL(file);
+  };
 
   const solve = async () => {
     if (!question.trim() || !grade) return;
     if (!canUse) { setShowLimitModal(true); return; }
-
     setLoading(true);
     setResult(null);
     setShowExplain(false);
-
     const newCount = incrementUsage();
     setRemaining(Math.max(0, DAILY_LIMIT - newCount));
-
     try {
       const res = await fetch("/api/solve-exercise", {
         method: "POST",
@@ -117,7 +138,7 @@ export default function SolvePage() {
           <h1 className="text-xl font-bold text-white flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-yellow-400" /> AI Giải Bài Tập Tiếng Anh
           </h1>
-          <p className="text-sm text-gray-400 mt-1">Giải bài tập từ THCS đến THPT · Giải thích chi tiết</p>
+          <p className="text-sm text-gray-400 mt-1">Dán bài tập hoặc chụp ảnh · Giải thích chi tiết</p>
         </div>
         {!isPremium && (
           <div className="text-right shrink-0 ml-3">
@@ -136,31 +157,25 @@ export default function SolvePage() {
           <p className="text-xs text-gray-400 font-semibold uppercase tracking-wide">Chọn lớp <span className="text-red-400">*</span></p>
         </div>
         <div className="flex flex-col gap-2">
-          {/* THCS */}
           <div>
             <p className="text-xs text-gray-600 mb-1.5 ml-1">THCS</p>
             <div className="flex gap-2 flex-wrap">
               {GRADES.filter(g => g.school === "THCS").map(g => (
-                <button key={g.id} onClick={() => { setGrade(g); setQuestion(""); setResult(null); }}
+                <button key={g.id} onClick={() => { setGrade(g); setQuestion(""); setResult(null); setImagePreview(null); }}
                   className={cn("px-4 py-2 rounded-xl border text-sm font-medium transition-all",
-                    grade?.id === g.id
-                      ? "border-primary-500 bg-primary-900/30 text-white scale-105"
-                      : "border-gray-700 bg-gray-800 text-gray-400 hover:border-gray-600")}>
+                    grade?.id === g.id ? "border-primary-500 bg-primary-900/30 text-white scale-105" : "border-gray-700 bg-gray-800 text-gray-400 hover:border-gray-600")}>
                   {g.label}
                 </button>
               ))}
             </div>
           </div>
-          {/* THPT */}
           <div>
             <p className="text-xs text-gray-600 mb-1.5 ml-1">THPT</p>
             <div className="flex gap-2 flex-wrap">
               {GRADES.filter(g => g.school === "THPT").map(g => (
-                <button key={g.id} onClick={() => { setGrade(g); setQuestion(""); setResult(null); }}
+                <button key={g.id} onClick={() => { setGrade(g); setQuestion(""); setResult(null); setImagePreview(null); }}
                   className={cn("px-4 py-2 rounded-xl border text-sm font-medium transition-all",
-                    grade?.id === g.id
-                      ? "border-yellow-500 bg-yellow-900/20 text-yellow-300 scale-105"
-                      : "border-gray-700 bg-gray-800 text-gray-400 hover:border-gray-600")}>
+                    grade?.id === g.id ? "border-yellow-500 bg-yellow-900/20 text-yellow-300 scale-105" : "border-gray-700 bg-gray-800 text-gray-400 hover:border-gray-600")}>
                   {g.label}
                 </button>
               ))}
@@ -169,11 +184,9 @@ export default function SolvePage() {
         </div>
       </div>
 
-      {/* Step 2: Chọn loại + nhập bài (chỉ hiện sau khi chọn lớp) */}
       {!grade ? (
-        <div className="rounded-2xl p-8 text-center"
-          style={{ background: "rgba(26,16,53,0.5)", border: "1px dashed rgba(139,92,246,0.3)" }}>
-          <p className="text-4xl mb-3">�</p>
+        <div className="rounded-2xl p-8 text-center" style={{ background: "rgba(26,16,53,0.5)", border: "1px dashed rgba(139,92,246,0.3)" }}>
+          <p className="text-4xl mb-3">📚</p>
           <p className="text-gray-400 text-sm">Vui lòng chọn lớp trước để tiếp tục</p>
         </div>
       ) : (
@@ -188,9 +201,7 @@ export default function SolvePage() {
               {TYPES.map(t => (
                 <button key={t.id} onClick={() => setType(t)}
                   className={cn("flex items-center gap-2 px-3 py-2 rounded-xl border text-sm transition-all",
-                    type.id === t.id
-                      ? "border-primary-500 bg-primary-900/30 text-white"
-                      : "border-gray-700 bg-gray-800 text-gray-400 hover:border-gray-600")}>
+                    type.id === t.id ? "border-primary-500 bg-primary-900/30 text-white" : "border-gray-700 bg-gray-800 text-gray-400 hover:border-gray-600")}>
                   <span>{t.emoji}</span>
                   <span className="text-xs">{t.label}</span>
                 </button>
@@ -198,7 +209,7 @@ export default function SolvePage() {
             </div>
           </div>
 
-          {/* Question input */}
+          {/* Input area */}
           <div className="rounded-2xl p-4 mb-4" style={{ background: "rgba(26,16,53,0.8)", border: "1px solid rgba(139,92,246,0.2)" }}>
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
@@ -210,17 +221,52 @@ export default function SolvePage() {
                 {grade.label} · {type.label}
               </span>
             </div>
+
+            {/* Image preview */}
+            {imagePreview && (
+              <div className="relative mb-3 rounded-xl overflow-hidden">
+                <img src={imagePreview} alt="Bài tập" className="w-full max-h-48 object-contain rounded-xl" style={{ background: "rgba(0,0,0,0.3)" }} />
+                <button onClick={() => { setImagePreview(null); }}
+                  className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 flex items-center justify-center text-white hover:bg-black/80 transition-colors">
+                  <X className="w-3.5 h-3.5" />
+                </button>
+                {ocrLoading && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-xl">
+                    <div className="flex items-center gap-2 text-white text-sm">
+                      <Loader2 className="w-4 h-4 animate-spin" /> Đang đọc bài tập...
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Upload buttons */}
+            <div className="flex gap-2 mb-3">
+              <button onClick={() => cameraInputRef.current?.click()}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-purple-700/50 bg-purple-900/20 text-purple-300 text-xs font-medium hover:bg-purple-900/40 transition-colors">
+                <Camera className="w-3.5 h-3.5" /> Chụp ảnh
+              </button>
+              <button onClick={() => fileInputRef.current?.click()}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-gray-700 bg-gray-800 text-gray-400 text-xs font-medium hover:border-gray-600 transition-colors">
+                <ImagePlus className="w-3.5 h-3.5" /> Tải ảnh lên
+              </button>
+              <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" className="hidden"
+                onChange={e => e.target.files?.[0] && handleImage(e.target.files[0])} />
+              <input ref={fileInputRef} type="file" accept="image/*" className="hidden"
+                onChange={e => e.target.files?.[0] && handleImage(e.target.files[0])} />
+            </div>
+
             <textarea
               value={question}
               onChange={e => setQuestion(e.target.value)}
               placeholder={`Dán bài tập ${grade.label} vào đây...\n\nVí dụ:\nChoose the correct answer:\nShe ___ to school every day.\nA. go  B. goes  C. going  D. gone`}
-              rows={6}
+              rows={5}
               className="w-full rounded-xl px-3 py-2.5 text-sm text-white placeholder-gray-500 border border-gray-700 focus:outline-none focus:border-primary-500 resize-none mb-3"
               style={{ background: "rgba(15,10,30,0.8)" }}
             />
             <div className="flex gap-2">
               {question && (
-                <button onClick={() => { setQuestion(""); setResult(null); }}
+                <button onClick={() => { setQuestion(""); setResult(null); setImagePreview(null); }}
                   className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-gray-700 text-gray-400 text-xs hover:border-gray-600 transition-colors">
                   <RotateCcw className="w-3.5 h-3.5" /> Xóa
                 </button>
@@ -228,34 +274,23 @@ export default function SolvePage() {
               <button onClick={solve} disabled={loading || !question.trim() || !canUse}
                 className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold text-white transition-all disabled:opacity-50"
                 style={{ background: canUse ? "linear-gradient(135deg,#7c3aed,#6366f1)" : "rgba(107,114,128,0.5)" }}>
-                {loading
-                  ? <><Loader2 className="w-4 h-4 animate-spin" /> Đang giải...</>
-                  : !canUse
-                    ? <><AlertCircle className="w-4 h-4" /> Hết lượt hôm nay</>
-                    : <><Sparkles className="w-4 h-4" /> Giải ngay</>
-                }
+                {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Đang giải...</>
+                  : !canUse ? <><AlertCircle className="w-4 h-4" /> Hết lượt hôm nay</>
+                  : <><Sparkles className="w-4 h-4" /> Giải ngay</>}
               </button>
             </div>
             {!isPremium && remaining <= 20 && remaining > 0 && (
-              <p className="text-xs text-yellow-400 mt-2 text-center">
-                ⚠️ Còn {remaining} lần sử dụng hôm nay
-              </p>
+              <p className="text-xs text-yellow-400 mt-2 text-center">⚠️ Còn {remaining} lần sử dụng hôm nay</p>
             )}
           </div>
 
-          {/* Loading */}
           {loading && (
             <div className="flex flex-col items-center py-8 gap-3">
-              <div className="flex gap-1.5">
-                <div className="ai-typing-dot" />
-                <div className="ai-typing-dot" />
-                <div className="ai-typing-dot" />
-              </div>
+              <div className="flex gap-1.5"><div className="ai-typing-dot" /><div className="ai-typing-dot" /><div className="ai-typing-dot" /></div>
               <p className="text-gray-500 text-sm">AI đang phân tích và giải bài...</p>
             </div>
           )}
 
-          {/* Result */}
           {result && !loading && (
             <div className="flex flex-col gap-3 animate-fade-in-up">
               <div className="rounded-2xl p-4" style={{ background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.25)" }}>
@@ -265,7 +300,6 @@ export default function SolvePage() {
                 </div>
                 <p className="text-white font-semibold text-base leading-relaxed whitespace-pre-wrap">{result.answer}</p>
               </div>
-
               {result.steps?.length > 0 && (
                 <div className="rounded-2xl p-4" style={{ background: "rgba(26,16,53,0.8)", border: "1px solid rgba(139,92,246,0.2)" }}>
                   <p className="text-xs text-primary-400 font-semibold uppercase tracking-wide mb-3">📝 Các bước giải</p>
@@ -279,14 +313,12 @@ export default function SolvePage() {
                   </div>
                 </div>
               )}
-
               {result.rule && (
                 <div className="rounded-2xl p-4" style={{ background: "rgba(234,179,8,0.08)", border: "1px solid rgba(234,179,8,0.2)" }}>
                   <p className="text-xs text-yellow-400 font-semibold uppercase tracking-wide mb-2">📐 Quy tắc ngữ pháp</p>
                   <p className="text-sm text-gray-200 leading-relaxed">{result.rule}</p>
                 </div>
               )}
-
               {result.explanation && (
                 <div className="rounded-2xl overflow-hidden" style={{ background: "rgba(26,16,53,0.8)", border: "1px solid rgba(139,92,246,0.15)" }}>
                   <button onClick={() => setShowExplain(!showExplain)}
@@ -301,17 +333,13 @@ export default function SolvePage() {
                   )}
                 </div>
               )}
-
               {result.tips?.length > 0 && (
                 <div className="rounded-2xl p-4" style={{ background: "rgba(99,102,241,0.08)", border: "1px solid rgba(99,102,241,0.2)" }}>
                   <p className="text-xs text-indigo-400 font-semibold uppercase tracking-wide mb-2">🎯 Mẹo ghi nhớ</p>
-                  {result.tips.map((tip: string, i: number) => (
-                    <p key={i} className="text-sm text-gray-300 mb-1">• {tip}</p>
-                  ))}
+                  {result.tips.map((tip: string, i: number) => <p key={i} className="text-sm text-gray-300 mb-1">• {tip}</p>)}
                 </div>
               )}
-
-              <button onClick={() => { setResult(null); setQuestion(""); }}
+              <button onClick={() => { setResult(null); setQuestion(""); setImagePreview(null); }}
                 className="w-full py-2.5 rounded-xl border border-gray-700 text-gray-400 hover:border-gray-600 text-sm transition-colors">
                 Giải bài khác
               </button>
@@ -320,7 +348,6 @@ export default function SolvePage() {
         </>
       )}
 
-      {/* Limit modal */}
       {showLimitModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4"
           style={{ background: "rgba(0,0,0,0.8)", backdropFilter: "blur(8px)" }}
@@ -328,25 +355,15 @@ export default function SolvePage() {
           <div className="w-full max-w-sm rounded-3xl p-6 text-center"
             style={{ background: "#0f0a1e", border: "1px solid rgba(245,158,11,0.4)" }}
             onClick={e => e.stopPropagation()}>
-            <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
-              style={{ background: "rgba(245,158,11,0.15)" }}>
-              <Crown className="w-8 h-8 text-yellow-400" />
-            </div>
+            <Crown className="w-10 h-10 text-yellow-400 mx-auto mb-3" />
             <h3 className="text-white font-black text-lg mb-2">Hết lượt hôm nay</h3>
-            <p className="text-gray-400 text-sm mb-2">
-              Bạn đã dùng hết <strong className="text-white">{DAILY_LIMIT} lần</strong> giải bài miễn phí hôm nay.
-            </p>
-            <p className="text-gray-500 text-xs mb-5">Lượt sẽ được reset vào 00:00 ngày mai.</p>
+            <p className="text-gray-400 text-sm mb-5">Bạn đã dùng hết <strong className="text-white">{DAILY_LIMIT} lần</strong> miễn phí hôm nay.</p>
             <button onClick={() => { setShowLimitModal(false); router.push("/premium"); }}
-              className="w-full py-3 rounded-2xl font-bold text-white mb-3 transition-all hover:opacity-90"
-              style={{ background: "linear-gradient(135deg,#f59e0b,#f97316)", boxShadow: "0 4px 20px rgba(245,158,11,0.3)" }}>
-              <Crown className="w-4 h-4 inline mr-2" />
-              Nâng cấp Premium — Không giới hạn
+              className="w-full py-3 rounded-2xl font-bold text-white mb-3"
+              style={{ background: "linear-gradient(135deg,#f59e0b,#f97316)" }}>
+              Nâng cấp Premium
             </button>
-            <button onClick={() => setShowLimitModal(false)}
-              className="w-full py-2 text-gray-500 text-sm hover:text-gray-300 transition-colors">
-              Quay lại
-            </button>
+            <button onClick={() => setShowLimitModal(false)} className="w-full py-2 text-gray-500 text-sm">Quay lại</button>
           </div>
         </div>
       )}
