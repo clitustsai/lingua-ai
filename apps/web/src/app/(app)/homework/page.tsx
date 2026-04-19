@@ -204,7 +204,7 @@ export default function HomeworkPage() {
           {/* Topic selector */}
           <div>
             <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-3">Chủ đề bài học <span className="text-gray-700 normal-case font-normal">(tuỳ chọn)</span></p>
-            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-5 px-5" style={{ touchAction: "pan-x" }}>
               <button onClick={() => setTopic(null)}
                 className={cn("flex flex-col items-center gap-1 px-3 py-2 rounded-xl border transition-all shrink-0",
                   topic === null ? "border-primary-500 bg-primary-900/30" : "border-gray-700 bg-gray-800/60 hover:border-gray-600")}>
@@ -215,9 +215,9 @@ export default function HomeworkPage() {
                 <button key={t.topic} onClick={() => setTopic(t.topic)}
                   className={cn("flex flex-col items-center gap-1 px-3 py-2 rounded-xl border transition-all shrink-0",
                     topic === t.topic ? "border-primary-500 bg-primary-900/30" : "border-gray-700 bg-gray-800/60 hover:border-gray-600")}
-                  style={{ minWidth: 64 }}>
+                  style={{ minWidth: 68 }}>
                   <span className="text-xl">{t.emoji}</span>
-                  <span className={cn("text-xs leading-tight text-center", topic === t.topic ? "text-white" : "text-gray-400")} style={{ maxWidth: 60 }}>{t.label}</span>
+                  <span className={cn("text-xs leading-tight text-center", topic === t.topic ? "text-white" : "text-gray-400")} style={{ maxWidth: 64 }}>{t.label}</span>
                 </button>
               ))}
             </div>
