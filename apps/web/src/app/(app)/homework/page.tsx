@@ -1,8 +1,9 @@
 ﻿"use client";
 import { useState, useEffect, useRef } from "react";
 import { useAppStore } from "@/store/useAppStore";
-import { GraduationCap, Loader2, CheckCircle2, XCircle, Star, RefreshCw, ChevronRight, Timer, Zap, Target, BookOpen, Mic2, PenLine, Brain } from "lucide-react";
+import { GraduationCap, CheckCircle2, XCircle, Star, RefreshCw, ChevronRight, Timer } from "lucide-react";
 import { cn } from "@/lib/utils";
+import AIErrorToast from "@/components/AIErrorToast";
 
 type Exercise = {
   id: string; type: string; instruction: string; question: string;
@@ -69,6 +70,7 @@ export default function HomeworkPage() {
   const [timerActive, setTimerActive] = useState(false);
   const [streak, setStreak] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [aiError, setAiError] = useState<string | null>(null);
   const timerRef = useRef<any>(null);
 
   useEffect(() => {
@@ -108,8 +110,11 @@ export default function HomeworkPage() {
       }
       setHomework(data);
       setTimerActive(true);
-    } catch {
-      setError("Lỗi kết nối. Vui lòng thử lại!");
+    } catch (e: any) {
+      const msg = String(e?.message ?? "");
+      const errText = msg.includes("429") ? "AI đang bận, thử lại sau 1 phút." : "Lỗi kết nối. Vui lòng thử lại!";
+      setError(errText);
+      setAiError(errText);
     } finally { setLoading(false); }
   };
 
@@ -146,6 +151,7 @@ export default function HomeworkPage() {
 
   return (
     <div className="p-5 max-w-xl">
+      <AIErrorToast error={aiError} onDismiss={() => setAiError(null)} onRetry={generate} />
       <div className="pt-2 mb-5 flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-white flex items-center gap-2">

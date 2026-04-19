@@ -6,6 +6,7 @@ import ChatMessage from "@/components/ChatMessage";
 import { speakText } from "@/components/VoiceButton";
 import PronunciationScore from "@/components/PronunciationScore";
 import WordOfDay from "@/components/WordOfDay";
+import AIErrorToast from "@/components/AIErrorToast";
 import { Trash2, Plus, Mic, Send, Save, ChevronDown, Crown } from "lucide-react";
 import { CHAT_SCENARIOS } from "@ai-lang/shared";
 import type { Message } from "@ai-lang/shared";
@@ -55,6 +56,7 @@ export default function ChatPage() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [scenario, setScenario] = useState(CHAT_SCENARIOS[0]);
   const [showScenarioPicker, setShowScenarioPicker] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const recRef = useRef<any>(null);
@@ -195,8 +197,15 @@ export default function ChatPage() {
           }
         }, 300);
       }
-    } catch {
-      addMessage({ id: (Date.now() + 1).toString(), role: "assistant", content: "Lỗi kết nối. Thử lại nhé!", timestamp: new Date() });
+    } catch (err: any) {
+      const msg = String(err?.message ?? "");
+      const errText = msg.includes("429") || msg.includes("rate")
+        ? "AI đang bận, thử lại sau 1 phút."
+        : msg.includes("timeout")
+          ? "AI phản hồi quá chậm. Thử lại nhé."
+          : "Lỗi kết nối. Thử lại nhé!";
+      setAiError(errText);
+      addMessage({ id: (Date.now() + 1).toString(), role: "assistant", content: errText, timestamp: new Date() });
     } finally {
       setLoading(false);
     }
@@ -227,6 +236,7 @@ export default function ChatPage() {
 
   return (
     <div className="flex flex-col h-screen" style={{ background: "#0f0a1e" }}>
+      <AIErrorToast error={aiError} onDismiss={() => setAiError(null)} onRetry={() => sendMessage()} />
 
       {/* ── Header ── */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/5 shrink-0">

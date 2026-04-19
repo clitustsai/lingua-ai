@@ -2,9 +2,10 @@
 import { useState } from "react";
 import { useAppStore } from "@/store/useAppStore";
 import { SUPPORTED_LANGUAGES } from "@ai-lang/shared";
-import { ArrowLeftRight, Loader2, Copy, Volume2, Plus, BookOpen, Zap, Check, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowLeftRight, Loader2, Copy, Volume2, Plus, BookOpen, Zap, Check } from "lucide-react";
 import { speakText } from "@/components/VoiceButton";
 import { cn } from "@/lib/utils";
+import AIErrorToast from "@/components/AIErrorToast";
 
 type Mode = "translate" | "explain" | "practice";
 
@@ -17,7 +18,7 @@ export default function TranslatePage() {
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [mode, setMode] = useState<Mode>("translate");
-  const [showExplain, setShowExplain] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
   // Practice quiz state
   const [quizAnswers, setQuizAnswers] = useState<Record<number, string>>({});
   const [quizChecked, setQuizChecked] = useState(false);
@@ -33,7 +34,6 @@ export default function TranslatePage() {
     setResult(null);
     setQuizAnswers({});
     setQuizChecked(false);
-    setShowExplain(false);
     try {
       const endpoint = mode === "practice" ? "/api/translate-practice" : "/api/translate";
       const res = await fetch(endpoint, {
@@ -53,6 +53,9 @@ export default function TranslatePage() {
       if (data?.translation) {
         addTranslateHistory({ original: input, translation: data.translation, fromLang: fromObj.name, toLang: toObj.name });
       }
+    } catch (e: any) {
+      const msg = String(e?.message ?? "");
+      setAiError(msg.includes("429") ? "AI đang bận, thử lại sau 1 phút." : "Lỗi kết nối. Thử lại nhé!");
     } finally { setLoading(false); }
   };
 
@@ -73,6 +76,7 @@ export default function TranslatePage() {
 
   return (
     <div className="p-5 max-w-2xl">
+      <AIErrorToast error={aiError} onDismiss={() => setAiError(null)} onRetry={translate} />
       <div className="mb-5">
         <h1 className="text-xl font-bold text-white">Dịch thuật AI</h1>
         <p className="text-sm text-gray-500 mt-1">Dịch · Giải thích ngữ pháp · Luyện tập</p>
