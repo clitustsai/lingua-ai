@@ -165,12 +165,26 @@ export default function DonatePage() {
             <div className="mt-4 animate-fade-in-scale">
               <div className="flex justify-center">
                 <div className="flex flex-col items-center gap-1.5">
-                  <div className="bg-white p-2 rounded-2xl w-44">
-                    <img src={`https://img.vietqr.io/image/ACB-${BANK_INFO.accountNumber}-compact2.png?amount=${finalAmount}&addInfo=${encodeURIComponent(note)}&accountName=THAI+TUAN+KIET`}
-                      alt="ACB QR" className="w-full rounded-xl" />
+                  <div className="bg-white p-3 rounded-2xl" style={{ width: 180 }}>
+                    <img
+                      src={`https://img.vietqr.io/image/ACB-${BANK_INFO.accountNumber}-compact2.png?amount=${finalAmount}&addInfo=${encodeURIComponent(note)}&accountName=THAI+TUAN+KIET`}
+                      alt="QR chuyển khoản ACB"
+                      width={160}
+                      height={160}
+                      style={{ width: 160, height: "auto", display: "block", borderRadius: 8 }}
+                      onError={(e) => {
+                        // Fallback: dùng URL đơn giản hơn không có amount
+                        const img = e.currentTarget;
+                        if (!img.dataset.fallback) {
+                          img.dataset.fallback = "1";
+                          img.src = `https://img.vietqr.io/image/ACB-${BANK_INFO.accountNumber}-compact2.png`;
+                        }
+                      }}
+                    />
                   </div>
                   <p className="text-sm font-bold text-blue-400">ACB Bank</p>
                   <p className="text-xs text-gray-500">{BANK_INFO.accountNumber}</p>
+                  <p className="text-xs text-gray-600 text-center max-w-[160px]">Nội dung: <span className="text-gray-400">{note}</span></p>
                 </div>
               </div>
               <p className="text-xs text-gray-500 text-center mt-2">Quét bằng app ngân hàng bất kỳ</p>

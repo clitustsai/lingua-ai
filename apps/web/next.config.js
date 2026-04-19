@@ -6,6 +6,7 @@ const nextConfig = {
       { protocol: "https", hostname: "img.youtube.com" },
       { protocol: "https", hostname: "i.ytimg.com" },
       { protocol: "https", hostname: "lh3.googleusercontent.com" },
+      { protocol: "https", hostname: "img.vietqr.io" },
     ],
     // Enable Next.js image optimization (WebP/AVIF auto-conversion)
     unoptimized: false,
@@ -28,7 +29,7 @@ const nextConfig = {
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "X-XSS-Protection", value: "1; mode=block" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-          { key: "Permissions-Policy", value: "camera=(), microphone=(self), geolocation=()" },
+          { key: "Permissions-Policy", value: "camera=(self), microphone=(self), geolocation=()" },
           {
             key: "Content-Security-Policy",
             value: [
