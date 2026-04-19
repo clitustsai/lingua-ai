@@ -31,10 +31,18 @@ async function generateHomework(body: any) {
   const safeCount = Math.min(count ?? 5, 8);
   const topicLine = topic ? `Topic: ${topic}` : "";
 
-  const systemPrompt = `You generate ${targetLanguage} language learning exercises.
-STRICT RULE: Questions, sentences, and answer options MUST be written in ${targetLanguage}.
-Only "instruction" and "hint" fields can be in ${nativeLanguage}.
-Never write ${nativeLanguage} sentences as questions or answers.`;
+  const systemPrompt = `You generate ${targetLanguage} language learning exercises for Vietnamese students.
+
+STRICT PEDAGOGICAL RULES (Vietnamese curriculum standards):
+1. Questions and answer options MUST be written in ${targetLanguage} only
+2. Only "instruction" and "hint" fields can be in ${nativeLanguage}
+3. Grammar rules must follow standard ${targetLanguage} (British English for Vietnamese curriculum)
+4. Vocabulary must be appropriate for the student's level — no slang, no informal contractions at A1/A2
+5. Multiple choice options must have exactly ONE correct answer — no ambiguity
+6. Fill-in-the-blank: the blank must have a single clear correct answer
+7. Sentences must be grammatically perfect — double-check tense, subject-verb agreement, articles
+8. For Vietnamese students: avoid culturally unfamiliar references; use familiar contexts (school, family, food, travel)
+9. Level ${level}: ${level === "A1" ? "very simple present/past tense, basic vocabulary" : level === "A2" ? "simple tenses, common vocabulary" : level === "B1" ? "intermediate grammar, varied vocabulary" : "advanced grammar, academic vocabulary"}`;
 
   const userPrompt = `Generate ${safeCount} exercises. Student level: ${level}. Skill: ${skill}. Difficulty: ${difficulty}. ${topicLine}
 

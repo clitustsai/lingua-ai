@@ -7,9 +7,18 @@ const nextConfig = {
       { protocol: "https", hostname: "i.ytimg.com" },
       { protocol: "https", hostname: "lh3.googleusercontent.com" },
     ],
-    unoptimized: true,
+    // Enable Next.js image optimization (WebP/AVIF auto-conversion)
+    unoptimized: false,
+    formats: ["image/avif", "image/webp"],
+    minimumCacheTTL: 86400, // 24h cache
+    deviceSizes: [640, 750, 828, 1080, 1200],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256],
   },
-  // Security headers
+  // Compress responses
+  compress: true,
+  // Production optimizations
+  poweredByHeader: false,
+  // Security headers + performance caching
   async headers() {
     return [
       {
@@ -33,6 +42,20 @@ const nextConfig = {
               "font-src 'self' data:",
             ].join("; "),
           },
+        ],
+      },
+      {
+        // Cache static assets aggressively
+        source: "/_next/static/(.*)",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
+      {
+        // Cache public assets (images, fonts, icons)
+        source: "/(.*)\\.(png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|otf|webp|avif)",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" },
         ],
       },
       {
