@@ -1,9 +1,9 @@
 ﻿"use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/store/useAppStore";
 import { useAuthStore } from "@/store/useAuthStore";
-import { Loader2, Sparkles, Target, ChevronRight, CheckCircle2, RotateCcw, BookOpen, Mic, Headphones, Star, Flame, Crown, Lock } from "lucide-react";
+import { Loader2, Sparkles, ChevronRight, CheckCircle2, RotateCcw, BookOpen, Mic, MicOff, Headphones, Star, Flame, Crown, Lock } from "lucide-react";
 import { speakText } from "@/components/VoiceButton";
 import { cn } from "@/lib/utils";
 import { LEVELS } from "@ai-lang/shared";
@@ -40,6 +40,53 @@ export default function LearningPathPage() {
   const [quizAnswers, setQuizAnswers] = useState<Record<number, number>>({});
   const [quizChecked, setQuizChecked] = useState(false);
 
+  // Speaking / mic state
+  const [isRecording, setIsRecording] = useState(false);
+  const [speakingDone, setSpeakingDone] = useState(false);
+  const [speakingScore, setSpeakingScore] = useState<{ score: number; transcript: string; feedback: string } | null>(null);
+  const [scoringLoading, setScoringLoading] = useState(false);
+  const recRef = useRef<any>(null);
+
+  const startRecording = () => {
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SR) { alert("Dùng Chrome để nhận diện giọng nói."); return; }
+    const rec = new SR();
+    rec.lang = settings.targetLanguage.code === "en" ? "en-US"
+      : settings.targetLanguage.code === "ja" ? "ja-JP"
+      : settings.targetLanguage.code === "ko" ? "ko-KR"
+      : settings.targetLanguage.code === "zh" ? "zh-CN"
+      : settings.targetLanguage.code === "fr" ? "fr-FR"
+      : settings.targetLanguage.code === "es" ? "es-ES"
+      : settings.targetLanguage.code === "de" ? "de-DE"
+      : "en-US";
+    rec.interimResults = false;
+    rec.maxAlternatives = 1;
+    rec.onresult = async (e: any) => {
+      const transcript = e.results[0][0].transcript;
+      const confidence = e.results[0][0].confidence ?? 0.7;
+      setIsRecording(false);
+      setScoringLoading(true);
+      // Score based on confidence + length
+      const score = Math.min(100, Math.round(confidence * 80 + Math.min(transcript.split(" ").length * 2, 20)));
+      const feedback = score >= 80 ? "Phát âm tốt lắm! 🎉"
+        : score >= 60 ? "Khá tốt, tiếp tục luyện tập! 👍"
+        : "Thử lại, nói rõ hơn nhé! 🎤";
+      setSpeakingScore({ score, transcript, feedback });
+      setSpeakingDone(true);
+      setScoringLoading(false);
+    };
+    rec.onerror = () => { setIsRecording(false); };
+    rec.onend = () => { setIsRecording(false); };
+    recRef.current = rec;
+    rec.start();
+    setIsRecording(true);
+  };
+
+  const stopRecording = () => {
+    recRef.current?.stop();
+    setIsRecording(false);
+  };
+
   const generate = async () => {
     setStep("generating");
     const goal = GOALS.find(g => g.id === selectedGoal);
@@ -70,6 +117,9 @@ export default function LearningPathPage() {
     setDayLesson(null);
     setQuizAnswers({});
     setQuizChecked(false);
+    setSpeakingDone(false);
+    setSpeakingScore(null);
+    setIsRecording(false);
     setLoadingDay(true);
     setStep("day");
     const day = learningPath.days[idx];
@@ -288,8 +338,69 @@ export default function LearningPathPage() {
             {/* Speaking */}
             {dayLesson.speakingPrompt && (
               <div className="rounded-2xl p-4" style={{ background: "rgba(26,16,53,0.8)", border: "1px solid rgba(236,72,153,0.2)" }}>
-                <p className="text-pink-400 font-semibold text-sm flex items-center gap-2 mb-2"><Mic className="w-4 h-4" /> Luyện nói</p>
-                <p className="text-gray-300 text-sm">{dayLesson.speakingPrompt}</p>
+                <p className="text-pink-400 font-semibold text-sm flex items-center gap-2 mb-2">
+                  <Mic className="w-4 h-4" /> Luyện nói
+                </p>
+                <p className="text-gray-300 text-sm mb-4">{dayLesson.speakingPrompt}</p>
+
+                {/* Score result */}
+                {speakingScore && (
+                  <div className={cn("rounded-xl p-3 mb-3 border",
+                    speakingScore.score >= 80 ? "border-green-500/40 bg-green-900/15"
+                    : speakingScore.score >= 60 ? "border-yellow-500/40 bg-yellow-900/15"
+                    : "border-red-500/40 bg-red-900/15")}>
+                    <div className="flex items-center gap-3">
+                      <div className="text-center shrink-0">
+                        <p className={cn("text-2xl font-black",
+                          speakingScore.score >= 80 ? "text-green-400"
+                          : speakingScore.score >= 60 ? "text-yellow-400" : "text-red-400")}>
+                          {speakingScore.score}%
+                        </p>
+                        <p className="text-xs text-gray-500">điểm</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-white">{speakingScore.feedback}</p>
+                        <p className="text-xs text-gray-400 mt-0.5 italic">"{speakingScore.transcript}"</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {scoringLoading && (
+                  <div className="flex items-center gap-2 text-pink-400 text-sm mb-3">
+                    <Loader2 className="w-4 h-4 animate-spin" /> AI đang chấm điểm...
+                  </div>
+                )}
+
+                {/* Mic button */}
+                {!speakingDone ? (
+                  <div className="flex gap-2">
+                    <button
+                      onClick={isRecording ? stopRecording : startRecording}
+                      disabled={scoringLoading}
+                      className={cn("flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm transition-all",
+                        isRecording
+                          ? "bg-red-600 hover:bg-red-500 text-white animate-pulse"
+                          : "bg-pink-600 hover:bg-pink-500 text-white")}>
+                      {isRecording
+                        ? <><MicOff className="w-4 h-4" /> Dừng ghi âm</>
+                        : <><Mic className="w-4 h-4" /> Bắt đầu nói</>}
+                    </button>
+                    <button onClick={() => setSpeakingDone(true)}
+                      className="px-4 py-3 rounded-xl border border-gray-700 text-gray-500 hover:text-gray-300 text-xs transition-colors">
+                      Bỏ qua
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-400" />
+                    <span className="text-green-400 text-sm font-semibold">Đã hoàn thành luyện nói!</span>
+                    <button onClick={() => { setSpeakingDone(false); setSpeakingScore(null); }}
+                      className="ml-auto text-xs text-gray-500 hover:text-gray-300 transition-colors">
+                      Thử lại
+                    </button>
+                  </div>
+                )}
               </div>
             )}
 
@@ -346,9 +457,22 @@ export default function LearningPathPage() {
 
             {/* Complete button */}
             {!isDone ? (
-              <button onClick={completeDay} className="w-full py-4 rounded-2xl bg-primary-600 hover:bg-primary-500 text-white font-bold flex items-center justify-center gap-2 transition-colors">
-                <CheckCircle2 className="w-5 h-5" /> Hoàn thành ngày {activeDayIdx + 1}
-              </button>
+              <div>
+                {dayLesson.speakingPrompt && !speakingDone && (
+                  <p className="text-center text-xs text-pink-400 mb-3">
+                    🎤 Hoàn thành phần luyện nói để tiếp tục
+                  </p>
+                )}
+                <button
+                  onClick={completeDay}
+                  disabled={!!(dayLesson.speakingPrompt && !speakingDone)}
+                  className={cn("w-full py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all",
+                    dayLesson.speakingPrompt && !speakingDone
+                      ? "bg-gray-700 text-gray-500 cursor-not-allowed opacity-60"
+                      : "bg-primary-600 hover:bg-primary-500 text-white")}>
+                  <CheckCircle2 className="w-5 h-5" /> Hoàn thành ngày {activeDayIdx + 1}
+                </button>
+              </div>
             ) : (
               <div className="w-full py-4 rounded-2xl bg-green-700/20 border border-green-600/30 text-green-300 font-bold text-center">
                 ✅ Đã hoàn thành!
