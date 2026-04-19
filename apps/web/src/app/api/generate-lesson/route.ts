@@ -9,27 +9,41 @@ export async function POST(req: NextRequest) {
     const { topic, targetLanguage, nativeLanguage, level } = await req.json();
 
     const prompt = `Create a language lesson for: "${topic}"
-Student: ${level} level, learning ${targetLanguage}, native: ${nativeLanguage}
+Student: ${level} level, learning ${targetLanguage}, native language: ${nativeLanguage}
+
+CRITICAL LANGUAGE RULES — follow exactly:
+- "title": in ${nativeLanguage}
+- "description": in ${nativeLanguage}
+- "tags": in ${nativeLanguage}
+- "questions[].question": MUST be in ${targetLanguage} (the language being learned)
+- "questions[].tip": in ${nativeLanguage}
+- "sampleAnswers[].question": in ${targetLanguage}
+- "sampleAnswers[].answer": MUST be in ${targetLanguage} — full natural sentences
+- "sampleAnswers[].keyPhrases": in ${targetLanguage}
+- "vocabulary[].word": in ${targetLanguage}
+- "vocabulary[].meaning": in ${nativeLanguage}
+- "vocabulary[].example": in ${targetLanguage}
+- "grammarTips": in ${nativeLanguage}
 
 Return ONLY valid JSON:
 {
   "title": "lesson title in ${nativeLanguage}",
   "description": "brief description in ${nativeLanguage}",
-  "tags": ["tag1", "tag2", "tag3"],
+  "tags": ["tag1 in ${nativeLanguage}", "tag2", "tag3"],
   "questions": [
     {"question": "practice question in ${targetLanguage}", "tip": "hint in ${nativeLanguage}"}
   ],
   "sampleAnswers": [
     {
-      "question": "the question",
-      "answer": "full sample answer in ${targetLanguage} (2-3 sentences)",
-      "keyPhrases": ["key phrase 1", "key phrase 2"]
+      "question": "the question in ${targetLanguage}",
+      "answer": "full sample answer in ${targetLanguage} (2-3 natural sentences)",
+      "keyPhrases": ["key phrase in ${targetLanguage}", "phrase 2"]
     }
   ],
   "vocabulary": [
     {"word": "word in ${targetLanguage}", "meaning": "meaning in ${nativeLanguage}", "example": "example sentence in ${targetLanguage}"}
   ],
-  "grammarTips": ["grammar tip 1 in ${nativeLanguage}", "tip 2"]
+  "grammarTips": ["grammar tip in ${nativeLanguage}", "tip 2"]
 }
 
 Create 4 questions with sample answers. Include 6-8 vocabulary words.`;

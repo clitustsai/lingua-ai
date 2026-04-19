@@ -18,26 +18,40 @@ export async function POST(req: NextRequest) {
         content: `Create a language lesson for a video titled "${title}" about "${topic}".
 The video teaches ${lessonLang}. Learner level: ${level}. Native language: ${nativeLanguage}.
 
-RULES:
-- script, keyPhrases, vocabulary.word, vocabulary.example, grammar.examples → in ${lessonLang}
-- scriptTranslation, vocabulary.definition, grammar.explanation, grammar.tip, quiz questions/options/explanation → in ${nativeLanguage}
+CRITICAL LANGUAGE RULES — follow exactly:
+- script → MUST be in ${lessonLang} only (no ${nativeLanguage})
+- scriptTranslation → in ${nativeLanguage}
+- keyPhrases → MUST be in ${lessonLang}
+- vocabulary.word → in ${lessonLang}
+- vocabulary.definition → in ${nativeLanguage}
+- vocabulary.example → in ${lessonLang}
+- grammar.point → in English/language name
+- grammar.explanation → in ${nativeLanguage}
+- grammar.examples → MUST be in ${lessonLang}
+- grammar.tip → in ${nativeLanguage}
+- quiz.question → in ${nativeLanguage} (asking about ${lessonLang} content)
+- quiz.options → MUST be in ${lessonLang} (the answer choices are ${lessonLang} words/phrases)
+- quiz.explanation → in ${nativeLanguage}
+- fillBlanks.sentence → in ${lessonLang} with ___ blank
+- fillBlanks.answer → in ${lessonLang}
+- fillBlanks.options → in ${lessonLang}
 
-Return JSON (keep it concise):
+Return JSON (keep concise):
 {
   "script": "2-3 paragraph ${lessonLang} script teaching the topic",
   "scriptTranslation": "translation in ${nativeLanguage}",
-  "keyPhrases": ["phrase1 in ${lessonLang}", "phrase2", "phrase3", "phrase4"],
+  "keyPhrases": ["${lessonLang} phrase 1", "${lessonLang} phrase 2", "${lessonLang} phrase 3", "${lessonLang} phrase 4"],
   "quiz": [
-    {"question": "question in ${nativeLanguage}", "options": ["A in ${lessonLang}","B","C","D"], "correct": 0, "explanation": "why in ${nativeLanguage}"}
+    {"question": "question in ${nativeLanguage}", "options": ["${lessonLang} option A","B","C","D"], "correct": 0, "explanation": "why in ${nativeLanguage}"}
   ],
   "vocabulary": [
-    {"word": "${lessonLang} word", "pronunciation": "IPA or romanization", "partOfSpeech": "noun", "definition": "meaning in ${nativeLanguage}", "example": "sentence in ${lessonLang}"}
+    {"word": "${lessonLang} word", "pronunciation": "IPA or romanization", "partOfSpeech": "noun", "definition": "meaning in ${nativeLanguage}", "example": "${lessonLang} sentence"}
   ],
   "grammar": [
-    {"point": "Grammar Point", "explanation": "in ${nativeLanguage}", "examples": ["${lessonLang} ex1", "ex2"], "tip": "tip in ${nativeLanguage}"}
+    {"point": "Grammar Point Name", "explanation": "in ${nativeLanguage}", "examples": ["${lessonLang} ex1", "${lessonLang} ex2"], "tip": "tip in ${nativeLanguage}"}
   ],
   "fillBlanks": [
-    {"sentence": "${lessonLang} sentence with ___ blank", "answer": "word", "options": ["opt1","opt2","opt3","opt4"]}
+    {"sentence": "${lessonLang} sentence with ___ blank", "answer": "${lessonLang} word", "options": ["${lessonLang} opt1","opt2","opt3","opt4"]}
   ]
 }`
       }],

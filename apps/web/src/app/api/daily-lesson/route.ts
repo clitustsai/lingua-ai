@@ -24,26 +24,53 @@ Theme: "${theme}", Focus: ${focus}, Goal: ${goal}
 
 ${vocabInstruction}
 
+CRITICAL LANGUAGE RULES:
+- warmup → in ${nativeLanguage}
+- vocabulary.word → in ${targetLanguage} (the language being learned)
+- vocabulary.romanization → romanization/pinyin/furigana if non-Latin script
+- vocabulary.translation → in ${nativeLanguage}
+- vocabulary.example → MUST be in ${targetLanguage}
+- vocabulary.tip → in ${nativeLanguage}
+- grammarPoint.rule → name of the grammar rule (English ok)
+- grammarPoint.explanation → in ${nativeLanguage}
+- grammarPoint.examples → MUST be in ${targetLanguage} (real example sentences)
+- speakingPrompt → in ${nativeLanguage} (instruction for user)
+- listeningText → MUST be in ${targetLanguage} (the text to listen to)
+- listeningTranslation → in ${nativeLanguage}
+- quiz.question → in ${nativeLanguage} (asking about ${targetLanguage} content)
+- quiz.options → MUST be in ${targetLanguage} (the answer choices are ${targetLanguage} words/phrases)
+- quiz.explanation → in ${nativeLanguage}
+- dailyChallenge → in ${nativeLanguage}
+
 Return JSON:
 {
-  "warmup": "fun fact or motivational quote in ${nativeLanguage}",
+  "warmup": "motivational quote in ${nativeLanguage}",
   "vocabulary": [
     {
-      "word": "${isNonLatin ? "native script ONLY e.g. 你好 or こんにちは or 안녕하세요" : "the word itself"}",
-      "romanization": "${isNonLatin ? "pinyin/furigana/romanization e.g. ni hao" : null}",
+      "word": "${isNonLatin ? "native script ONLY" : "the word in " + targetLanguage}",
+      "romanization": "${isNonLatin ? "pinyin/furigana/romanization" : "null"}",
       "translation": "meaning in ${nativeLanguage}",
       "example": "example sentence in ${targetLanguage}",
       "tip": "memory tip in ${nativeLanguage}"
     }
   ],
-  "grammarPoint": {"rule":"","explanation":"in ${nativeLanguage}","examples":["",""]},
-  "speakingPrompt": "conversation prompt in ${nativeLanguage}",
-  "listeningText": "short text in ${targetLanguage}",
+  "grammarPoint": {
+    "rule": "grammar rule name",
+    "explanation": "explanation in ${nativeLanguage}",
+    "examples": ["${targetLanguage} example 1", "${targetLanguage} example 2"]
+  },
+  "speakingPrompt": "speaking task instruction in ${nativeLanguage}",
+  "listeningText": "short paragraph in ${targetLanguage} to read/listen",
   "listeningTranslation": "translation in ${nativeLanguage}",
   "quiz": [
-    {"question":"","options":["","","",""],"correct":0,"explanation":"in ${nativeLanguage}"}
+    {
+      "question": "question in ${nativeLanguage}",
+      "options": ["${targetLanguage} option A", "${targetLanguage} option B", "${targetLanguage} option C", "${targetLanguage} option D"],
+      "correct": 0,
+      "explanation": "explanation in ${nativeLanguage}"
+    }
   ],
-  "dailyChallenge": "one fun challenge in ${nativeLanguage}"
+  "dailyChallenge": "fun challenge description in ${nativeLanguage}"
 }`
       }],
       response_format: { type: "json_object" },
