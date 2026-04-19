@@ -165,19 +165,23 @@ export default function DonatePage() {
             <div className="mt-4 animate-fade-in-scale">
               <div className="flex justify-center">
                 <div className="flex flex-col items-center gap-1.5">
-                  <div className="bg-white p-3 rounded-2xl" style={{ width: 180 }}>
+                  <div className="bg-white p-3 rounded-2xl" style={{ width: 200 }}>
                     <img
-                      src={`https://img.vietqr.io/image/ACB-${BANK_INFO.accountNumber}-compact2.png?amount=${finalAmount}&addInfo=${encodeURIComponent(note)}&accountName=THAI+TUAN+KIET`}
+                      src={`/api/qr?bank=ACB&account=${BANK_INFO.accountNumber}&amount=${finalAmount}&info=${encodeURIComponent(note)}&name=THAI+TUAN+KIET`}
                       alt="QR chuyển khoản ACB"
-                      width={160}
-                      height={160}
-                      style={{ width: 160, height: "auto", display: "block", borderRadius: 8 }}
+                      width={176}
+                      height={176}
+                      style={{ width: 176, height: 176, display: "block", borderRadius: 8, objectFit: "contain" }}
                       onError={(e) => {
-                        // Fallback: dùng URL đơn giản hơn không có amount
                         const img = e.currentTarget;
-                        if (!img.dataset.fallback) {
-                          img.dataset.fallback = "1";
-                          img.src = `https://img.vietqr.io/image/ACB-${BANK_INFO.accountNumber}-compact2.png`;
+                        img.style.display = "none";
+                        const parent = img.parentElement;
+                        if (parent && !parent.querySelector(".qr-fallback")) {
+                          const fb = document.createElement("div");
+                          fb.className = "qr-fallback";
+                          fb.style.cssText = "width:176px;height:176px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#666;text-align:center;padding:8px";
+                          fb.textContent = "Không tải được QR. Dùng STK bên trên.";
+                          parent.appendChild(fb);
                         }
                       }}
                     />
