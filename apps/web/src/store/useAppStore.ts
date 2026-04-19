@@ -159,6 +159,7 @@ type AppStore = {
   setNotifications: (enabled: boolean) => void;
   claimStreakReward: (day: number) => void;
   setUsername: (name: string) => void;
+  checkDailyStreak: () => void;
   completedVideos: string[];
   addCompletedVideo: (videoId: string) => void;
   translateHistory: { id: string; original: string; translation: string; fromLang: string; toLang: string; savedAt: string; starred: boolean }[];
@@ -399,6 +400,22 @@ export const useAppStore = create<AppStore>()(
       }),
 
       setUsername: (name) => set({ username: name }),
+
+      checkDailyStreak: () => set((state) => {
+        const today = todayStr();
+        if (state.lastStreakDate === today) return state; // already checked today
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yStr = yesterday.toISOString().slice(0, 10);
+        const isConsecutive = state.lastStreakDate === yStr;
+        const newStreak = isConsecutive ? state.streak + 1 : 1;
+        return {
+          streak: newStreak,
+          lastStreakDate: today,
+          totalXp: state.totalXp + 10, // +10 XP for daily login
+          stats: { ...state.stats, streakDay: newStreak },
+        };
+      }),
 
       completedVideos: [],
 

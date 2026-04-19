@@ -5,23 +5,33 @@ import { useAuthStore } from "@/store/useAuthStore";
 import type { AuthUser } from "@/store/useAuthStore";
 import { isTrialActive } from "@/store/useAuthStore";
 import { createClient } from "@/lib/supabase";
+import { useAppStore } from "@/store/useAppStore";
 import Sidebar from "@/components/Sidebar";
 import NotificationManager from "@/components/NotificationManager";
 import BottomNav from "@/components/BottomNav";
 import WelcomePopup from "@/components/WelcomePopup";
 import ExitGuard from "@/components/ExitGuard";
 import PremiumGate from "@/components/PremiumGate";
+import DailyStreakPopup from "@/components/DailyStreakPopup";
 
 const AVATARS = ["🦊","🐼","🦁","🐯","🦋","🐸","🦄","🐙","🦅","🐬","🌟","🎭"];
 
 export default function AppLayoutClient({ children }: { children: React.ReactNode }) {
   const { isLoggedIn, login, theme, user } = useAuthStore();
+  const { checkDailyStreak } = useAppStore();
   const router = useRouter();
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     setHydrated(true);
   }, []);
+
+  // Check daily streak on app open
+  useEffect(() => {
+    if (hydrated && isLoggedIn) {
+      checkDailyStreak();
+    }
+  }, [hydrated, isLoggedIn]);
 
   // Sync Supabase session -> Zustand (handles OAuth redirect)
   useEffect(() => {
@@ -108,6 +118,7 @@ export default function AppLayoutClient({ children }: { children: React.ReactNod
       <BottomNav />
       <WelcomePopup />
       <ExitGuard />
+      <DailyStreakPopup />
     </div>
   );
 }

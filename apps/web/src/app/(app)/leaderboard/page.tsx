@@ -1,62 +1,146 @@
 ﻿"use client";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAppStore } from "@/store/useAppStore";
 import { useAuthStore } from "@/store/useAuthStore";
-import { Trophy, Flame, Star, Crown } from "lucide-react";
+import { createClient } from "@/lib/supabase";
+import { Trophy, Flame, Crown, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const MOCK_USERS = [
   { rank: 1, name: "Nguyễn Minh Tuấn", avatar: "🦁", xp: 4820, streak: 32, level: "B2" },
-  { rank: 2, name: "Trần Thị Lan Anh", avatar: "🦋", xp: 3950, streak: 21, level: "B1" },
-  { rank: 3, name: "Lê Văn Hùng", avatar: "🐯", xp: 3210, streak: 18, level: "B1" },
-  { rank: 4, name: "Phạm Thu Hà", avatar: "🦊", xp: 2780, streak: 14, level: "A2" },
-  { rank: 5, name: "Võ Đức Thành", avatar: "🐺", xp: 2340, streak: 11, level: "A2" },
-  { rank: 6, name: "Hoàng Thị Mai", avatar: "🦄", xp: 1980, streak: 9, level: "A1" },
-  { rank: 7, name: "Bùi Quang Huy", avatar: "🐸", xp: 1650, streak: 7, level: "A1" },
-  { rank: 8, name: "Đặng Thị Ngọc", avatar: "🌸", xp: 1320, streak: 5, level: "A1" },
+  { rank: 2, name: "Trần Thị Lan Anh",  avatar: "🦋", xp: 3950, streak: 21, level: "B1" },
+  { rank: 3, name: "Lê Văn Hùng",       avatar: "🐯", xp: 3210, streak: 18, level: "B1" },
+  { rank: 4, name: "Phạm Thu Hà",       avatar: "🦊", xp: 2780, streak: 14, level: "A2" },
+  { rank: 5, name: "Võ Đức Thành",      avatar: "🐺", xp: 2340, streak: 11, level: "A2" },
+  { rank: 6, name: "Hoàng Thị Mai",     avatar: "🦄", xp: 1980, streak: 9,  level: "A1" },
+  { rank: 7, name: "Bùi Quang Huy",     avatar: "🐸", xp: 1650, streak: 7,  level: "A1" },
+  { rank: 8, name: "Đặng Thị Ngọc",     avatar: "🌸", xp: 1320, streak: 5,  level: "A1" },
 ];
 
 const LEVEL_THRESHOLDS = [
-  { level: "Beginner", min: 0, max: 500, color: "#6b7280" },
-  { level: "Elementary", min: 500, max: 1500, color: "#10b981" },
-  { level: "Intermediate", min: 1500, max: 3000, color: "#3b82f6" },
-  { level: "Advanced", min: 3000, max: 6000, color: "#8b5cf6" },
-  { level: "Master", min: 6000, max: 99999, color: "#f59e0b" },
+  { level: "Beginner",     min: 0,    max: 500,   color: "#6b7280" },
+  { level: "Elementary",   min: 500,  max: 1500,  color: "#10b981" },
+  { level: "Intermediate", min: 1500, max: 3000,  color: "#3b82f6" },
+  { level: "Advanced",     min: 3000, max: 6000,  color: "#8b5cf6" },
+  { level: "Master",       min: 6000, max: 99999, color: "#f59e0b" },
 ];
 
 function getUserLevel(xp: number) {
   return LEVEL_THRESHOLDS.find(l => xp >= l.min && xp < l.max) ?? LEVEL_THRESHOLDS[0];
 }
 
+type LeaderEntry = {
+  rank: number;
+  name: string;
+  avatar: string;
+  xp: number;
+  streak: number;
+  level: string;
+  isMe?: boolean;
+};
+
+// Push current user XP to Supabase profiles table
+async function syncXpToSupabase(userId: string, name: string, avatar: string, xp: number, streak: number) {
+  try {
+    const supabase = createClient();
+    await supabase.from("profiles").upsert({
+      id: userId,
+      display_name: name,
+      avatar,
+      total_xp: xp,
+      streak,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: "id" });
+  } catch { /* silently fail if table doesn't exist yet */ }
+}
+
+// Fetch top users from Supabase
+async function fetchLeaderboard(): Promise<LeaderEntry[] | null> {
+  try {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("id, display_name, avatar, total_xp, streak")
+      .order("total_xp", { ascending: false })
+      .limit(20);
+    if (error || !data?.length) return null;
+    return data.map((u, i) => ({
+      rank: i + 1,
+      name: u.display_name || "Ẩn danh",
+      avatar: u.avatar || "⭐",
+      xp: u.total_xp || 0,
+      streak: u.streak || 0,
+      level: getUserLevel(u.total_xp || 0).level,
+    }));
+  } catch { return null; }
+}
+
 export default function LeaderboardPage() {
   const { totalXp, streak } = useAppStore();
   const { user } = useAuthStore();
   const [tab, setTab] = useState<"week" | "all">("week");
+  const [liveData, setLiveData] = useState<LeaderEntry[] | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const myXp = totalXp;
   const myLevel = getUserLevel(myXp);
   const nextLevel = LEVEL_THRESHOLDS[LEVEL_THRESHOLDS.indexOf(myLevel) + 1];
   const progressToNext = nextLevel ? ((myXp - myLevel.min) / (nextLevel.min - myLevel.min)) * 100 : 100;
 
-  // Insert real user into leaderboard
-  const myEntry = { rank: 0, name: user?.name || "Bạn", avatar: user?.avatar || "⭐", xp: myXp, streak, level: myLevel.level, isMe: true };
-  const allUsers = [...MOCK_USERS, { ...myEntry, rank: MOCK_USERS.length + 1 }]
-    .sort((a, b) => b.xp - a.xp)
-    .map((u, i) => ({ ...u, rank: i + 1 }));
+  const load = useCallback(async () => {
+    setLoading(true);
+    // Sync own XP first
+    if (user?.id) {
+      await syncXpToSupabase(user.id, user.name, user.avatar, myXp, streak);
+    }
+    const data = await fetchLeaderboard();
+    setLiveData(data);
+    setLastUpdated(new Date());
+    setLoading(false);
+  }, [user, myXp, streak]);
+
+  useEffect(() => { load(); }, [load]);
+
+  // Build final list: live data or fallback to mock + me
+  const myEntry: LeaderEntry = {
+    rank: 0, name: user?.name || "Bạn", avatar: user?.avatar || "⭐",
+    xp: myXp, streak, level: myLevel.level, isMe: true,
+  };
+
+  const baseList = liveData ?? MOCK_USERS;
+  const allUsers: LeaderEntry[] = liveData
+    ? baseList.map((u, i) => ({ ...u, isMe: u.name === user?.name }))
+    : [...MOCK_USERS, { ...myEntry, rank: MOCK_USERS.length + 1 }]
+        .sort((a, b) => b.xp - a.xp)
+        .map((u, i) => ({ ...u, rank: i + 1 }));
 
   const top3 = allUsers.slice(0, 3);
   const rest = allUsers.slice(3);
 
   return (
     <div className="max-w-lg" style={{ background: "#0a0614", minHeight: "100vh" }}>
+      {/* Header */}
       <div className="relative overflow-hidden px-5 pt-10 pb-6"
         style={{ background: "linear-gradient(135deg,#1a0533,#0f0a1e)" }}>
         <div className="absolute top-0 right-0 w-48 h-48 rounded-full opacity-20 blur-3xl pointer-events-none"
           style={{ background: "radial-gradient(circle,#f59e0b,transparent)" }} />
-        <h1 className="text-2xl font-black text-white flex items-center gap-2 relative z-10">
-          <Trophy className="w-6 h-6 text-yellow-400" /> Bảng xếp hạng
-        </h1>
-        <p className="text-gray-400 text-sm mt-1 relative z-10">Top học viên tuần này</p>
+        <div className="flex items-center justify-between relative z-10">
+          <div>
+            <h1 className="text-2xl font-black text-white flex items-center gap-2">
+              <Trophy className="w-6 h-6 text-yellow-400" /> Bảng xếp hạng
+            </h1>
+            <p className="text-gray-400 text-sm mt-1">
+              {liveData ? "🟢 Thời gian thực" : "📊 Dữ liệu mẫu"}
+              {lastUpdated && <span className="text-gray-600 ml-2 text-xs">· {lastUpdated.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })}</span>}
+            </p>
+          </div>
+          <button onClick={load} disabled={loading}
+            className="p-2 rounded-xl text-gray-400 hover:text-white transition-colors"
+            style={{ background: "rgba(255,255,255,0.06)" }}>
+            <RefreshCw className={cn("w-4 h-4", loading && "animate-spin")} />
+          </button>
+        </div>
       </div>
 
       <div className="px-5 pb-8 space-y-5">
@@ -104,7 +188,8 @@ export default function LeaderboardPage() {
             return (
               <div key={u.rank} className="flex flex-col items-center gap-2" style={{ width: 90 }}>
                 {isFirst && <Crown className="w-5 h-5 text-yellow-400" />}
-                <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl"
+                <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center text-2xl",
+                  u.isMe ? "ring-2 ring-primary-400" : "")}
                   style={{ background: isFirst ? "rgba(245,158,11,0.2)" : "rgba(139,92,246,0.15)", border: isFirst ? "2px solid rgba(245,158,11,0.5)" : "1px solid rgba(139,92,246,0.3)" }}>
                   {u.avatar}
                 </div>
@@ -123,36 +208,33 @@ export default function LeaderboardPage() {
 
         {/* Rest of leaderboard */}
         <div className="flex flex-col gap-2">
-          {rest.map(u => {
-            const isMe = (u as any).isMe;
-            return (
-              <div key={u.rank}
-                className={cn("flex items-center gap-3 px-4 py-3 rounded-2xl transition-all",
-                  isMe ? "ring-2 ring-primary-500" : "")}
-                style={{ background: isMe ? "rgba(124,58,237,0.15)" : "rgba(20,12,40,0.8)", border: isMe ? "1px solid rgba(124,58,237,0.4)" : "1px solid rgba(255,255,255,0.05)" }}>
-                <span className="text-gray-500 font-bold text-sm w-6 text-center">#{u.rank}</span>
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center text-xl shrink-0"
-                  style={{ background: "rgba(139,92,246,0.15)" }}>
-                  {u.avatar}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className={cn("text-sm font-semibold truncate", isMe ? "text-primary-300" : "text-white")}>
-                    {u.name} {isMe && "(Bạn)"}
-                  </p>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <span className="flex items-center gap-0.5 text-xs text-orange-400">
-                      <Flame className="w-3 h-3" />{u.streak}
-                    </span>
-                    <span className="text-xs text-gray-600">{u.level}</span>
-                  </div>
-                </div>
-                <div className="text-right shrink-0">
-                  <p className="text-white font-bold text-sm">{u.xp.toLocaleString()}</p>
-                  <p className="text-xs text-gray-600">XP</p>
+          {rest.map(u => (
+            <div key={u.rank}
+              className={cn("flex items-center gap-3 px-4 py-3 rounded-2xl transition-all",
+                u.isMe ? "ring-2 ring-primary-500" : "")}
+              style={{ background: u.isMe ? "rgba(124,58,237,0.15)" : "rgba(20,12,40,0.8)", border: u.isMe ? "1px solid rgba(124,58,237,0.4)" : "1px solid rgba(255,255,255,0.05)" }}>
+              <span className="text-gray-500 font-bold text-sm w-6 text-center">#{u.rank}</span>
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center text-xl shrink-0"
+                style={{ background: "rgba(139,92,246,0.15)" }}>
+                {u.avatar}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className={cn("text-sm font-semibold truncate", u.isMe ? "text-primary-300" : "text-white")}>
+                  {u.name} {u.isMe && "(Bạn)"}
+                </p>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <span className="flex items-center gap-0.5 text-xs text-orange-400">
+                    <Flame className="w-3 h-3" />{u.streak}
+                  </span>
+                  <span className="text-xs text-gray-600">{u.level}</span>
                 </div>
               </div>
-            );
-          })}
+              <div className="text-right shrink-0">
+                <p className="text-white font-bold text-sm">{u.xp.toLocaleString()}</p>
+                <p className="text-xs text-gray-600">XP</p>
+              </div>
+            </div>
+          ))}
         </div>
 
         {/* How to earn XP */}
@@ -161,9 +243,9 @@ export default function LeaderboardPage() {
           <div className="grid grid-cols-2 gap-2">
             {[
               { action: "Hoàn thành bài học", xp: "+20 XP" },
-              { action: "Chat với AI", xp: "+5 XP" },
-              { action: "Streak hàng ngày", xp: "+10 XP" },
-              { action: "Hoàn thành quiz", xp: "+15 XP" },
+              { action: "Chat với AI",        xp: "+5 XP"  },
+              { action: "Streak hàng ngày",   xp: "+10 XP" },
+              { action: "Hoàn thành quiz",    xp: "+15 XP" },
             ].map(({ action, xp }) => (
               <div key={action} className="flex items-center justify-between px-3 py-2 rounded-xl"
                 style={{ background: "rgba(139,92,246,0.08)" }}>
