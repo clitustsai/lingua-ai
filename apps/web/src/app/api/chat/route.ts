@@ -39,6 +39,7 @@ export async function POST(req: NextRequest) {
       topic,
       persona = "tutor",
       tutorMemory,
+      correctionMode = "gentle",
     } = await req.json();
 
     const personaBase = (PERSONA_PROMPTS[persona] ?? PERSONA_PROMPTS.tutor)
@@ -67,6 +68,16 @@ export async function POST(req: NextRequest) {
       ? `Common errors to watch for: ${tutorMemory.commonErrors.slice(0, 3).join("; ")}.`
       : "";
 
+    const correctionStyle = correctionMode === "strict"
+      ? `CORRECTION STYLE (STRICT MODE — user wants detailed corrections):
+- After every message, explicitly point out grammar errors with explanation
+- Show the correct form AND explain WHY it's correct
+- Example: User says "I go to school yesterday" → Reply naturally, then add: "📝 Correction: 'I WENT to school yesterday' — use Past Simple for completed past actions."
+- Also suggest more natural/native-like phrasing when applicable`
+      : `CORRECTION STYLE (GENTLE MODE):
+- Don't just say "Wrong!" — model the correct form naturally within conversation
+- Example: User says "I go to school yesterday" → You say "Oh, you WENT to school yesterday? What did you study?"`;
+
     const systemPrompt = `${personaBase}
 
 CONTEXT:
@@ -80,13 +91,11 @@ ${errorCount}
 YOUR ROLE:
 1. Stay IN CHARACTER as the persona above — don't break character
 2. Respond naturally as that character would
-3. If user makes mistakes, correct them GENTLY within the flow of conversation
+3. If user makes mistakes, correct them based on the correction style below
 4. Track if user is struggling (short answers, many errors) → simplify
 5. Track if user is doing well → increase complexity slightly
 
-CORRECTION STYLE:
-- Don't just say "Wrong!" — model the correct form naturally
-- Example: User says "I go to school yesterday" → You say "Oh, you WENT to school yesterday? What did you study?"
+${correctionStyle}
 
 Return ONLY valid JSON:
 {

@@ -56,6 +56,7 @@ export default function ChatPage() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [scenario, setScenario] = useState(CHAT_SCENARIOS[0]);
   const [showScenarioPicker, setShowScenarioPicker] = useState(false);
+  const [correctionMode, setCorrectionMode] = useState<"gentle" | "strict">("gentle");
   const [aiError, setAiError] = useState<string | null>(null);
 
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -148,6 +149,7 @@ export default function ChatPage() {
           topic: settingsRef.current.conversationTopic ?? "free",
           persona: scenario.persona,
           tutorMemory: useAppStore.getState().tutorMemory,
+          correctionMode,
         }),
       });
       const data = await res.json();
@@ -252,6 +254,15 @@ export default function ChatPage() {
         </button>
 
         <div className="flex items-center gap-1">
+          {/* Correction mode toggle */}
+          <button onClick={() => setCorrectionMode(m => m === "gentle" ? "strict" : "gentle")}
+            className={cn("px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors border",
+              correctionMode === "strict"
+                ? "border-yellow-500/40 bg-yellow-900/20 text-yellow-300"
+                : "border-gray-700 bg-gray-800 text-gray-500 hover:text-gray-300")}
+            title={correctionMode === "strict" ? "Sửa lỗi chi tiết (tắt)" : "Bật sửa lỗi chi tiết"}>
+            {correctionMode === "strict" ? "✏️ Strict" : "✏️ Gentle"}
+          </button>
           {messages.length > 0 && (
             <button onClick={() => saveSession(`${scenario.label} - ${new Date().toLocaleDateString()}`)}
               className="p-2 rounded-lg text-gray-500 hover:text-primary-400 hover:bg-white/5 transition-colors" title="Lưu hội thoại">

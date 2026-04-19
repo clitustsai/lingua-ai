@@ -24,6 +24,7 @@ export default function PronunciationPage() {
   const [isListening, setIsListening] = useState(false);
   const [userScore, setUserScore] = useState<number | null>(null);
   const [userTranscript, setUserTranscript] = useState("");
+  const [phonemeHints, setPhonemeHints] = useState<string[]>([]);
   const recRef = useRef<any>(null);
 
   const lookup = async (w?: string) => {
@@ -48,10 +49,29 @@ export default function PronunciationPage() {
     rec.interimResults = false;
     rec.onresult = (e: any) => {
       const r = e.results[0][0];
+      const transcript = r.transcript.toLowerCase().trim();
+      const target = (data?.word ?? word).toLowerCase().trim();
       setUserTranscript(r.transcript);
+
+      // Detailed phoneme analysis
       const conf = r.confidence ?? 0.7;
-      const match = r.transcript.toLowerCase().includes((data?.word ?? word).toLowerCase()) ? 1 : 0.5;
-      setUserScore(Math.round(Math.min(conf * match * 100 + (match === 1 ? 20 : 0), 100)));
+      const exactMatch = transcript === target;
+      const partialMatch = transcript.includes(target) || target.includes(transcript);
+      const score = exactMatch ? Math.round(Math.min(conf * 100 + 15, 100))
+        : partialMatch ? Math.round(conf * 75 + 10)
+        : Math.round(conf * 50);
+      setUserScore(score);
+
+      // Find which sounds differ
+      const targetChars = target.split("");
+      const spokenChars = transcript.split("");
+      const missedSounds: string[] = [];
+      targetChars.forEach((ch, i) => {
+        if (spokenChars[i] !== ch && !"aeiou ".includes(ch)) {
+          missedSounds.push(`"${ch}"`);
+        }
+      });
+      setPhonemeHints(missedSounds.slice(0, 3));
       setIsListening(false);
     };
     rec.onerror = () => setIsListening(false);
@@ -150,10 +170,20 @@ export default function PronunciationPage() {
                   <div className={cn("text-3xl font-bold mb-1", userScore >= 80 ? "text-green-400" : userScore >= 50 ? "text-yellow-400" : "text-red-400")}>
                     {userScore}%
                   </div>
-                  <p className="text-sm text-gray-300">You said: "{userTranscript}"</p>
+                  <p className="text-sm text-gray-300">Bạn nói: "{userTranscript}"</p>
                   <p className="text-xs text-gray-500 mt-1">
-                    {userScore >= 80 ? "🎉 Excellent!" : userScore >= 50 ? "👍 Good, keep practicing!" : "🎤 Try again, speak clearly"}
+                    {userScore >= 80 ? "🎉 Phát âm tốt lắm!" : userScore >= 50 ? "👍 Khá tốt, luyện thêm nhé!" : "🎤 Thử lại, nói rõ hơn"}
                   </p>
+                  {phonemeHints.length > 0 && userScore < 80 && (
+                    <div className="mt-3 p-2 rounded-lg bg-orange-900/20 border border-orange-700/30">
+                      <p className="text-xs text-orange-300 font-semibold mb-1">⚠️ Âm cần chú ý:</p>
+                      <p className="text-xs text-orange-200">Kiểm tra lại âm {phonemeHints.join(", ")} — phát âm chậm từng âm tiết</p>
+                    </div>
+                  )}
+                  <button onClick={() => { setUserScore(null); setUserTranscript(""); setPhonemeHints([]); }}
+                    className="mt-3 text-xs text-gray-500 hover:text-gray-300 transition-colors">
+                    Thử lại
+                  </button>
                 </div>
               )}
             </div>
