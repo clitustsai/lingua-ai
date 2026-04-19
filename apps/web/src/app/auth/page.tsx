@@ -199,8 +199,23 @@ export default function AuthPage() {
     if (password.length < 6) { setError("Mật khẩu tối thiểu 6 ký tự"); return; }
     if (mode === "register") {
       if (!name.trim()) { setError("Vui lòng nhập tên"); return; }
-      if (!/^[A-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠƯẠ-Ỹ]/.test(name.trim())) {
-        setError("Tên hiển thị phải bắt đầu bằng chữ hoa"); return;
+      const trimmedName = name.trim();
+      // Phải có khoảng cách (ít nhất 2 từ)
+      if (!trimmedName.includes(" ")) {
+        setError("Tên phải có ít nhất 2 từ, cách nhau bằng dấu cách (ví dụ: Nguyễn Văn A)"); return;
+      }
+      // Phải có dấu tiếng Việt
+      const hasVietnamese = /[àáâãèéêìíòóôõùúăđĩũơưạảấầẩẫậắằẳẵặẹẻẽếềểễệỉịọỏốồổỗộớờởỡợụủứừửữựỳỵỷỹý]/i.test(trimmedName);
+      if (!hasVietnamese) {
+        setError("Tên phải là tiếng Việt có dấu (ví dụ: Nguyễn Văn An)"); return;
+      }
+      // Không được có ký tự đặc biệt hay số
+      if (/[0-9!@#$%^&*()_+=\[\]{};':"\\|,.<>\/?]/.test(trimmedName)) {
+        setError("Tên không được chứa số hoặc ký tự đặc biệt"); return;
+      }
+      // Chữ cái đầu phải viết hoa
+      if (!/^[A-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠƯẠ-Ỹ]/.test(trimmedName)) {
+        setError("Tên phải bắt đầu bằng chữ hoa"); return;
       }
       if (!/[A-Z]/.test(password)) {
         setError("Mật khẩu phải chứa ít nhất 1 chữ cái in hoa"); return;
@@ -338,7 +353,7 @@ export default function AuthPage() {
                 ) : (
                 <form onSubmit={submitEmail} className="flex flex-col gap-3">
                     {mode === "register" && (
-                      <input value={name} onChange={e => setName(e.target.value)} placeholder="Tên hiển thị (bắt đầu bằng chữ hoa)" className={inputCls} />
+                      <input value={name} onChange={e => setName(e.target.value)} placeholder="Họ và tên tiếng Việt (ví dụ: Nguyễn Văn An)" className={inputCls} />
                     )}
                     <input value={email} onChange={e => setEmail(e.target.value)} type="email" placeholder="Email" className={inputCls} />
                     <div className="relative">

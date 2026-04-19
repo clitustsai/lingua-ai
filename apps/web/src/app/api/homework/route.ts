@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Groq from "groq-sdk";
 
-export const maxDuration = 30;
+export const maxDuration = 60;
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
@@ -50,14 +50,14 @@ Return JSON exactly like this (no extra text):
 {"title":"lesson title in ${nativeLanguage}","exercises":[{"id":"1","type":"multiple-choice","instruction":"Chọn đáp án đúng","question":"${targetLanguage} sentence here","answer":"correct option","points":5,"options":["A","B","C","D"]},{"id":"2","type":"fill-blank","instruction":"Điền vào chỗ trống","question":"${targetLanguage} sentence with ___ blank","answer":"missing word","points":7,"hint":"gợi ý tiếng Việt"}]}`;
 
   const completion = await groq.chat.completions.create({
-    model: "llama-3.3-70b-versatile",
+    model: "llama-3.1-8b-instant",
     messages: [
       { role: "system", content: systemPrompt },
       { role: "user", content: userPrompt },
     ],
     response_format: { type: "json_object" },
     temperature: 0.5,
-    max_tokens: 2500,
+    max_tokens: 2000,
   });
 
   const raw = completion.choices[0].message.content || "{}";
