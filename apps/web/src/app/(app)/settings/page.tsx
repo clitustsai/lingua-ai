@@ -231,9 +231,10 @@ export default function SettingsPage() {
         </div>
 
         {/* Daily goal */}
+        {/* Daily goal */}
         <div>
           <label className="block text-sm font-medium text-gray-400 mb-2 flex items-center gap-2">
-            <Target className="w-4 h-4" /> Daily word goal: <span className="text-white">{settings.dailyGoal ?? 5}</span>
+            <Target className="w-4 h-4" /> Mục tiêu từ mỗi ngày: <span className="text-white">{settings.dailyGoal ?? 5}</span>
           </label>
           <input type="range" min={3} max={30} value={settings.dailyGoal ?? 5}
             onChange={(e) => setSettings({ dailyGoal: Number(e.target.value) })}
@@ -303,9 +304,9 @@ export default function SettingsPage() {
 
         {/* Summary */}
         <div className="bg-gray-800 rounded-xl p-4 text-sm text-gray-400">
-          <p className="font-medium text-white mb-1">Current setup</p>
-          <p>Learning {settings.targetLanguage.flag} {settings.targetLanguage.name} at {settings.level} level</p>
-          <p>Native: {settings.nativeLanguage.flag} {settings.nativeLanguage.name}</p>
+          <p className="font-medium text-white mb-1">Cài đặt hiện tại</p>
+          <p>Đang học {settings.targetLanguage.flag} {settings.targetLanguage.name} · Trình độ {settings.level}</p>
+          <p>Tiếng mẹ đẻ: {settings.nativeLanguage.flag} {settings.nativeLanguage.name}</p>
           <p>Topic: {CONVERSATION_TOPICS.find(t => t.id === settings.conversationTopic)?.emoji} {CONVERSATION_TOPICS.find(t => t.id === settings.conversationTopic)?.label ?? "Free Talk"}</p>
         </div>
 
