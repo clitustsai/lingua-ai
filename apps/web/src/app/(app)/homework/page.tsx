@@ -1,9 +1,10 @@
 ﻿"use client";
 import { useState, useEffect, useRef } from "react";
 import { useAppStore } from "@/store/useAppStore";
-import { GraduationCap, CheckCircle2, XCircle, Star, RefreshCw, ChevronRight, Timer } from "lucide-react";
+import { GraduationCap, CheckCircle2, XCircle, Star, RefreshCw, ChevronRight, Timer, Volume2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import AIErrorToast from "@/components/AIErrorToast";
+import { speakText } from "@/components/VoiceButton";
 
 type Exercise = {
   id: string; type: string; instruction: string; question: string;
@@ -308,6 +309,10 @@ export default function HomeworkPage() {
               </div>
 
               <p className="text-white font-medium text-sm mb-3">{ex.question}</p>
+              <button onClick={() => speakText(ex.question, settings.targetLanguage.code, settings.speechRate)}
+                className="flex items-center gap-1 text-xs text-gray-500 hover:text-primary-400 transition-colors mb-3">
+                <Volume2 className="w-3.5 h-3.5" /> Nghe câu hỏi
+              </button>
 
               {ex.type === "multiple-choice" && ex.options ? (
                 <div className="grid grid-cols-2 gap-2">

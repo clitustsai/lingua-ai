@@ -137,11 +137,29 @@ export function speakText(text: string, langCode: string, rate = 0.9) {
     .replace(/[*_~]/g, "")               // remaining markdown
     .trim();
 
+  if (!cleaned) return;
+
   const u = new SpeechSynthesisUtterance(cleaned);
   u.lang = toLangTag(langCode);
   // Mobile browsers tend to speak faster
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   u.rate = isMobile ? Math.min(rate, 0.75) : rate;
   u.pitch = 1;
-  window.speechSynthesis.speak(u);
+
+  // Wait for voices to load if not ready yet
+  const doSpeak = () => {
+    const voices = window.speechSynthesis.getVoices();
+    const langTag = toLangTag(langCode);
+    const match = voices.find(v => v.lang.startsWith(langTag.split("-")[0]));
+    if (match) u.voice = match;
+    window.speechSynthesis.speak(u);
+  };
+
+  if (window.speechSynthesis.getVoices().length > 0) {
+    doSpeak();
+  } else {
+    window.speechSynthesis.onvoiceschanged = () => { doSpeak(); };
+    // Fallback: speak anyway after short delay
+    setTimeout(() => { if (!window.speechSynthesis.speaking) doSpeak(); }, 300);
+  }
 }
