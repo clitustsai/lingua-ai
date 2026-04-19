@@ -94,6 +94,8 @@ export default function PlacementPage() {
         const data = await res.json();
         setResult(data);
         if (data.level) setSettings({ level: data.level });
+        // Mark placement as done
+        localStorage.setItem("lingua-placement-done", "1");
         setStep("result");
       } catch { setStep("result"); }
     } else {
