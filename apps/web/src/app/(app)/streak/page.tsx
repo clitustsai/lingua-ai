@@ -1,7 +1,8 @@
 "use client";
 import { useAppStore } from "@/store/useAppStore";
-import { Flame, Star, Trophy, Gift, CheckCircle2, Lock } from "lucide-react";
+import { Flame, Star, Trophy, Gift, CheckCircle2, Lock, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 const LEVEL_THRESHOLDS = [
   { min: 0,    max: 99,   label: "Beginner",    color: "text-gray-400",   bg: "bg-gray-700" },
@@ -10,6 +11,13 @@ const LEVEL_THRESHOLDS = [
   { min: 700,  max: 1499, label: "Scholar",     color: "text-purple-400", bg: "bg-purple-700" },
   { min: 1500, max: 2999, label: "Expert",      color: "text-yellow-400", bg: "bg-yellow-700" },
   { min: 3000, max: Infinity, label: "Master",  color: "text-orange-400", bg: "bg-orange-700" },
+];
+
+const DAILY_CHALLENGES = [
+  { id: "chat5", emoji: "💬", label: "Chat 5 tin nhắn", xp: 15, route: "/" },
+  { id: "lesson1", emoji: "📖", label: "Hoàn thành 1 bài học", xp: 20, route: "/lessons" },
+  { id: "flashcard10", emoji: "🃏", label: "Ôn 10 flashcard", xp: 10, route: "/flashcards" },
+  { id: "translate3", emoji: "🌐", label: "Dịch 3 câu", xp: 10, route: "/translate" },
 ];
 
 function getLevel(xp: number) {
@@ -28,10 +36,17 @@ function xpToNextLevel(xp: number) {
 
 export default function StreakPage() {
   const { streak, totalXp, streakRewards, claimStreakReward, achievements, stats, settings } = useAppStore();
+  const router = useRouter();
   const level = getLevel(totalXp);
   const xpInfo = xpToNextLevel(totalXp);
   const goal = settings.dailyGoal ?? 5;
   const todayDone = stats.wordsLearned >= goal;
+
+  // Daily challenge completion based on today's stats
+  const todayKey = `daily-challenge-${new Date().toISOString().slice(0, 10)}`;
+  const completedChallenges: string[] = typeof window !== "undefined"
+    ? JSON.parse(localStorage.getItem(todayKey) || "[]")
+    : [];
 
   // Build 7-day streak calendar
   const today = new Date();
@@ -135,6 +150,32 @@ export default function StreakPage() {
                   </div>
                 )}
               </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Daily Challenges */}
+      <div className="rounded-2xl p-4 mb-4" style={{ background: "rgba(26,16,53,0.8)", border: "1px solid rgba(139,92,246,0.15)" }}>
+        <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-3 flex items-center gap-2">
+          <Zap className="w-3.5 h-3.5 text-yellow-400" /> Thử thách hôm nay
+        </p>
+        <div className="flex flex-col gap-2">
+          {DAILY_CHALLENGES.map(c => {
+            const done = completedChallenges.includes(c.id);
+            return (
+              <button key={c.id} onClick={() => router.push(c.route)}
+                className={cn("flex items-center gap-3 p-3 rounded-xl border text-left transition-all",
+                  done ? "border-green-600/30 bg-green-900/10 opacity-60" : "border-purple-700/30 bg-purple-900/10 hover:bg-purple-900/20")}>
+                <span className="text-xl">{c.emoji}</span>
+                <div className="flex-1">
+                  <p className={cn("text-sm font-semibold", done ? "text-gray-400 line-through" : "text-white")}>{c.label}</p>
+                  <p className="text-xs text-yellow-400">+{c.xp} XP</p>
+                </div>
+                {done
+                  ? <CheckCircle2 className="w-5 h-5 text-green-400 shrink-0" />
+                  : <span className="text-xs text-gray-500 shrink-0">Bắt đầu →</span>}
+              </button>
             );
           })}
         </div>

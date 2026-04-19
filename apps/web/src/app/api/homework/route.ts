@@ -14,7 +14,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (e: any) {
     console.error("homework error:", e?.message ?? e);
-    return NextResponse.json({ error: String(e?.message ?? "Failed") }, { status: 500 });
+    const msg = String(e?.message ?? e ?? "");
+    if (msg.includes("429") || msg.includes("rate")) {
+      return NextResponse.json({ error: "AI đang bận, thử lại sau 1 phút." }, { status: 429 });
+    }
+    if (msg.includes("timeout")) {
+      return NextResponse.json({ error: "AI phản hồi quá chậm. Thử lại nhé." }, { status: 504 });
+    }
+    return NextResponse.json({ error: String(e?.message ?? "Không thể tạo bài tập. Thử lại.") }, { status: 500 });
   }
 }
 

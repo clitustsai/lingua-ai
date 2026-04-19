@@ -127,8 +127,15 @@ Return ONLY valid JSON:
       newWords: Array.isArray(result.newWords) ? result.newWords : [],
       difficultyAdjust: result.difficultyAdjust ?? "same",
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("[chat/route] error:", error);
-    return NextResponse.json({ error: "Failed to get response" }, { status: 500 });
+    const msg = String(error?.message ?? error ?? "");
+    if (msg.includes("429") || msg.includes("rate")) {
+      return NextResponse.json({ error: "AI đang bận, vui lòng thử lại sau 1 phút." }, { status: 429 });
+    }
+    if (msg.includes("timeout") || msg.includes("ETIMEDOUT")) {
+      return NextResponse.json({ error: "AI phản hồi quá chậm. Vui lòng thử lại." }, { status: 504 });
+    }
+    return NextResponse.json({ error: "Không thể kết nối AI. Kiểm tra mạng và thử lại." }, { status: 500 });
   }
 }

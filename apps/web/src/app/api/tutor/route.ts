@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import Groq from "groq-sdk";
 import { rateLimit } from "@/lib/rateLimit";
+
+export const maxDuration = 30;
+
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 export async function POST(req: NextRequest) {
@@ -70,8 +73,15 @@ Return JSON:
       encouragement: result.encouragement ?? null,
       newWords: Array.isArray(result.newWords) ? result.newWords : [],
     });
-  } catch (e) {
-    console.error(e);
-    return NextResponse.json({ error: "Failed" }, { status: 500 });
+  } catch (e: any) {
+    console.error("[tutor/route] error:", e);
+    const msg = String(e?.message ?? e ?? "");
+    if (msg.includes("429") || msg.includes("rate")) {
+      return NextResponse.json({ error: "AI đang bận, thử lại sau 1 phút." }, { status: 429 });
+    }
+    if (msg.includes("timeout")) {
+      return NextResponse.json({ error: "AI phản hồi quá chậm. Thử lại nhé." }, { status: 504 });
+    }
+    return NextResponse.json({ error: "Không thể kết nối AI. Kiểm tra mạng." }, { status: 500 });
   }
 }

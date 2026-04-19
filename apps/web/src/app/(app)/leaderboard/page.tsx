@@ -38,7 +38,8 @@ export default function LeaderboardPage() {
   const nextLevel = LEVEL_THRESHOLDS[LEVEL_THRESHOLDS.indexOf(myLevel) + 1];
   const progressToNext = nextLevel ? ((myXp - myLevel.min) / (nextLevel.min - myLevel.min)) * 100 : 100;
 
-  const myEntry = { rank: 0, name: user?.name || "Bạn", avatar: user?.avatar || "⭐", xp: myXp, streak, level: "A1", isMe: true };
+  // Insert real user into leaderboard
+  const myEntry = { rank: 0, name: user?.name || "Bạn", avatar: user?.avatar || "⭐", xp: myXp, streak, level: myLevel.level, isMe: true };
   const allUsers = [...MOCK_USERS, { ...myEntry, rank: MOCK_USERS.length + 1 }]
     .sort((a, b) => b.xp - a.xp)
     .map((u, i) => ({ ...u, rank: i + 1 }));
