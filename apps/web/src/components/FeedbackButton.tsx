@@ -39,7 +39,7 @@ export default function FeedbackButton() {
     return (
       <button
         onClick={() => setStatus("open")}
-        className="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+        className="fixed bottom-20 right-4 z-50 md:bottom-6 md:right-6 w-12 h-12 rounded-full shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95"
         style={{ background: "linear-gradient(135deg,#7c3aed,#6366f1)", boxShadow: "0 4px 20px rgba(124,58,237,0.5)" }}
         title="Báo lỗi / Feedback">
         <MessageSquareWarning className="w-5 h-5 text-white" />
@@ -49,7 +49,7 @@ export default function FeedbackButton() {
 
   if (status === "sent") {
     return (
-      <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-2xl shadow-2xl text-sm font-medium text-white animate-fade-in-scale"
+      <div className="fixed bottom-20 right-4 z-50 md:bottom-6 md:right-6 flex items-center gap-2 px-4 py-3 rounded-2xl shadow-2xl text-sm font-medium text-white animate-fade-in-scale"
         style={{ background: "rgba(16,185,129,0.9)", backdropFilter: "blur(12px)" }}>
         <CheckCircle2 className="w-4 h-4" /> Đã gửi! Cảm ơn bạn.
       </div>
@@ -57,7 +57,7 @@ export default function FeedbackButton() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 w-80 rounded-3xl shadow-2xl animate-fade-in-scale"
+    <div className="fixed bottom-20 right-4 z-50 md:bottom-6 md:right-6 w-80 rounded-3xl shadow-2xl animate-fade-in-scale"
       style={{ background: "rgba(15,10,30,0.97)", border: "1px solid rgba(139,92,246,0.35)", backdropFilter: "blur(20px)" }}>
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
