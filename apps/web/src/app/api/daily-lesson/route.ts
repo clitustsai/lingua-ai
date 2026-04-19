@@ -11,69 +11,39 @@ export async function POST(req: NextRequest) {
 
     const isNonLatin = ["Chinese", "Japanese", "Korean", "Arabic", "Thai", "Hindi"].some(l => targetLanguage.includes(l));
 
-    const vocabInstruction = isNonLatin
-      ? `CRITICAL: "word" field MUST contain the native script characters (e.g. 你好 NOT "ni hao", 我叫 NOT "wo jiao", こんにちは NOT "konnichiwa"). Put romanization/pinyin/furigana in "romanization" field.`
-      : `"word" field contains the actual word. "romanization" should be null.`;
+    const systemMsg = `You are a ${targetLanguage} language teacher for ${nativeLanguage} speakers.
+ABSOLUTE RULES — never break these:
+1. All ${targetLanguage} content (vocabulary words, example sentences, listening text, quiz options, grammar examples) MUST be written in ${targetLanguage} only — correct, natural ${targetLanguage}.
+2. All explanations, translations, tips, instructions MUST be in ${nativeLanguage} only — correct, natural ${nativeLanguage}.
+3. NEVER mix languages within a single field.
+4. NEVER write fake or nonsense text. Every sentence must be grammatically correct.
+5. listeningText MUST be a real, natural ${targetLanguage} paragraph — NOT ${nativeLanguage}.
+6. speakingPrompt is an instruction in ${nativeLanguage} telling the user what to say in ${targetLanguage}.`;
+
+    const userMsg = `Generate a ${targetLanguage} lesson. Level: ${level}. Theme: "${theme}". Focus: ${focus}. Goal: ${goal}.
+${isNonLatin ? `IMPORTANT: vocabulary "word" field must use ${targetLanguage} script (e.g. 你好, こんにちは, 안녕하세요). Put romanization separately.` : ""}
+
+Return JSON with these exact fields:
+{
+  "warmup": "short motivational message in ${nativeLanguage}",
+  "vocabulary": [{"word":"${targetLanguage} word","romanization":"${isNonLatin ? "romanization" : ""}","translation":"${nativeLanguage} meaning","example":"${targetLanguage} sentence","tip":"${nativeLanguage} memory tip"}],
+  "grammarPoint": {"rule":"rule name","explanation":"${nativeLanguage} explanation","examples":["${targetLanguage} sentence 1","${targetLanguage} sentence 2"]},
+  "speakingPrompt": "${nativeLanguage} instruction telling user what to say in ${targetLanguage}",
+  "listeningText": "2-3 sentence ${targetLanguage} paragraph",
+  "listeningTranslation": "${nativeLanguage} translation of the paragraph",
+  "quiz": [{"question":"${nativeLanguage} question about ${targetLanguage}","options":["${targetLanguage} A","${targetLanguage} B","${targetLanguage} C","${targetLanguage} D"],"correct":0,"explanation":"${nativeLanguage} why"}],
+  "dailyChallenge": "${nativeLanguage} description of a fun ${targetLanguage} challenge"
+}`;
 
     const completion = await groq.chat.completions.create({
-      model: "llama-3.1-8b-instant",
-      messages: [{
-        role: "user",
-        content: `Generate today's ${targetLanguage} lesson for a ${level} learner.
-Theme: "${theme}", Focus: ${focus}, Goal: ${goal}
-
-${vocabInstruction}
-
-CRITICAL LANGUAGE RULES:
-- warmup → in ${nativeLanguage}
-- vocabulary.word → in ${targetLanguage} (the language being learned)
-- vocabulary.romanization → romanization/pinyin/furigana if non-Latin script
-- vocabulary.translation → in ${nativeLanguage}
-- vocabulary.example → MUST be in ${targetLanguage}
-- vocabulary.tip → in ${nativeLanguage}
-- grammarPoint.rule → name of the grammar rule (English ok)
-- grammarPoint.explanation → in ${nativeLanguage}
-- grammarPoint.examples → MUST be in ${targetLanguage} (real example sentences)
-- speakingPrompt → in ${nativeLanguage} (instruction for user)
-- listeningText → MUST be in ${targetLanguage} (the text to listen to)
-- listeningTranslation → in ${nativeLanguage}
-- quiz.question → in ${nativeLanguage} (asking about ${targetLanguage} content)
-- quiz.options → MUST be in ${targetLanguage} (the answer choices are ${targetLanguage} words/phrases)
-- quiz.explanation → in ${nativeLanguage}
-- dailyChallenge → in ${nativeLanguage}
-
-Return JSON:
-{
-  "warmup": "motivational quote in ${nativeLanguage}",
-  "vocabulary": [
-    {
-      "word": "${isNonLatin ? "native script ONLY" : "the word in " + targetLanguage}",
-      "romanization": "${isNonLatin ? "pinyin/furigana/romanization" : "null"}",
-      "translation": "meaning in ${nativeLanguage}",
-      "example": "example sentence in ${targetLanguage}",
-      "tip": "memory tip in ${nativeLanguage}"
-    }
-  ],
-  "grammarPoint": {
-    "rule": "grammar rule name",
-    "explanation": "explanation in ${nativeLanguage}",
-    "examples": ["${targetLanguage} example 1", "${targetLanguage} example 2"]
-  },
-  "speakingPrompt": "speaking task instruction in ${nativeLanguage}",
-  "listeningText": "short paragraph in ${targetLanguage} to read/listen",
-  "listeningTranslation": "translation in ${nativeLanguage}",
-  "quiz": [
-    {
-      "question": "question in ${nativeLanguage}",
-      "options": ["${targetLanguage} option A", "${targetLanguage} option B", "${targetLanguage} option C", "${targetLanguage} option D"],
-      "correct": 0,
-      "explanation": "explanation in ${nativeLanguage}"
-    }
-  ],
-  "dailyChallenge": "fun challenge description in ${nativeLanguage}"
-}`
-      }],
+      model: "llama-3.3-70b-versatile",
+      messages: [
+        { role: "system", content: systemMsg },
+        { role: "user", content: userMsg },
+      ],
       response_format: { type: "json_object" },
+      temperature: 0.4,
+      max_tokens: 1500,
     });
 
     const result = JSON.parse(completion.choices[0].message.content || "{}");
