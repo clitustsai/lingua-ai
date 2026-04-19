@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { ACHIEVEMENTS } from "@ai-lang/shared";
 import { cn } from "@/lib/utils";
+import AdBanner from "@/components/AdBanner";
 
 function motivationMessage(streak: number, wordsToday: number, goal: number, langName: string) {
   if (streak >= 7) return `🔥 ${streak} ngày liên tiếp! Bạn đang chinh phục ${langName}!`;
@@ -266,6 +267,9 @@ export default function DashboardPage() {
             <ChevronRight className="w-5 h-5 text-yellow-400 shrink-0" />
           </button>
         )}
+
+        {/* ── AD BANNER (chỉ hiện cho free users, giữa các section) ── */}
+        <AdBanner slot="REPLACE_WITH_YOUR_SLOT_ID" format="horizontal" className="my-2" />
       </div>
     </div>
   );
