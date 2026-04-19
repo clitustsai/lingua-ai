@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Groq from "groq-sdk";
+import { rateLimit } from "@/lib/rateLimit";
 
 export const maxDuration = 30;
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
@@ -20,6 +21,15 @@ const PERSONA_PROMPTS: Record<string, string> = {
 };
 
 export async function POST(req: NextRequest) {
+  // Rate limit: 30 requests/min per IP
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const rl = rateLimit(`chat:${ip}`, 30, 60_000);
+  if (!rl.success) {
+    return NextResponse.json(
+      { error: "Quá nhiều yêu cầu. Vui lòng thử lại sau 1 phút." },
+      { status: 429 }
+    );
+  }
   try {
     const {
       messages,

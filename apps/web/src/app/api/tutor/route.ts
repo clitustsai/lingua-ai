@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import Groq from "groq-sdk";
+import { rateLimit } from "@/lib/rateLimit";
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 export async function POST(req: NextRequest) {
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const rl = rateLimit(`tutor:${ip}`, 20, 60_000);
+  if (!rl.success) return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 });
   try {
     const { messages, targetLanguage, nativeLanguage, level, tutorMemory } = await req.json();
 
