@@ -126,9 +126,20 @@ export default function VoiceButton({ onTranscript, language, disabled }: VoiceB
 export function speakText(text: string, langCode: string, rate = 0.9) {
   if (typeof window === "undefined" || !window.speechSynthesis) return;
   window.speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
+
+  // Clean text before speaking — remove blanks, markdown, special chars
+  const cleaned = text
+    .replace(/_{2,}/g, "blank")          // ___ → "blank"
+    .replace(/\[.*?\]/g, "")             // [brackets]
+    .replace(/\*{1,2}(.*?)\*{1,2}/g, "$1") // **bold** → bold
+    .replace(/`[^`]*`/g, "")             // `code`
+    .replace(/#{1,6}\s/g, "")            // ## headers
+    .replace(/[*_~]/g, "")               // remaining markdown
+    .trim();
+
+  const u = new SpeechSynthesisUtterance(cleaned);
   u.lang = toLangTag(langCode);
-  // Mobile browsers (iOS/Android) tend to speak faster — reduce rate
+  // Mobile browsers tend to speak faster
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   u.rate = isMobile ? Math.min(rate, 0.75) : rate;
   u.pitch = 1;
