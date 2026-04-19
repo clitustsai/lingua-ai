@@ -145,6 +145,7 @@ export default function ChatPage() {
           level: settingsRef.current.level,
           topic: settingsRef.current.conversationTopic ?? "free",
           persona: scenario.persona,
+          tutorMemory: useAppStore.getState().tutorMemory,
         }),
       });
       const data = await res.json();
