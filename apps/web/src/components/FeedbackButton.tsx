@@ -96,10 +96,7 @@ export default function FeedbackButton() {
           style={{ background: "rgba(26,16,53,0.8)" }}
         />
 
-        {/* User info */}
-        {user && (
-          <p className="text-xs text-gray-600">Gửi từ: {user.name} · {user.email}</p>
-        )}
+        {/* User info - ẩn để bảo mật */}
 
         <button onClick={submit} disabled={!message.trim() || status === "sending"}
           className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-semibold text-white transition-all disabled:opacity-50"

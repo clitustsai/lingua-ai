@@ -309,8 +309,8 @@ export default function SettingsPage() {
               </div>
             </div>
             <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className={cn("w-12 h-6 rounded-full transition-colors relative shrink-0 overflow-hidden", theme === "light" ? "bg-yellow-500" : "bg-primary-600")}>
-              <span className={cn("absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform", theme === "light" ? "translate-x-6" : "translate-x-0.5")} />
+              className={cn("w-12 h-6 rounded-full transition-colors relative shrink-0", theme === "light" ? "bg-yellow-500" : "bg-primary-600")}>
+              <span className={cn("absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-transform duration-200", theme === "light" ? "translate-x-6" : "translate-x-0.5")} />
             </button>
           </div>
           <div className="flex items-center justify-between bg-gray-800 rounded-xl px-4 py-3">
@@ -319,8 +319,8 @@ export default function SettingsPage() {
               <span className="text-sm text-gray-300">Auto-speak AI replies</span>
             </div>
             <button onClick={() => setSettings({ autoSpeak: !settings.autoSpeak })}
-              className={cn("w-12 h-6 rounded-full transition-colors relative shrink-0 overflow-hidden", settings.autoSpeak ? "bg-primary-600" : "bg-gray-700")}>
-              <span className={cn("absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform", settings.autoSpeak ? "translate-x-6" : "translate-x-0.5")} />
+              className={cn("w-12 h-6 rounded-full transition-colors relative shrink-0", settings.autoSpeak ? "bg-primary-600" : "bg-gray-700")}>
+              <span className={cn("absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-transform duration-200", settings.autoSpeak ? "translate-x-6" : "translate-x-0.5")} />
             </button>
           </div>
           <NotificationToggle />
