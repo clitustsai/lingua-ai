@@ -17,6 +17,7 @@ const nav = [
   { href: "/call",          icon: Phone,           label: "Voice Call" },
   { href: "/tutor",         icon: Sparkles,        label: "AI Tutor" },
   { href: "/homework",      icon: GraduationCap,   label: "AI Teacher" },
+  { href: "/solve",         icon: Sparkles,        label: "Giải bài tập" },
   { href: "/videos",        icon: Youtube,         label: "Video Lessons" },
   { href: "/partners",      icon: Users,           label: "Partners" },
   { href: "/community",     icon: Globe,           label: "Community" },
