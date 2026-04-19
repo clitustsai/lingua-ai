@@ -22,10 +22,12 @@ export function isTrialActive(createdAt: string): boolean {
 type AuthStore = {
   user: AuthUser | null;
   theme: "dark" | "light";
+  uiLang: "vi" | "en";
   isLoggedIn: boolean;
   login: (user: AuthUser) => void;
   logout: () => void;
   setTheme: (t: "dark" | "light") => void;
+  setUiLang: (l: "vi" | "en") => void;
   updateProfile: (updates: Partial<AuthUser>) => void;
 };
 
@@ -78,10 +80,12 @@ export const useAuthStore = create<AuthStore>()(
     (set) => ({
       user: null,
       theme: "dark",
+      uiLang: "vi",
       isLoggedIn: false,
       login: (user) => set({ user, isLoggedIn: true }),
       logout: () => set({ user: null, isLoggedIn: false }),
       setTheme: (theme) => set({ theme }),
+      setUiLang: (uiLang) => set({ uiLang }),
       updateProfile: (updates) => set((state) => ({
         user: state.user ? { ...state.user, ...updates } : null,
       })),

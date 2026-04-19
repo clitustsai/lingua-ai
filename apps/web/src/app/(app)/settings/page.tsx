@@ -2,7 +2,7 @@
 import { useAppStore } from "@/store/useAppStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { SUPPORTED_LANGUAGES, LEVELS, CONVERSATION_TOPICS } from "@ai-lang/shared";
-import { Volume2, Target, Sun, Moon, Camera, Check, X, Pencil, LogOut, HelpCircle, MessageCircle, ChevronRight, BookOpen, Crown, Lock } from "lucide-react";
+import { Volume2, Target, Sun, Moon, Camera, Check, X, Pencil, LogOut, HelpCircle, MessageCircle, ChevronRight, BookOpen, Crown, Lock, Globe } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -15,6 +15,7 @@ export default function SettingsPage() {
   const router = useRouter();
   const { settings, setSettings, streak, stats, flashcards, totalMessages } = useAppStore();
   const { theme, setTheme, user, updateProfile, logout } = useAuthStore();
+  const { uiLang, setUiLang } = useAuthStore();
 
   const handleLogout = () => { logout(); router.push("/auth"); };
 
@@ -148,6 +149,29 @@ export default function SettingsPage() {
             <div className="text-2xl font-bold text-accent-400">{totalMessages}</div>
             <div className="text-xs text-gray-500 mt-0.5">Messages</div>
           </div>
+        </div>
+
+        {/* UI Language */}
+        <div>
+          <label className="block text-sm font-medium text-gray-400 mb-2 flex items-center gap-2">
+            <Globe className="w-4 h-4" /> Ngôn ngữ giao diện
+          </label>
+          <div className="flex gap-2">
+            {([
+              { id: "vi", flag: "🇻🇳", label: "Tiếng Việt" },
+              { id: "en", flag: "🇺🇸", label: "English" },
+            ] as const).map(l => (
+              <button key={l.id} onClick={() => setUiLang(l.id)}
+                className={cn("flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium transition-all flex-1 justify-center",
+                  (uiLang ?? "vi") === l.id
+                    ? "border-primary-500 bg-primary-600/20 text-white"
+                    : "border-gray-700 bg-gray-800 text-gray-400 hover:border-gray-600")}>
+                <span>{l.flag}</span>
+                <span>{l.label}</span>
+              </button>
+            ))}
+          </div>
+          <p className="text-xs text-gray-600 mt-1.5">Thay đổi ngôn ngữ hiển thị của toàn bộ giao diện</p>
         </div>
 
         {/* Target language */}

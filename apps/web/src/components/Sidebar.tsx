@@ -10,55 +10,57 @@ import {
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/useAppStore";
 import { useAuthStore } from "@/store/useAuthStore";
-
-const nav = [
-  { href: "/dashboard",     icon: LayoutDashboard, label: "Dashboard" },
-  { href: "/",              icon: MessageCircle,   label: "Chat AI" },
-  { href: "/call",          icon: Phone,           label: "Gọi thoại AI" },
-  { href: "/tutor",         icon: Sparkles,        label: "AI Tutor" },
-  { href: "/homework",      icon: GraduationCap,   label: "AI Teacher" },
-  { href: "/solve",         icon: Sparkles,        label: "Giải bài tập" },
-  { href: "/videos",        icon: Youtube,         label: "Video bài học" },
-  { href: "/partners",      icon: Users,           label: "Đối tác" },
-  { href: "/community",     icon: Globe,           label: "Cộng đồng" },
-  { href: "/streak",        icon: Flame,           label: "Streak" },
-  { href: "/placement",     icon: Target,          label: "Test trình độ" },
-  { href: "/rewrite",       icon: Wand2,           label: "AI Viết lại" },
-  { href: "/brain",         icon: Brain,           label: "Brain Mode" },
-  { href: "/camera",        icon: Camera,          label: "Camera AI" },
-  { href: "/dub",           icon: Video,           label: "AI Lồng tiếng" },
-  { href: "/courses",       icon: Compass,         label: "Khóa học" },
-  { href: "/learning-path", icon: BookMarked,      label: "Lộ trình AI" },
-  { href: "/skills",        icon: TrendingUp,      label: "Kỹ năng" },
-  { href: "/leaderboard",   icon: Trophy,          label: "Bảng xếp hạng" },
-  { href: "/video",         icon: Youtube,         label: "Video phụ đề" },
-  { href: "/ocr",           icon: Camera,          label: "Quét ảnh" },
-  { href: "/flashcards",    icon: BookOpen,        label: "Flashcards" },
-  { href: "/study-sets",    icon: BookOpen,        label: "Bộ học tập" },
-  { href: "/review",        icon: RotateCcw,       label: "Ôn tập" },
-  { href: "/saved",         icon: Bookmark,        label: "Câu hay" },
-  { href: "/lessons",       icon: GraduationCap,   label: "Bài học" },
-  { href: "/reading",       icon: BookMarked,      label: "Đọc hiểu" },
-  { href: "/listening",     icon: Headphones,      label: "Luyện nghe" },
-  { href: "/pronunciation", icon: Mic2,            label: "Phát âm" },
-  { href: "/writing",       icon: PenLine,         label: "Luyện viết" },
-  { href: "/grammar",       icon: CheckSquare,     label: "Ngữ pháp" },
-  { href: "/translate",     icon: Languages,       label: "Dịch thuật" },
-  { href: "/share",         icon: Share2,          label: "Chia sẻ" },
-  { href: "/affiliate",     icon: DollarSign,      label: "Affiliate" },
-  { href: "/money",         icon: Banknote,        label: "AI Kiếm tiền" },
-  { href: "/donate",        icon: Heart,           label: "Ủng hộ" },
-  { href: "/premium",       icon: Crown,           label: "Premium" },
-  { href: "/minigame",      icon: Gamepad2,        label: "Mini Games" },
-  { href: "/reviews",       icon: Star,            label: "Đánh giá" },
-  { href: "/history",       icon: History,         label: "Lịch sử" },
-  { href: "/settings",      icon: Settings,        label: "Cài đặt" },
-];
+import { useT } from "@/lib/i18n";
 
 export default function Sidebar() {
   const pathname = usePathname();
   const { streak, stats, settings, flashcards } = useAppStore();
-  const { user, logout } = useAuthStore();
+  const { user, logout, uiLang } = useAuthStore();
+  const tr = useT(uiLang ?? "vi");
+
+  const nav = [
+    { href: "/dashboard",     icon: LayoutDashboard, label: tr.dashboard },
+    { href: "/",              icon: MessageCircle,   label: tr.chat },
+    { href: "/call",          icon: Phone,           label: tr.voiceCall },
+    { href: "/tutor",         icon: Sparkles,        label: tr.aiTutor },
+    { href: "/homework",      icon: GraduationCap,   label: tr.aiTeacher },
+    { href: "/solve",         icon: Sparkles,        label: tr.solveExercise },
+    { href: "/videos",        icon: Youtube,         label: tr.videoLessons },
+    { href: "/partners",      icon: Users,           label: tr.partners },
+    { href: "/community",     icon: Globe,           label: tr.community },
+    { href: "/streak",        icon: Flame,           label: tr.streak },
+    { href: "/placement",     icon: Target,          label: tr.placement },
+    { href: "/rewrite",       icon: Wand2,           label: tr.rewrite },
+    { href: "/brain",         icon: Brain,           label: tr.brainMode },
+    { href: "/camera",        icon: Camera,          label: tr.cameraAI },
+    { href: "/dub",           icon: Video,           label: tr.aiDub },
+    { href: "/courses",       icon: Compass,         label: tr.courses },
+    { href: "/learning-path", icon: BookMarked,      label: tr.learningPath },
+    { href: "/skills",        icon: TrendingUp,      label: tr.skills },
+    { href: "/leaderboard",   icon: Trophy,          label: tr.leaderboard },
+    { href: "/video",         icon: Youtube,         label: tr.videoSub },
+    { href: "/ocr",           icon: Camera,          label: tr.ocr },
+    { href: "/flashcards",    icon: BookOpen,        label: tr.flashcards },
+    { href: "/study-sets",    icon: BookOpen,        label: tr.studySets },
+    { href: "/review",        icon: RotateCcw,       label: tr.review },
+    { href: "/saved",         icon: Bookmark,        label: tr.saved },
+    { href: "/lessons",       icon: GraduationCap,   label: tr.lessons },
+    { href: "/reading",       icon: BookMarked,      label: tr.reading },
+    { href: "/listening",     icon: Headphones,      label: tr.listening },
+    { href: "/pronunciation", icon: Mic2,            label: tr.pronunciation },
+    { href: "/writing",       icon: PenLine,         label: tr.writing },
+    { href: "/grammar",       icon: CheckSquare,     label: tr.grammar },
+    { href: "/translate",     icon: Languages,       label: tr.translate },
+    { href: "/share",         icon: Share2,          label: tr.share },
+    { href: "/affiliate",     icon: DollarSign,      label: tr.affiliate },
+    { href: "/money",         icon: Banknote,        label: tr.moneyAI },
+    { href: "/donate",        icon: Heart,           label: tr.donate },
+    { href: "/premium",       icon: Crown,           label: tr.premium },
+    { href: "/minigame",      icon: Gamepad2,        label: tr.miniGames },
+    { href: "/reviews",       icon: Star,            label: tr.reviews },
+    { href: "/history",       icon: History,         label: tr.history },
+    { href: "/settings",      icon: Settings,        label: tr.settings },
+  ];
   const goal = settings.dailyGoal ?? 5;
   const pct = Math.min((stats.wordsLearned / goal) * 100, 100);
   const today = new Date().toISOString().slice(0, 10);
