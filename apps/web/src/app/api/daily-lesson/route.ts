@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Groq from "groq-sdk";
 
-export const maxDuration = 30;
+export const maxDuration = 60;
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
       : `"word" field contains the actual word. "romanization" should be null.`;
 
     const completion = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
+      model: "llama-3.1-8b-instant",
       messages: [{
         role: "user",
         content: `Generate today's ${targetLanguage} lesson for a ${level} learner.
@@ -51,8 +51,10 @@ Return JSON:
 
     const result = JSON.parse(completion.choices[0].message.content || "{}");
     return NextResponse.json(result);
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: "Failed" }, { status: 500 });
+  } catch (error: any) {
+    console.error("[daily-lesson]", error?.message);
+    const msg = String(error?.message ?? "");
+    if (msg.includes("429")) return NextResponse.json({ error: "AI đang bận, thử lại sau 1 phút." }, { status: 429 });
+    return NextResponse.json({ error: "Không thể tải bài học. Thử lại nhé!" }, { status: 500 });
   }
 }

@@ -1,19 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import Groq from "groq-sdk";
 
-export const maxDuration = 30;
+export const maxDuration = 60;
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 export async function POST(req: NextRequest) {
   try {
     const { topic, targetLanguage, nativeLanguage, level } = await req.json();
 
-    const prompt = `Create a comprehensive language lesson for: "${topic}"
+    const prompt = `Create a language lesson for: "${topic}"
 Student: ${level} level, learning ${targetLanguage}, native: ${nativeLanguage}
 
 Return ONLY valid JSON:
 {
-  "title": "lesson title",
+  "title": "lesson title in ${nativeLanguage}",
   "description": "brief description in ${nativeLanguage}",
   "tags": ["tag1", "tag2", "tag3"],
   "questions": [
@@ -22,32 +22,39 @@ Return ONLY valid JSON:
   "sampleAnswers": [
     {
       "question": "the question",
-      "answer": "full sample answer in ${targetLanguage} (2-4 sentences, natural and fluent)",
+      "answer": "full sample answer in ${targetLanguage} (2-3 sentences)",
       "keyPhrases": ["key phrase 1", "key phrase 2"]
     }
   ],
   "vocabulary": [
-    {"word": "word in ${targetLanguage}", "meaning": "meaning in ${nativeLanguage}", "example": "example sentence"}
+    {"word": "word in ${targetLanguage}", "meaning": "meaning in ${nativeLanguage}", "example": "example sentence in ${targetLanguage}"}
   ],
   "grammarTips": ["grammar tip 1 in ${nativeLanguage}", "tip 2"]
 }
 
-Create 4-6 questions with sample answers. Include 8-10 vocabulary words. Make it practical and useful for ${level} level.`;
+Create 4 questions with sample answers. Include 6-8 vocabulary words.`;
 
     const completion = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
+      model: "llama-3.1-8b-instant",
       messages: [{ role: "user", content: prompt }],
       response_format: { type: "json_object" },
       temperature: 0.6,
-      max_tokens: 3000,
+      max_tokens: 2500,
     });
 
     const raw = completion.choices[0].message.content || "{}";
     let result: any = {};
     try { result = JSON.parse(raw); } catch { result = {}; }
+
+    if (!result.questions && !result.vocabulary) {
+      return NextResponse.json({ error: "AI không tạo được bài học" }, { status: 500 });
+    }
+
     return NextResponse.json(result);
   } catch (e: any) {
     console.error("generate-lesson error:", e?.message);
-    return NextResponse.json({ error: "Failed" }, { status: 500 });
+    const msg = String(e?.message ?? "");
+    if (msg.includes("429")) return NextResponse.json({ error: "AI đang bận, thử lại sau 1 phút." }, { status: 429 });
+    return NextResponse.json({ error: "Không thể tạo bài học. Thử lại nhé!" }, { status: 500 });
   }
 }

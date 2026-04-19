@@ -86,9 +86,17 @@ export default function LearningPathPage() {
           goal: learningPath.goal,
         }),
       });
-      setDayLesson(await res.json());
+      const data = await res.json();
+      if (data.error || (!data.vocabulary && !data.grammarPoint && !data.quiz)) {
+        setDayLesson({ _error: data.error || "Không thể tải bài học. Thử lại nhé!" });
+      } else {
+        setDayLesson(data);
+      }
+    } catch {
+      setDayLesson({ _error: "Lỗi kết nối. Vui lòng thử lại!" });
     } finally {
-      setLoadingDay(false); }
+      setLoadingDay(false);
+    }
   };
 
   const completeDay = () => {
@@ -201,6 +209,14 @@ export default function LearningPathPage() {
           <div className="flex flex-col items-center justify-center h-64 gap-3">
             <Loader2 className="w-8 h-8 text-purple-400 animate-spin" />
             <p className="text-gray-400 text-sm">Đang tạo bài học hôm nay...</p>
+          </div>
+        ) : dayLesson?._error ? (
+          <div className="flex flex-col items-center justify-center h-64 gap-4">
+            <p className="text-red-400 text-sm text-center">⚠️ {dayLesson._error}</p>
+            <button onClick={() => openDay(activeDayIdx)}
+              className="px-5 py-2.5 rounded-xl bg-primary-600 hover:bg-primary-500 text-white text-sm font-semibold transition-colors">
+              Thử lại
+            </button>
           </div>
         ) : dayLesson && (
           <div className="flex flex-col gap-5">

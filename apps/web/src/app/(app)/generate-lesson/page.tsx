@@ -25,6 +25,7 @@ export default function GenerateLessonPage() {
   const [topic, setTopic] = useState("");
   const [loading, setLoading] = useState(false);
   const [lesson, setLesson] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
   const [showSection, setShowSection] = useState<Record<string, boolean>>({ questions: true, vocab: true, answers: false });
   const [copied, setCopied] = useState("");
 
@@ -34,6 +35,7 @@ export default function GenerateLessonPage() {
     setTopic(finalTopic);
     setLoading(true);
     setLesson(null);
+    setError(null);
     try {
       const res = await fetch("/api/generate-lesson", {
         method: "POST",
@@ -45,7 +47,14 @@ export default function GenerateLessonPage() {
           level: settings.level,
         }),
       });
-      setLesson(await res.json());
+      const data = await res.json();
+      if (data.error || (!data.questions && !data.vocabulary)) {
+        setError("AI không tạo được bài học. Thử lại nhé!");
+        return;
+      }
+      setLesson(data);
+    } catch {
+      setError("Lỗi kết nối. Vui lòng thử lại!");
     } finally { setLoading(false); }
   };
 
@@ -107,6 +116,17 @@ export default function GenerateLessonPage() {
             <div className="ai-typing-dot" />
           </div>
           <p className="text-gray-500 text-sm">AI đang tạo bài học cho "{topic}"...</p>
+        </div>
+      )}
+
+      {/* Error */}
+      {error && !loading && (
+        <div className="rounded-2xl p-5 text-center" style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)" }}>
+          <p className="text-red-400 text-sm mb-3">⚠️ {error}</p>
+          <button onClick={() => { setError(null); generate(); }}
+            className="px-5 py-2 rounded-xl bg-primary-600 hover:bg-primary-500 text-white text-sm font-semibold transition-colors">
+            Thử lại
+          </button>
         </div>
       )}
 
