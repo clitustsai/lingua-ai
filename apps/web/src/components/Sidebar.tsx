@@ -44,6 +44,7 @@ export default function Sidebar() {
     { href: "/study-sets",    icon: BookOpen,        label: tr.studySets },
     { href: "/review",        icon: RotateCcw,       label: tr.review },
     { href: "/saved",         icon: Bookmark,        label: tr.saved },
+  { href: "/notebook",      icon: BookOpen,        label: "Notebook" },
     { href: "/lessons",       icon: GraduationCap,   label: tr.lessons },
     { href: "/reading",       icon: BookMarked,      label: tr.reading },
     { href: "/listening",     icon: Headphones,      label: tr.listening },

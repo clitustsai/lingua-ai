@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 type Mode = "translate" | "explain" | "practice";
 
 export default function TranslatePage() {
-  const { settings, addFlashcard, incrementTranslations } = useAppStore();
+  const { settings, addFlashcard, incrementTranslations, addTranslateHistory } = useAppStore();
   const [fromLang, setFromLang] = useState(settings.nativeLanguage.code);
   const [toLang, setToLang] = useState(settings.targetLanguage.code);
   const [input, setInput] = useState("");
@@ -47,8 +47,12 @@ export default function TranslatePage() {
           nativeLanguage: settings.nativeLanguage.name,
         }),
       });
-      setResult(await res.json());
+      const data = await res.json();
+      setResult(data);
       incrementTranslations();
+      if (data?.translation) {
+        addTranslateHistory({ original: input, translation: data.translation, fromLang: fromObj.name, toLang: toObj.name });
+      }
     } finally { setLoading(false); }
   };
 

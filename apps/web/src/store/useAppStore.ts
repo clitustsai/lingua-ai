@@ -161,6 +161,10 @@ type AppStore = {
   setUsername: (name: string) => void;
   completedVideos: string[];
   addCompletedVideo: (videoId: string) => void;
+  translateHistory: { id: string; original: string; translation: string; fromLang: string; toLang: string; savedAt: string; starred: boolean }[];
+  addTranslateHistory: (item: { original: string; translation: string; fromLang: string; toLang: string }) => void;
+  toggleStarTranslation: (id: string) => void;
+  clearTranslateHistory: () => void;
   addCommunityPost: (post: CommunityPost) => void;
   likePost: (id: string) => void;
   addComment: (postId: string, comment: CommunityComment) => void;
@@ -403,6 +407,23 @@ export const useAppStore = create<AppStore>()(
           ? state.completedVideos
           : [...state.completedVideos, videoId],
       })),
+
+      translateHistory: [],
+
+      addTranslateHistory: (item) => set((state) => ({
+        translateHistory: [
+          { ...item, id: Date.now().toString(), savedAt: new Date().toISOString(), starred: false },
+          ...state.translateHistory,
+        ].slice(0, 200),
+      })),
+
+      toggleStarTranslation: (id) => set((state) => ({
+        translateHistory: state.translateHistory.map(t =>
+          t.id === id ? { ...t, starred: !t.starred } : t
+        ),
+      })),
+
+      clearTranslateHistory: () => set({ translateHistory: [] }),
 
       addCommunityPost: (post: CommunityPost) => set((state) => ({
         communityPosts: [post, ...state.communityPosts].slice(0, 100),
