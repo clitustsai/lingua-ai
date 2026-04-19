@@ -118,6 +118,12 @@ export const CHAT_SCENARIOS = [
   { id: "barista",     label: "Gọi đồ tại quán",     emoji: "☕", persona: "barista",     desc: "Thực hành tình huống thực tế" },
   { id: "doctor",      label: "Khám bệnh",           emoji: "🏥", persona: "doctor",      desc: "Từ vựng y tế, sức khỏe" },
   { id: "shopkeeper",  label: "Mua sắm",             emoji: "🛍️", persona: "shopkeeper",  desc: "Hỏi giá, mặc cả, mua hàng" },
+  { id: "hotel",       label: "Đặt phòng khách sạn", emoji: "🏨", persona: "hotel",       desc: "Check-in, yêu cầu dịch vụ" },
+  { id: "airport",     label: "Sân bay & Du lịch",   emoji: "✈️", persona: "airport",     desc: "Hỏi đường, làm thủ tục" },
+  { id: "restaurant",  label: "Nhà hàng",            emoji: "🍽️", persona: "restaurant",  desc: "Gọi món, hỏi thực đơn" },
+  { id: "bank",        label: "Ngân hàng",           emoji: "🏦", persona: "bank",        desc: "Giao dịch, hỏi thông tin" },
+  { id: "debate",      label: "Tranh luận",          emoji: "🗣️", persona: "debate",      desc: "Luyện lập luận, thuyết phục" },
+  { id: "smalltalk",   label: "Nói chuyện phiếm",    emoji: "💬", persona: "smalltalk",   desc: "Giao tiếp hàng ngày tự nhiên" },
 ];
 
 export const SUPPORTED_LANGUAGES: Language[] = [
