@@ -8,7 +8,6 @@ import { createClient } from "@/lib/supabase";
 import { useAppStore } from "@/store/useAppStore";
 import Sidebar from "@/components/Sidebar";
 import NotificationManager from "@/components/NotificationManager";
-import BottomNav from "@/components/BottomNav";
 import WelcomePopup from "@/components/WelcomePopup";
 import ExitGuard from "@/components/ExitGuard";
 import PremiumGate from "@/components/PremiumGate";
