@@ -9,22 +9,16 @@ export const metadata: Metadata = {
   description: "AI-powered language learning app",
 };
 
-// Thay YOUR_PUBLISHER_ID bằng ca-pub-XXXXXXXXXXXXXXXXX của bạn
-const ADSENSE_ID = process.env.NEXT_PUBLIC_ADSENSE_ID ?? "";
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
-        {/* Google AdSense Auto Ads — chỉ load khi có publisher ID */}
-        {ADSENSE_ID && (
-          <Script
-            async
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_ID}`}
-            crossOrigin="anonymous"
-            strategy="afterInteractive"
-          />
-        )}
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9757340188160338"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
       </head>
       <body>
         <AppInit>
