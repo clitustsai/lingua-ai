@@ -127,26 +127,31 @@ export function speakText(text: string, langCode: string, rate = 0.9) {
   if (typeof window === "undefined" || !window.speechSynthesis) return;
   window.speechSynthesis.cancel();
 
-  // Clean text before speaking — remove blanks, markdown, special chars
+  // Strip everything except readable words/sentences
   const cleaned = text
-    .replace(/_{2,}/g, "blank")          // ___ → "blank"
-    .replace(/\[.*?\]/g, "")             // [brackets]
-    .replace(/\*{1,2}(.*?)\*{1,2}/g, "$1") // **bold** → bold
-    .replace(/`[^`]*`/g, "")             // `code`
-    .replace(/#{1,6}\s/g, "")            // ## headers
-    .replace(/[*_~]/g, "")               // remaining markdown
+    .replace(/_{2,}/g, "blank")                        // ___ → blank
+    .replace(/\*{1,2}(.*?)\*{1,2}/g, "$1")            // **bold** → bold
+    .replace(/`[^`]*`/g, "")                           // `code` → remove
+    .replace(/#{1,6}\s/g, "")                          // ## headers → remove
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")           // [link](url) → link text only
+    .replace(/\[.*?\]/g, "")                           // [brackets] → remove
+    .replace(/[*_~>|]/g, "")                           // markdown chars
+    .replace(/^\s*[-•·▸▹→]\s*/gm, "")                 // bullet points
+    .replace(/^\s*\d+[.)]\s*/gm, "")                  // numbered lists: 1. 2)
+    .replace(/[\u{1F300}-\u{1FFFF}]/gu, "")           // emoji (unicode range)
+    .replace(/[\u2600-\u27BF]/gu, "")                  // misc symbols
+    .replace(/[^\p{L}\p{N}\p{P}\s]/gu, "")            // keep only letters, numbers, punctuation
+    .replace(/\s{2,}/g, " ")                           // collapse whitespace
     .trim();
 
   if (!cleaned) return;
 
   const u = new SpeechSynthesisUtterance(cleaned);
   u.lang = toLangTag(langCode);
-  // Mobile browsers tend to speak faster
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   u.rate = isMobile ? Math.min(rate, 0.75) : rate;
   u.pitch = 1;
 
-  // Wait for voices to load if not ready yet
   const doSpeak = () => {
     const voices = window.speechSynthesis.getVoices();
     const langTag = toLangTag(langCode);
@@ -159,7 +164,6 @@ export function speakText(text: string, langCode: string, rate = 0.9) {
     doSpeak();
   } else {
     window.speechSynthesis.onvoiceschanged = () => { doSpeak(); };
-    // Fallback: speak anyway after short delay
     setTimeout(() => { if (!window.speechSynthesis.speaking) doSpeak(); }, 300);
   }
 }
