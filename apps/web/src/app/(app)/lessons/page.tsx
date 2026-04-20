@@ -41,7 +41,6 @@ type Tab = "vocab" | "grammar" | "dialogue" | "exercises";
 export default function LessonsPage() {
   const { settings, addFlashcard, incrementLessons, checkAchievements } = useAppStore();
   const { user } = useAuthStore();
-  if (!user?.isPremium) return <PremiumGate title="Lessons — Premium" desc="Bài học AI cá nhân hóa theo chủ đề và trình độ của bạn. Yêu cầu gói Premium." />;
   const [selectedTopic, setSelectedTopic] = useState(LESSON_TOPICS[0]);
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [loading, setLoading] = useState(false);

@@ -64,7 +64,6 @@ const NAV_GROUPS = (tr: any) => [
       { href: "/leaderboard",   icon: Trophy,          label: tr.leaderboard },
       { href: "/streak",        icon: Flame,           label: tr.streak },
       { href: "/skills",        icon: TrendingUp,      label: tr.skills },
-      { href: "/placement",     icon: Target,          label: tr.placement },
       { href: "/exam",          icon: Trophy,          label: "Thi chứng chỉ" },
       { href: "/partners",      icon: Users,           label: tr.partners },
       { href: "/community",     icon: Globe,           label: tr.community },

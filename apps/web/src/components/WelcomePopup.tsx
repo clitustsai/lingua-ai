@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useAppStore } from "@/store/useAppStore";
-import { Sparkles, Lock, CheckCircle2, ChevronRight, Trophy } from "lucide-react";
+import { Sparkles, Lock, CheckCircle2, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const ONBOARD_KEY = "lingua-onboarded-v2";
@@ -60,7 +60,6 @@ export default function WelcomePopup() {
   };
 
   if (!show || !user) return null;
-
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4"
       style={{ background: "rgba(0,0,0,0.85)", backdropFilter: "blur(12px)" }}>
@@ -115,11 +114,6 @@ export default function WelcomePopup() {
               className="w-full py-3.5 rounded-2xl font-bold text-white flex items-center justify-center gap-2 transition-all hover:opacity-90"
               style={{ background: "linear-gradient(135deg,#6d28d9,#4f46e5)", boxShadow: "0 4px 20px rgba(109,40,217,0.4)" }}>
               <ChevronRight className="w-4 h-4" /> Bắt đầu học {picked}
-            </button>
-            <button onClick={goTest}
-              className="w-full py-3 rounded-2xl font-semibold text-purple-300 flex items-center justify-center gap-2 transition-all hover:bg-white/5"
-              style={{ background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.2)" }}>
-              <Trophy className="w-4 h-4" /> Test trình độ để xác định chính xác
             </button>
           </div>
         </div>

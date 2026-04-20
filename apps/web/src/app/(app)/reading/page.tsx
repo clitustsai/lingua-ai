@@ -19,7 +19,7 @@ const LEVEL_COLOR: Record<string, string> = {
 };
 
 export default function ReadingPage() {
-  const { settings, addFlashcard, incrementLessons, checkAchievements } = useAppStore();
+  const { settings, addFlashcard, incrementLessons, checkAchievements, canAccessLevel } = useAppStore() as any;
   const [level, setLevel] = useState<Level>((settings.level as Level) || "A1");
   const [customTopic, setCustomTopic] = useState("");
   const [selectedTopic, setSelectedTopic] = useState("");
@@ -65,13 +65,19 @@ export default function ReadingPage() {
 
       {/* Level selector */}
       <div className="flex gap-1.5 flex-wrap mb-4">
-        {LEVELS.map(l => (
-          <button key={l} onClick={() => { setLevel(l); setSelectedTopic(""); setData(null); }}
-            className={cn("px-3 py-1.5 rounded-xl text-xs font-bold border transition-all",
-              level === l ? LEVEL_COLOR[l] : "bg-white/4 text-gray-500 border-white/8 hover:text-white")}>
-            {l}
-          </button>
-        ))}
+        {LEVELS.map(l => {
+          const locked = !canAccessLevel(l);
+          return (
+            <button key={l} onClick={() => !locked && setLevel(l)}
+              disabled={locked}
+              title={locked ? `Thi đạt ${LEVELS[LEVELS.indexOf(l)-1]} trước` : ""}
+              className={cn("px-3 py-1.5 rounded-xl text-xs font-bold border transition-all",
+                locked ? "bg-white/3 text-gray-600 border-white/5 cursor-not-allowed opacity-40" :
+                level === l ? LEVEL_COLOR[l] : "bg-white/4 text-gray-500 border-white/8 hover:text-white")}>
+              {locked ? "🔒" : ""}{l}
+            </button>
+          );
+        })}
       </div>
 
       {/* Topic suggestions */}
