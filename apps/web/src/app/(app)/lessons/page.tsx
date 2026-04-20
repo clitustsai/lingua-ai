@@ -252,6 +252,12 @@ export default function LessonsPage() {
               {lesson.exercises.map((ex, i) => (
                 <div key={i} className="rounded-2xl p-4" style={{ background: "rgba(26,16,53,0.8)", border: "1px solid rgba(139,92,246,0.15)" }}>
                   <p className="text-white text-sm font-medium mb-3">{i + 1}. {ex.question}</p>
+                  {/* Input to fill in answer */}
+                  <input
+                    placeholder="Nhập câu trả lời của bạn..."
+                    className="w-full rounded-xl px-3 py-2.5 text-sm text-white placeholder-white/25 border border-white/10 focus:outline-none focus:border-purple-500/60 mb-3 transition-all"
+                    style={{ background: "rgba(255,255,255,0.05)" }}
+                  />
                   <button onClick={() => setShowAnswers(prev => ({ ...prev, [i]: !prev[i] }))}
                     className="flex items-center gap-1.5 text-xs text-primary-400 hover:text-primary-300 transition-colors">
                     {showAnswers[i] ? <><ChevronUp className="w-3.5 h-3.5" /> Ẩn đáp án</> : <><ChevronDown className="w-3.5 h-3.5" /> Xem đáp án</>}
