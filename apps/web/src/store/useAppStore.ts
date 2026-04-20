@@ -170,6 +170,8 @@ type AppStore = {
   likePost: (id: string) => void;
   addComment: (postId: string, comment: CommunityComment) => void;
   addCorrection: (postId: string, correction: CommunityCorrection) => void;
+  examResults: Record<string, { passed: boolean; score: number; date: string }>;
+  saveExamResult: (level: string, result: { passed: boolean; score: number; date: string }) => void;
 };
 
 function todayStr() { return new Date().toISOString().slice(0, 10); }
@@ -220,6 +222,7 @@ export const useAppStore = create<AppStore>()(
       username: "",
       lastStreakDate: "",
       communityPosts: [],
+      examResults: {},
       streakRewards: [
         { day: 1,  xp: 10,  emoji: "🌱", claimed: false },
         { day: 3,  xp: 25,  emoji: "🔥", claimed: false },
@@ -459,6 +462,10 @@ export const useAppStore = create<AppStore>()(
         communityPosts: state.communityPosts.map(p =>
           p.id === postId ? { ...p, corrections: [...p.corrections, correction] } : p
         ),
+      })),
+      saveExamResult: (level, result) => set((state) => ({
+        examResults: { ...state.examResults, [level]: result },
+        totalXp: result.passed ? state.totalXp + 200 : state.totalXp,
       })),
     }),
     { name: "ai-lang-store-v2" }

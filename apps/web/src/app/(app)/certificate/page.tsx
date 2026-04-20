@@ -3,6 +3,7 @@ import { useRef, useState } from "react";
 import { useAppStore } from "@/store/useAppStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Award, Download, Share2, Star } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 const CERT_TYPES = [
@@ -18,13 +19,16 @@ const LEVELS_MAP: Record<string, string> = {
 };
 
 export default function CertificatePage() {
-  const { streak, totalXp, flashcards, lessonsCompleted, settings } = useAppStore();
+  const { streak, totalXp, flashcards, lessonsCompleted, settings, examResults = {} } = useAppStore() as any;
   const { user } = useAuthStore();
   const [certType, setCertType] = useState(CERT_TYPES[0]);
   const certRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   const today = new Date().toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit", year: "numeric" });
   const levelName = LEVELS_MAP[settings.level] ?? settings.level;
+  const passedLevels = Object.entries(examResults as Record<string, any>).filter(([, r]) => r.passed).map(([l]) => l);
+  const hasAnyPassed = passedLevels.length > 0;
 
   const downloadCert = async () => {
     if (!certRef.current) return;
@@ -58,6 +62,37 @@ export default function CertificatePage() {
         </h1>
         <p className="text-sm text-gray-400 mt-1">Tạo chứng chỉ học tập để chia sẻ thành tích</p>
       </div>
+
+      {/* Gate: must pass exam first */}
+      {!hasAnyPassed && (
+        <div className="rounded-2xl p-5 mb-5 text-center"
+          style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.25)" }}>
+          <p className="text-4xl mb-3">🔒</p>
+          <p className="text-white font-bold mb-1">Chưa có chứng chỉ nào</p>
+          <p className="text-gray-400 text-sm mb-4">Bạn cần hoàn thành bài thi trình độ (A1, A2...) và đạt điểm 60+ để nhận chứng chỉ.</p>
+          <button onClick={() => router.push("/exam")}
+            className="px-6 py-3 rounded-2xl font-bold text-white transition-all hover:opacity-90"
+            style={{ background: "linear-gradient(135deg,#f59e0b,#f97316)" }}>
+            🏆 Thi ngay
+          </button>
+        </div>
+      )}
+
+      {/* Passed levels */}
+      {hasAnyPassed && (
+        <div className="rounded-2xl p-4 mb-5"
+          style={{ background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)" }}>
+          <p className="text-sm font-semibold text-white mb-2">Trình độ đã đạt:</p>
+          <div className="flex gap-2 flex-wrap">
+            {passedLevels.map(lv => (
+              <span key={lv} className="px-3 py-1 rounded-full text-xs font-bold text-green-300"
+                style={{ background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.3)" }}>
+                ✅ {lv} · {(examResults as any)[lv]?.score}/100
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Cert type selector */}
       <div className="grid grid-cols-2 gap-2 mb-5">
