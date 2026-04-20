@@ -43,13 +43,15 @@ export default function AppLayoutClient({ children }: { children: React.ReactNod
       const name = (meta.full_name || meta.name || meta.user_name || "").trim()
         || (u.email?.split("@")[0] || "User");
       const avatar = meta.avatar_url || meta.picture || AVATARS[Math.floor(Math.random() * AVATARS.length)];
+      const isPremium = !!meta.isPremium;
       const stored = useAuthStore.getState().user;
       const needsUpdate = !stored
         || stored.email !== u.email
         || stored.name === "Demo User"
-        || stored.name === stored.email?.split("@")[0];
+        || stored.name === stored.email?.split("@")[0]
+        || stored.isPremium !== isPremium; // sync premium status
       if (needsUpdate) {
-        const user: AuthUser = { id: u.id, name, email: u.email || "", avatar, createdAt: u.created_at };
+        const user: AuthUser = { id: u.id, name, email: u.email || "", avatar, createdAt: u.created_at, isPremium };
         login(user);
       }
     };
@@ -62,7 +64,17 @@ export default function AppLayoutClient({ children }: { children: React.ReactNod
       if (session?.user) syncUser(session.user);
     });
 
-    return () => subscription.unsubscribe();
+    // Refresh session every 60s to pick up premium activation
+    const refreshInterval = setInterval(async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        // Force refresh to get latest user_metadata
+        const { data: { user: freshUser } } = await supabase.auth.getUser();
+        if (freshUser) syncUser(freshUser);
+      }
+    }, 60000);
+
+    return () => { subscription.unsubscribe(); clearInterval(refreshInterval); };
   }, [hydrated]);
 
   useEffect(() => {
