@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { NotificationToggle } from "@/components/NotificationManager";
+import TwoFactorAuth from "@/components/TwoFactorAuth";
 import { useState, useRef } from "react";
 
 const AVATARS = ["🦊","🐼","🦁","🐯","🦋","🐸","🦄","🐙","🦅","🐬","🌟","🎭","🐺","🦝","🐨","🦜","🐲","🧸","🎃","🤖","👾","🎯"];
@@ -324,6 +325,7 @@ export default function SettingsPage() {
             </button>
           </div>
           <NotificationToggle />
+          <TwoFactorAuth />
         </div>
 
         {/* Summary */}
