@@ -1,14 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
-import { createClient } from "@supabase/supabase-js";
 
-// Supabase admin client (service role key — bypasses RLS)
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!, // cần thêm vào .env
-);
+// Supabase admin client — only initialized when keys are available
+function getSupabaseAdmin() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return null;
+  const { createClient } = require("@supabase/supabase-js");
+  return createClient(url, key);
+}
 
 async function activatePremium(userId: string, plan: string) {
+  const supabaseAdmin = getSupabaseAdmin();
+  if (!supabaseAdmin) {
+    console.error("[webhook] SUPABASE_SERVICE_ROLE_KEY not configured");
+    throw new Error("Supabase admin not configured");
+  }
   const expiresAt = plan === "yearly"
     ? new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
     : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
