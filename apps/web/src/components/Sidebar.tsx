@@ -93,41 +93,48 @@ const NAV_GROUPS = (tr: any) => [
 function BellDropdown() {
   const [open, setOpen] = useState(false);
   const { streak, stats, settings } = useAppStore();
+  const { user } = useAuthStore();
   const today = new Date().toISOString().slice(0, 10);
   const studiedToday = stats.date === today && stats.messagesCount > 0;
 
   const notifications = [
-    !studiedToday && { id: "study", icon: "📚", text: `Hôm nay chưa học! Chỉ cần 5 phút thôi.`, time: "Hôm nay" },
+    user?.isPremium && { id: "vip", icon: "👑", text: "Tài khoản VIP đã được kích hoạt! Dùng không giới hạn.", time: "VIP" },
+    !studiedToday && { id: "study", icon: "📚", text: "Hôm nay chưa học! Chỉ cần 5 phút thôi.", time: "Hôm nay" },
     streak >= 3 && { id: "streak", icon: "🔥", text: `${streak} ngày streak! Tiếp tục duy trì nhé.`, time: "Streak" },
-    { id: "tip", icon: "💡", text: `Mẹo: Học ${settings.targetLanguage.name} 15 phút/ngày hiệu quả hơn 2 tiếng/tuần.`, time: "Mẹo học" },
+    { id: "tip", icon: "💡", text: `Học ${settings.targetLanguage.name} 15 phút/ngày hiệu quả hơn 2 tiếng/tuần.`, time: "Mẹo" },
   ].filter(Boolean) as { id: string; icon: string; text: string; time: string }[];
+
+  const hasUnread = !studiedToday || user?.isPremium;
 
   return (
     <div className="ml-auto hidden md:block relative">
       <button onClick={() => setOpen(o => !o)}
         className="flex items-center justify-center w-7 h-7 rounded-lg relative hover:bg-white/10 transition-colors">
         <Bell className="w-3.5 h-3.5 text-white/40" />
-        {!studiedToday && <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 rounded-full bg-purple-400" />}
+        {hasUnread && <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 rounded-full bg-purple-400" />}
       </button>
       {open && (
-        <div className="absolute top-9 right-0 w-72 rounded-2xl shadow-2xl z-50 overflow-hidden"
-          style={{ background: "rgba(15,8,30,0.98)", border: "1px solid rgba(139,92,246,0.25)" }}>
-          <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between">
-            <span className="text-white text-xs font-bold">Thông báo</span>
-            <button onClick={() => setOpen(false)} className="text-gray-500 hover:text-white text-xs">✕</button>
-          </div>
-          <div className="flex flex-col">
-            {notifications.map(n => (
-              <div key={n.id} className="flex items-start gap-3 px-4 py-3 hover:bg-white/5 transition-colors border-b border-white/4 last:border-0">
-                <span className="text-lg shrink-0">{n.icon}</span>
-                <div className="flex-1 min-w-0">
-                  <p className="text-white/80 text-xs leading-relaxed">{n.text}</p>
-                  <p className="text-gray-600 text-[10px] mt-0.5">{n.time}</p>
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+          <div className="fixed top-14 left-4 w-72 rounded-2xl shadow-2xl z-50 overflow-hidden"
+            style={{ background: "rgba(15,8,30,0.98)", border: "1px solid rgba(139,92,246,0.25)" }}>
+            <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between">
+              <span className="text-white text-xs font-bold">Thông báo</span>
+              <button onClick={() => setOpen(false)} className="text-gray-500 hover:text-white text-xs">✕</button>
+            </div>
+            <div className="flex flex-col max-h-80 overflow-y-auto">
+              {notifications.map(n => (
+                <div key={n.id} className="flex items-start gap-3 px-4 py-3 hover:bg-white/5 transition-colors border-b border-white/4 last:border-0">
+                  <span className="text-lg shrink-0">{n.icon}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white/80 text-xs leading-relaxed">{n.text}</p>
+                    <p className="text-gray-600 text-[10px] mt-0.5">{n.time}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );
