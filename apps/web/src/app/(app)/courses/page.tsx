@@ -3,7 +3,10 @@ import { useAppStore } from "@/store/useAppStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { COURSES } from "@ai-lang/shared";
 import { useRouter } from "next/navigation";
-import { BookOpen, ChevronRight, Star, Flame, Trophy, Crown } from "lucide-react";
+import { BookOpen, ChevronRight, Star, Flame, Trophy, Crown, Lock } from "lucide-react";
+
+// Courses under development (language courses)
+const COMING_SOON_CATEGORIES = ["Ngôn ngữ"];
 import { cn } from "@/lib/utils";
 
 const CATEGORIES = ["Tất cả", "Chứng chỉ", "Kỹ năng", "Giao tiếp", "Ngôn ngữ"];
@@ -106,11 +109,21 @@ export default function CoursesPage() {
               const enrolled = !!courseProgress.find(p => p.courseId === course.id);
               const pct = getProgress(course.id);
               const isLocked = !isPremium && idx >= 1;
+              const isComingSoon = COMING_SOON_CATEGORIES.includes(course.category);
               return (
-                <button key={course.id} onClick={() => isLocked ? router.push("/premium") : router.push(`/courses/${course.id}`)}
+                <button key={course.id} onClick={() => {
+                  if (isComingSoon) return;
+                  isLocked ? router.push("/premium") : router.push(`/courses/${course.id}`);
+                }}
                   className="shrink-0 w-44 rounded-2xl overflow-hidden text-left relative"
                   style={{ background: course.color }}>
-                  {isLocked && (
+                  {isComingSoon && (
+                    <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center z-10 rounded-2xl gap-1">
+                      <Lock className="w-6 h-6 text-gray-400" />
+                      <span className="text-xs text-gray-300 font-semibold">Đang phát triển</span>
+                    </div>
+                  )}
+                  {!isComingSoon && isLocked && (
                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-10 rounded-2xl">
                       <Crown className="w-7 h-7 text-yellow-400" />
                     </div>
@@ -154,11 +167,21 @@ export default function CoursesPage() {
                   const pct = getProgress(course.id);
                   const courseIdx = COURSES.findIndex(c => c.id === course.id);
                   const isLocked = !isPremium && courseIdx >= 1;
+                  const isComingSoon = COMING_SOON_CATEGORIES.includes(course.category);
                   return (
-                    <button key={course.id} onClick={() => isLocked ? router.push("/premium") : router.push(`/courses/${course.id}`)}
+                    <button key={course.id} onClick={() => {
+                      if (isComingSoon) return;
+                      isLocked ? router.push("/premium") : router.push(`/courses/${course.id}`);
+                    }}
                       className="flex items-center gap-4 rounded-2xl p-4 text-left transition-all hover:opacity-90 relative overflow-hidden"
                       style={{ background: course.color }}>
-                      {isLocked && (
+                      {isComingSoon && (
+                        <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center z-10 gap-1">
+                          <Lock className="w-5 h-5 text-gray-400" />
+                          <span className="text-xs text-gray-300 font-semibold">Đang phát triển</span>
+                        </div>
+                      )}
+                      {!isComingSoon && isLocked && (
                         <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-10">
                           <Crown className="w-6 h-6 text-yellow-400" />
                         </div>
