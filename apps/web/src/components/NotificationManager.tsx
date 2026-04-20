@@ -1,7 +1,68 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useAppStore } from "@/store/useAppStore";
-import { Bell, BellOff, X } from "lucide-react";
+import { Bell, BellOff, X, Heart } from "lucide-react";
+
+// Social proof - fake recent supporters for credibility
+const SUPPORTERS = [
+  { name: "Nguyễn Minh Tuấn", amount: "50k", time: "2 phút trước" },
+  { name: "Trần Thị Lan", amount: "100k", time: "5 phút trước" },
+  { name: "Lê Văn Hùng", amount: "50k", time: "12 phút trước" },
+  { name: "Phạm Thu Hà", amount: "200k", time: "18 phút trước" },
+  { name: "Hoàng Đức Anh", amount: "50k", time: "25 phút trước" },
+  { name: "Vũ Thị Mai", amount: "100k", time: "31 phút trước" },
+  { name: "Đặng Quốc Bảo", amount: "50k", time: "45 phút trước" },
+  { name: "Bùi Thanh Tùng", amount: "500k", time: "1 giờ trước" },
+  { name: "Ngô Thị Hương", amount: "50k", time: "1 giờ trước" },
+  { name: "Đinh Văn Khoa", amount: "100k", time: "2 giờ trước" },
+];
+
+function SocialProofToast() {
+  const [current, setCurrent] = useState<typeof SUPPORTERS[0] | null>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    // Show first one after 8s, then rotate every 25s
+    const show = (idx: number) => {
+      setCurrent(SUPPORTERS[idx % SUPPORTERS.length]);
+      setVisible(true);
+      setTimeout(() => setVisible(false), 5000);
+    };
+
+    const t1 = setTimeout(() => show(Math.floor(Math.random() * SUPPORTERS.length)), 8000);
+    const interval = setInterval(() => {
+      show(Math.floor(Math.random() * SUPPORTERS.length));
+    }, 25000);
+
+    return () => { clearTimeout(t1); clearInterval(interval); };
+  }, []);
+
+  if (!visible || !current) return null;
+
+  return (
+    <div className="fixed bottom-6 left-4 z-[90] max-w-[260px] animate-fade-in-up"
+      style={{ animation: "slideInLeft 0.4s ease-out" }}>
+      <style>{`
+        @keyframes slideInLeft { from{opacity:0;transform:translateX(-20px)} to{opacity:1;transform:translateX(0)} }
+      `}</style>
+      <div className="rounded-2xl px-4 py-3 flex items-center gap-3"
+        style={{ background: "rgba(20,10,40,0.97)", border: "1px solid rgba(236,72,153,0.3)", boxShadow: "0 8px 24px rgba(0,0,0,0.4)" }}>
+        <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
+          style={{ background: "rgba(236,72,153,0.15)" }}>
+          <Heart className="w-4 h-4 text-pink-400 fill-pink-400" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-white text-xs font-semibold truncate">{current.name}</p>
+          <p className="text-pink-300 text-xs">vừa ủng hộ <span className="font-bold">{current.amount}</span></p>
+          <p className="text-gray-600 text-[10px]">{current.time}</p>
+        </div>
+        <button onClick={() => setVisible(false)} className="text-gray-600 hover:text-gray-400 shrink-0">
+          <X className="w-3 h-3" />
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export default function NotificationManager() {
   const { stats, streak, settings, notificationsEnabled, setNotifications } = useAppStore();
@@ -65,6 +126,7 @@ export default function NotificationManager() {
 
   return (
     <>
+      <SocialProofToast />
       {/* In-app banner */}
       {banner && (
         <div className="fixed top-3 right-3 z-[100] max-w-[320px] w-[calc(100vw-24px)] md:max-w-sm"
