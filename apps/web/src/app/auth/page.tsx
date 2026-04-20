@@ -12,36 +12,39 @@ type Mode = "login" | "register";
 type Method = "email" | "phone";
 type Step = "form" | "otp";
 
-// Marquee phrases EN-VI
-const MARQUEE_ITEMS = [
-  { en: "Hello, how are you?", vi: "Xin chào, bạn khỏe không?" },
-  { en: "I love learning English", vi: "Tôi thích học tiếng Anh" },
-  { en: "Practice makes perfect", vi: "Luyện tập tạo nên sự hoàn hảo" },
-  { en: "What time is it?", vi: "Mấy giờ rồi?" },
-  { en: "Nice to meet you!", vi: "Rất vui được gặp bạn!" },
-  { en: "Where are you from?", vi: "Bạn đến từ đâu?" },
-  { en: "Can you help me?", vi: "Bạn có thể giúp tôi không?" },
-  { en: "I'm learning every day", vi: "Tôi học mỗi ngày" },
-  { en: "Speak with confidence", vi: "Nói chuyện tự tin" },
-  { en: "AI makes learning fun", vi: "AI giúp việc học thú vị hơn" },
+// Marquee feature highlights
+const MARQUEE_ROW1 = [
+  { icon: "🤖", text: "AI Chat thông minh" },
+  { icon: "🎤", text: "Luyện phát âm chuẩn" },
+  { icon: "🎧", text: "Nghe & hiểu tự nhiên" },
+  { icon: "📚", text: "Flashcard thông minh SRS" },
+  { icon: "🏆", text: "Bảng xếp hạng toàn cầu" },
+  { icon: "🎬", text: "Video bài học sinh động" },
+  { icon: "✍️", text: "Luyện viết AI chấm điểm" },
+  { icon: "🧠", text: "AI phân tích điểm yếu" },
+];
+const MARQUEE_ROW2 = [
+  { icon: "🌍", text: "10+ ngôn ngữ hỗ trợ" },
+  { icon: "⚡", text: "Phản hồi tức thì" },
+  { icon: "🎯", text: "Lộ trình học cá nhân" },
+  { icon: "🔥", text: "Streak học mỗi ngày" },
+  { icon: "📷", text: "Chụp ảnh dịch ngay" },
+  { icon: "🎭", text: "AI Roleplay tình huống thực" },
+  { icon: "📊", text: "Theo dõi tiến độ chi tiết" },
+  { icon: "🏅", text: "Chứng chỉ hoàn thành" },
 ];
 
-function MarqueeRow({ items, reverse = false }: { items: typeof MARQUEE_ITEMS; reverse?: boolean }) {
+function MarqueeRow({ items, reverse = false }: { items: { icon: string; text: string }[]; reverse?: boolean }) {
   const doubled = [...items, ...items];
   return (
-    <div className="overflow-hidden w-full" style={{ maskImage: "linear-gradient(to right,transparent,black 10%,black 90%,transparent)" }}>
-      <div
-        className="flex gap-3 w-max"
-        style={{
-          animation: `marquee${reverse ? "Rev" : ""} ${reverse ? "28s" : "22s"} linear infinite`,
-        }}
-      >
+    <div className="overflow-hidden w-full" style={{ maskImage: "linear-gradient(to right,transparent,black 8%,black 92%,transparent)" }}>
+      <div className="flex gap-2.5 w-max"
+        style={{ animation: `marquee${reverse ? "Rev" : ""} ${reverse ? "30s" : "24s"} linear infinite` }}>
         {doubled.map((item, i) => (
-          <div key={i} className="flex items-center gap-2 px-4 py-2 rounded-full shrink-0"
-            style={{ background: "rgba(124,58,237,0.12)", border: "1px solid rgba(139,92,246,0.2)" }}>
-            <span className="text-xs font-semibold text-white/80">{item.en}</span>
-            <span className="text-white/20 text-xs">→</span>
-            <span className="text-xs text-purple-300">{item.vi}</span>
+          <div key={i} className="flex items-center gap-2 px-3.5 py-1.5 rounded-full shrink-0"
+            style={{ background: "rgba(124,58,237,0.1)", border: "1px solid rgba(139,92,246,0.18)" }}>
+            <span className="text-sm">{item.icon}</span>
+            <span className="text-xs font-medium text-white/70 whitespace-nowrap">{item.text}</span>
           </div>
         ))}
       </div>
@@ -332,8 +335,8 @@ export default function AuthPage() {
       {/* Marquee top */}
       <div className="fixed top-0 left-0 right-0 z-20 py-2 flex flex-col gap-1.5"
         style={{ background: "linear-gradient(180deg,rgba(5,2,16,0.95),transparent)" }}>
-        <MarqueeRow items={MARQUEE_ITEMS} />
-        <MarqueeRow items={[...MARQUEE_ITEMS].reverse()} reverse />
+        <MarqueeRow items={MARQUEE_ROW1} />
+        <MarqueeRow items={MARQUEE_ROW2} reverse />
       </div>
 
       <div className="w-full max-w-md relative z-10 mt-16">
@@ -349,9 +352,14 @@ export default function AuthPage() {
               <div className="absolute inset-0 rounded-3xl" style={{ background: "linear-gradient(135deg,rgba(255,255,255,0.2),transparent)" }} />
             </div>
           </div>
-          <h1 className="text-3xl font-black text-white tracking-tight">LinguaAI</h1>
-          <p className="text-white/40 text-sm mt-1">Học ngôn ngữ cùng trí tuệ nhân tạo</p>
-          {/* AI 100% badge */}
+          <h1 className="text-3xl font-black tracking-tight"
+            style={{ background: "linear-gradient(135deg,#fff 30%,#a78bfa 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+            Chào mừng đến LinguaAI
+          </h1>
+          <p className="text-white/50 text-sm mt-1.5 text-center leading-relaxed">
+            Nền tảng học ngôn ngữ <span className="text-purple-400 font-semibold">AI thế hệ mới</span><br/>
+            <span className="text-white/30 text-xs">Nói · Nghe · Đọc · Viết — tất cả trong một</span>
+          </p>
           <div className="flex items-center gap-1.5 mt-3 px-3 py-1.5 rounded-full"
             style={{ background: "rgba(124,58,237,0.15)", border: "1px solid rgba(139,92,246,0.35)" }}>
             <span className="w-2 h-2 rounded-full bg-purple-400 shrink-0" style={{ animation: "aiDot 2s ease-in-out infinite" }} />
@@ -518,7 +526,7 @@ export default function AuthPage() {
       {/* Marquee bottom */}
       <div className="fixed bottom-0 left-0 right-0 z-20 py-2"
         style={{ background: "linear-gradient(0deg,rgba(5,2,16,0.95),transparent)" }}>
-        <MarqueeRow items={MARQUEE_ITEMS.slice(5)} />
+        <MarqueeRow items={MARQUEE_ROW1.slice(4)} />
       </div>
     </div>
   );
