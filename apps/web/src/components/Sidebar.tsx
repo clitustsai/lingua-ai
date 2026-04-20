@@ -53,8 +53,7 @@ const NAV_GROUPS = (tr: any) => [
     label: "Công cụ AI",
     items: [
       { href: "/brain",         icon: Brain,           label: tr.brainMode },
-      { href: "/camera",        icon: Camera,          label: tr.cameraAI },
-      { href: "/ocr",           icon: Camera,          label: tr.ocr },
+      { href: "/camera",        icon: Camera,          label: "Camera & OCR" },
       { href: "/rewrite",       icon: Wand2,           label: tr.rewrite },
       { href: "/dub",           icon: Video,           label: tr.aiDub },
     ],
