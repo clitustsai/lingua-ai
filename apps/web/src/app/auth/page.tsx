@@ -301,7 +301,7 @@ export default function AuthPage() {
     } finally { setLoading(false); }
   };
 
-  const inputCls = "w-full rounded-2xl px-4 py-3.5 text-sm text-white placeholder-white/25 border border-white/8 focus:outline-none focus:border-purple-500/60 focus:bg-white/8 transition-all bg-white/4 backdrop-blur-sm";
+  const inputCls = "w-full rounded-2xl px-4 py-3.5 text-sm text-white placeholder-white/30 border border-white/10 focus:outline-none focus:border-purple-500/60 transition-all";
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8 relative overflow-hidden"
@@ -316,6 +316,17 @@ export default function AuthPage() {
         @keyframes aiDot { 0%,100%{box-shadow:0 0 4px 1px #a78bfa} 50%{box-shadow:0 0 14px 4px #7c3aed} }
         @keyframes scanLine { 0%{transform:translateY(-100%)} 100%{transform:translateY(400%)} }
         @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+        input { background-color: rgba(255,255,255,0.05) !important; color: white !important; }
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
+          -webkit-box-shadow: 0 0 0 1000px rgba(30,15,60,0.95) inset !important;
+          -webkit-text-fill-color: white !important;
+          caret-color: white !important;
+          border-color: rgba(139,92,246,0.4) !important;
+          transition: background-color 9999s ease-in-out 0s;
+        }
       `}</style>
 
       <GridBg />
@@ -444,7 +455,8 @@ export default function AuthPage() {
                   <form onSubmit={submitForgot} className="flex flex-col gap-3">
                     <p className="text-white/50 text-xs">Nhập email để nhận link đặt lại mật khẩu</p>
                     <input value={forgotEmail} onChange={e => setForgotEmail(e.target.value)}
-                      type="email" placeholder="Email của bạn" className={inputCls} autoFocus />
+                      type="email" placeholder="Email của bạn" className={inputCls} autoFocus
+                      style={{ background: "rgba(255,255,255,0.05)" }} />
                     {error && <p className="text-red-400 text-xs">{error}</p>}
                     <button type="submit" disabled={loading}
                       className="w-full py-3.5 rounded-2xl font-bold text-white flex items-center justify-center gap-2 disabled:opacity-40"
@@ -459,15 +471,18 @@ export default function AuthPage() {
               <form onSubmit={submitEmail} className="flex flex-col gap-3">
                 {mode === "register" && (
                   <input value={name} onChange={e => setName(e.target.value)}
-                    placeholder="Họ và tên tiếng Việt (vd: Nguyễn Văn An)" className={inputCls} />
+                    placeholder="Họ và tên tiếng Việt (vd: Nguyễn Văn An)" className={inputCls}
+                    style={{ background: "rgba(255,255,255,0.05)" }} />
                 )}
                 <input value={email} onChange={e => setEmail(e.target.value)}
-                  type="email" placeholder="Email" className={inputCls} />
+                  type="email" placeholder="Email" className={inputCls}
+                  style={{ background: "rgba(255,255,255,0.05)" }} />
                 <div className="relative">
                   <input value={password} onChange={e => setPassword(e.target.value)}
                     type={showPw ? "text" : "password"}
                     placeholder={mode === "register" ? "Mật khẩu (≥6 ký tự, có chữ hoa)" : "Mật khẩu"}
-                    className={cn(inputCls, "pr-11")} />
+                    className={cn(inputCls, "pr-11")}
+                    style={{ background: "rgba(255,255,255,0.05)" }} />
                   <button type="button" onClick={() => setShowPw(!showPw)}
                     className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/25 hover:text-white/60 transition-colors">
                     {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
