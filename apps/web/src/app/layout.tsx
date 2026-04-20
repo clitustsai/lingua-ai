@@ -7,6 +7,9 @@ import Script from "next/script";
 export const metadata: Metadata = {
   title: "LinguaAI - Learn Languages with AI",
   description: "AI-powered language learning app",
+  other: {
+    "google-adsense-account": "ca-pub-9757340188160338",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
