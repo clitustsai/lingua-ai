@@ -7,6 +7,42 @@ import { Loader2, CheckCircle2, XCircle, Trophy, Mic, Headphones, BookOpen, PenL
 import { cn } from "@/lib/utils";
 import { speakText } from "@/components/VoiceButton";
 
+// Inline mic button for speaking section
+function MicButton({ qId, onTranscript }: { qId: string; onTranscript: (t: string) => void }) {
+  const [listening, setListening] = useState(false);
+  const recRef = useState<any>(null);
+
+  const toggle = () => {
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SR) { alert("Dùng Chrome để dùng mic."); return; }
+    if (listening) {
+      recRef[0]?.stop();
+      setListening(false);
+      return;
+    }
+    const rec = new SR();
+    rec.lang = "en-US";
+    rec.interimResults = false;
+    rec.onresult = (e: any) => { onTranscript(e.results[0][0].transcript); };
+    rec.onend = () => setListening(false);
+    rec.onerror = () => setListening(false);
+    recRef[0] = rec;
+    rec.start();
+    setListening(true);
+  };
+
+  return (
+    <button onClick={toggle}
+      className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold transition-all"
+      style={listening
+        ? { background: "rgba(236,72,153,0.25)", border: "1px solid rgba(236,72,153,0.5)", color: "#f9a8d4" }
+        : { background: "rgba(236,72,153,0.1)", border: "1px solid rgba(236,72,153,0.2)", color: "#ec4899" }}>
+      <Mic className={cn("w-3.5 h-3.5", listening && "animate-pulse")} />
+      {listening ? "Đang nghe... (bấm dừng)" : "Bấm để nói"}
+    </button>
+  );
+}
+
 const LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"];
 
 const EXAM_QUESTIONS: Record<string, Record<string, any[]>> = {
@@ -304,11 +340,15 @@ export default function ExamPage() {
             <div key={q.id} className="rounded-2xl p-4"
               style={{ background: "rgba(20,12,40,0.95)", border: "1px solid rgba(139,92,246,0.15)" }}>
               <p className="text-pink-300 text-sm font-medium mb-3">🎤 {q.prompt}</p>
+              <div className="flex gap-2 mb-2">
+                <MicButton qId={q.id} onTranscript={(t) => handleAnswer(q.id, (answers[q.id] ? answers[q.id] + " " : "") + t)} />
+              </div>
               <textarea value={answers[q.id] ?? ""} onChange={e => handleAnswer(q.id, e.target.value)}
-                placeholder="Gõ câu trả lời của bạn (hoặc dùng mic)..."
+                placeholder="Nói vào mic hoặc gõ câu trả lời..."
                 rows={3}
                 className="w-full rounded-xl px-3 py-2.5 text-sm text-white placeholder-white/25 border border-white/10 focus:outline-none focus:border-pink-500/50 resize-none"
                 style={{ background: "rgba(255,255,255,0.05)" }} />
+              {answers[q.id] && <p className="text-xs text-pink-400/60 mt-1">{answers[q.id].split(" ").filter(Boolean).length} từ</p>}
             </div>
           ))}
         </div>
