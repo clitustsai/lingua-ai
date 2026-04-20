@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Loader2, Mail, Phone, ArrowLeft, CheckCircle2, Sparkles } from "lucide-react";
+import { Eye, EyeOff, Loader2, Mail, Phone, ArrowLeft, CheckCircle2, Sparkles, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -11,6 +11,68 @@ const AVATARS = ["🦊","🐼","🦁","🐯","🦋","🐸","🦄","🐙","🦅",
 type Mode = "login" | "register";
 type Method = "email" | "phone";
 type Step = "form" | "otp";
+
+// Marquee phrases EN-VI
+const MARQUEE_ITEMS = [
+  { en: "Hello, how are you?", vi: "Xin chào, bạn khỏe không?" },
+  { en: "I love learning English", vi: "Tôi thích học tiếng Anh" },
+  { en: "Practice makes perfect", vi: "Luyện tập tạo nên sự hoàn hảo" },
+  { en: "What time is it?", vi: "Mấy giờ rồi?" },
+  { en: "Nice to meet you!", vi: "Rất vui được gặp bạn!" },
+  { en: "Where are you from?", vi: "Bạn đến từ đâu?" },
+  { en: "Can you help me?", vi: "Bạn có thể giúp tôi không?" },
+  { en: "I'm learning every day", vi: "Tôi học mỗi ngày" },
+  { en: "Speak with confidence", vi: "Nói chuyện tự tin" },
+  { en: "AI makes learning fun", vi: "AI giúp việc học thú vị hơn" },
+];
+
+function MarqueeRow({ items, reverse = false }: { items: typeof MARQUEE_ITEMS; reverse?: boolean }) {
+  const doubled = [...items, ...items];
+  return (
+    <div className="overflow-hidden w-full" style={{ maskImage: "linear-gradient(to right,transparent,black 10%,black 90%,transparent)" }}>
+      <div
+        className="flex gap-3 w-max"
+        style={{
+          animation: `marquee${reverse ? "Rev" : ""} ${reverse ? "28s" : "22s"} linear infinite`,
+        }}
+      >
+        {doubled.map((item, i) => (
+          <div key={i} className="flex items-center gap-2 px-4 py-2 rounded-full shrink-0"
+            style={{ background: "rgba(124,58,237,0.12)", border: "1px solid rgba(139,92,246,0.2)" }}>
+            <span className="text-xs font-semibold text-white/80">{item.en}</span>
+            <span className="text-white/20 text-xs">→</span>
+            <span className="text-xs text-purple-300">{item.vi}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// AI Glow light beam
+function AIBeam() {
+  return (
+    <div className="fixed inset-0 overflow-hidden pointer-events-none">
+      {/* Animated rotating beam */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-full opacity-30"
+        style={{
+          background: "linear-gradient(180deg,#a78bfa 0%,transparent 60%)",
+          animation: "beamPulse 3s ease-in-out infinite",
+          filter: "blur(2px)",
+        }} />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 rounded-full opacity-25 blur-3xl"
+        style={{
+          background: "radial-gradient(circle,#7c3aed,transparent)",
+          animation: "glowPulse 4s ease-in-out infinite",
+        }} />
+      {/* Corner beams */}
+      <div className="absolute top-0 left-0 w-px h-48 opacity-20"
+        style={{ background: "linear-gradient(180deg,#6366f1,transparent)", animation: "beamPulse 2.5s ease-in-out infinite 0.5s" }} />
+      <div className="absolute top-0 right-0 w-px h-48 opacity-20"
+        style={{ background: "linear-gradient(180deg,#8b5cf6,transparent)", animation: "beamPulse 2.5s ease-in-out infinite 1s" }} />
+    </div>
+  );
+}
 
 // Floating orb background
 function Orbs() {
@@ -255,20 +317,47 @@ export default function AuthPage() {
   const inputCls = "w-full rounded-2xl px-4 py-3.5 text-sm text-white placeholder-white/30 border border-white/10 focus:outline-none focus:border-primary-500/70 transition-all bg-white/5 backdrop-blur-sm";
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-8 relative"
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8 relative overflow-hidden"
       style={{ background: "linear-gradient(135deg,#050210 0%,#0d0520 40%,#050210 100%)" }}>
+      <style>{`
+        @keyframes marquee { from { transform: translateX(0) } to { transform: translateX(-50%) } }
+        @keyframes marqueeRev { from { transform: translateX(-50%) } to { transform: translateX(0) } }
+        @keyframes glowPulse { 0%,100% { opacity:0.15; transform:scale(1) } 50% { opacity:0.35; transform:scale(1.3) } }
+        @keyframes beamPulse { 0%,100% { opacity:0.1 } 50% { opacity:0.4 } }
+        @keyframes aiDot { 0%,100% { box-shadow:0 0 6px 2px #a78bfa } 50% { box-shadow:0 0 18px 6px #7c3aed } }
+      `}</style>
       <Orbs />
+      <AIBeam />
 
-      <div className="w-full max-w-md relative z-10">
+      {/* Marquee top */}
+      <div className="fixed top-0 left-0 right-0 z-20 py-2 flex flex-col gap-1.5"
+        style={{ background: "linear-gradient(180deg,rgba(5,2,16,0.95),transparent)" }}>
+        <MarqueeRow items={MARQUEE_ITEMS} />
+        <MarqueeRow items={[...MARQUEE_ITEMS].reverse()} reverse />
+      </div>
+
+      <div className="w-full max-w-md relative z-10 mt-16">
         {/* Logo */}
         <div className="flex flex-col items-center mb-10">
-          <div className="w-16 h-16 rounded-3xl flex items-center justify-center mb-4 relative"
-            style={{ background: "linear-gradient(135deg,#7c3aed,#6366f1)", boxShadow: "0 8px 32px rgba(124,58,237,0.5)" }}>
-            <Sparkles className="w-8 h-8 text-white" />
-            <div className="absolute inset-0 rounded-3xl" style={{ background: "linear-gradient(135deg,rgba(255,255,255,0.2),transparent)" }} />
+          {/* AI glow ring */}
+          <div className="relative mb-4">
+            <div className="absolute inset-0 rounded-3xl blur-xl opacity-60"
+              style={{ background: "linear-gradient(135deg,#7c3aed,#6366f1)", animation: "glowPulse 3s ease-in-out infinite" }} />
+            <div className="w-16 h-16 rounded-3xl flex items-center justify-center relative"
+              style={{ background: "linear-gradient(135deg,#7c3aed,#6366f1)", boxShadow: "0 8px 32px rgba(124,58,237,0.6)" }}>
+              <Sparkles className="w-8 h-8 text-white" />
+              <div className="absolute inset-0 rounded-3xl" style={{ background: "linear-gradient(135deg,rgba(255,255,255,0.2),transparent)" }} />
+            </div>
           </div>
           <h1 className="text-3xl font-black text-white tracking-tight">LinguaAI</h1>
           <p className="text-white/40 text-sm mt-1">Học ngôn ngữ cùng trí tuệ nhân tạo</p>
+          {/* AI 100% badge */}
+          <div className="flex items-center gap-1.5 mt-3 px-3 py-1.5 rounded-full"
+            style={{ background: "rgba(124,58,237,0.15)", border: "1px solid rgba(139,92,246,0.35)" }}>
+            <span className="w-2 h-2 rounded-full bg-purple-400 shrink-0" style={{ animation: "aiDot 2s ease-in-out infinite" }} />
+            <Zap className="w-3 h-3 text-purple-400" />
+            <span className="text-xs font-bold text-purple-300">AI 100% · Powered by LinguaAI</span>
+          </div>
         </div>
 
         {/* Card */}
@@ -424,6 +513,12 @@ export default function AuthPage() {
         <p className="text-center text-xs text-white/20 mt-6">
           LinguaAI &copy; 2026 · <a href="/terms" className="hover:text-white/40 transition-colors">Điều khoản</a>
         </p>
+      </div>
+
+      {/* Marquee bottom */}
+      <div className="fixed bottom-0 left-0 right-0 z-20 py-2"
+        style={{ background: "linear-gradient(0deg,rgba(5,2,16,0.95),transparent)" }}>
+        <MarqueeRow items={MARQUEE_ITEMS.slice(5)} />
       </div>
     </div>
   );
