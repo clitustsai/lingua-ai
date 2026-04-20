@@ -29,10 +29,10 @@ function SocialProofToast() {
       setTimeout(() => setVisible(false), 5000);
     };
 
-    const t1 = setTimeout(() => show(Math.floor(Math.random() * SUPPORTERS.length)), 8000);
+    const t1 = setTimeout(() => show(Math.floor(Math.random() * SUPPORTERS.length)), 10 * 60 * 1000);
     const interval = setInterval(() => {
       show(Math.floor(Math.random() * SUPPORTERS.length));
-    }, 25000);
+    }, 25 * 60 * 1000);
 
     return () => { clearTimeout(t1); clearInterval(interval); };
   }, []);

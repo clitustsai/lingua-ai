@@ -7,18 +7,18 @@ import { cn } from "@/lib/utils";
 import { FREE_LIMITS } from "@/lib/usageLimit";
 
 const PLANS = [
-  { id: "monthly", label: "1 thang (99k)", price: "99.000d/thang", badge: null as string | null },
-  { id: "yearly", label: "1 nam (1tr)", price: "1.000.000d/nam", badge: "Tiet kiem 16%" as string | null },
+  { id: "monthly", label: "1 tháng (99k)", price: "99.000d/thang", badge: null as string | null },
+  { id: "yearly", label: "1 năm (1tr)", price: "1.000.000d/nam", badge: "Tiết kiệm 16%" as string | null },
 ];
 
 const ROWS = [
-  { feature: "Chat AI", free: FREE_LIMITS.chat + " tin/ngay", vip: "Khong gioi han", hi: true },
-  { feature: "Dich thuat", free: FREE_LIMITS.translate + " lan/ngay", vip: "Khong gioi han", hi: true },
-  { feature: "AI Teacher", free: FREE_LIMITS.homework + " bai/ngay", vip: "Khong gioi han", hi: true },
-  { feature: "Tao bai hoc AI", free: FREE_LIMITS.generateLesson + " lan/ngay", vip: "Khong gioi han", hi: true },
-  { feature: "Giai bai tap", free: FREE_LIMITS.solve + " lan/ngay", vip: "Khong gioi han", hi: false },
-  { feature: "Voice", free: "Co gioi han", vip: "Lien tuc", hi: false },
-  { feature: "Khoa hoc", free: "1 khoa mien phi", vip: "Tat ca", hi: false },
+  { feature: " param($m) $m.Value -replace 'tin/ngay', 'tin/ngày' ", vip: "Không giới hạn", hi: true },
+  { feature: "Dịch thuật", free: FREE_LIMITS.translate + " lan/ngay", vip: "Không giới hạn", hi: true },
+  { feature: "AI Teacher", free: FREE_LIMITS.homework + " bai/ngay", vip: "Không giới hạn", hi: true },
+  { feature: "Tạo bài học AI", free: FREE_LIMITS.generateLesson + " lan/ngay", vip: "Không giới hạn", hi: true },
+  { feature: "Giải bài tập", free: FREE_LIMITS.solve + " lan/ngay", vip: "Không giới hạn", hi: false },
+  { feature: "Voice", free: "Co gioi han", vip: "Liên tục", hi: false },
+  { feature: "Khóa học", free: "1 khoa Miễn phí", vip: "Tất cả", hi: false },
 ];
 
 export default function PremiumPage() {
@@ -54,8 +54,8 @@ export default function PremiumPage() {
   if (user?.isPremium) return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center gap-5">
       <Crown className="w-16 h-16 text-yellow-400" />
-      <h2 className="text-white font-black text-2xl">Ban dang dung VIP</h2>
-      <p className="text-gray-400 text-sm">Tan huong khong gioi han luot dung AI!</p>
+      <h2 className="text-white font-black text-2xl">Bạn đang dùng VIP</h2>
+      <p className="text-gray-400 text-sm">Tan huong Không giới hạn luot dung AI!</p>
     </div>
   );
 
@@ -65,8 +65,8 @@ export default function PremiumPage() {
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold mb-4" style={{ background: "rgba(245,158,11,0.15)", color: "#fbbf24", border: "1px solid rgba(245,158,11,0.3)" }}>
           <Crown className="w-3.5 h-3.5" /> LinguaAI VIP
         </div>
-        <h1 className="text-3xl font-black text-white mb-2">Nang cap VIP</h1>
-        <p className="text-gray-400 text-sm">Chuyen khoan ACB - Tu dong kich hoat sau xac nhan</p>
+        <h1 className="text-3xl font-black text-white mb-2">Nâng cấp VIP</h1>
+        <p className="text-gray-400 text-sm">Chuyển khoản ACB · Tự động kích hoạt sau xác nhận</p>
       </div>
       <div className="px-5 space-y-5">
         <div className="flex gap-2 p-1 rounded-2xl" style={{ background: "rgba(15,10,30,0.8)", border: "1px solid rgba(255,255,255,0.06)" }}>
@@ -82,21 +82,21 @@ export default function PremiumPage() {
         {!qrData ? (
           <button onClick={getQR} disabled={loading} className="w-full py-4 rounded-2xl font-black text-black text-lg flex items-center justify-center gap-2 disabled:opacity-60" style={{ background: "linear-gradient(135deg,#f59e0b,#f97316)", boxShadow: "0 8px 30px rgba(245,158,11,0.4)" }}>
             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <QrCode className="w-5 h-5" />}
-            {loading ? "Dang tao QR..." : `Tao QR chuyen khoan - ${sel.price}`}
+            {loading ? "Đang tạo QR..." : `Tạo QR chuyển khoản - ${sel.price}`}
           </button>
         ) : (
           <div className="rounded-2xl p-5 flex flex-col items-center gap-4" style={{ background: "rgba(20,12,40,0.95)", border: "1px solid rgba(245,158,11,0.3)" }}>
-            <p className="text-yellow-300 font-bold text-sm">Quet QR de chuyen khoan</p>
+            <p className="text-yellow-300 font-bold text-sm">Quét QR để chuyển khoản</p>
             <div className="rounded-2xl overflow-hidden bg-white p-3 flex items-center justify-center" style={{ width: 240, height: 240 }}>
               <Image src={qrData["qrUrl"] as string} alt="VietQR ACB" width={220} height={220} unoptimized />
             </div>
             <div className="w-full rounded-xl p-3 space-y-2" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
               {[
-                { label: "Ngan hang", value: "ACB", key: "bank" },
-                { label: "So tai khoan", value: qrData["accountNo"] as string, key: "acc" },
-                { label: "Chu tai khoan", value: qrData["accountName"] as string, key: "name" },
-                { label: "So tien", value: String((qrData["amount"] as number)?.toLocaleString()) + "d", key: "amt" },
-                { label: "Noi dung CK", value: qrData["addInfo"] as string, key: "info" },
+                { label: "Ngân hàng", value: "ACB", key: "bank" },
+                { label: "Số tài khoản", value: qrData["accountNo"] as string, key: "acc" },
+                { label: "Chủ tài khoản", value: qrData["accountName"] as string, key: "name" },
+                { label: "Số tiền", value: String((qrData["amount"] as number)?.toLocaleString()) + "d", key: "amt" },
+                { label: "Nội dung CK", value: qrData["addInfo"] as string, key: "info" },
               ].map((item) => (
                 <div key={item.key} className="flex justify-between items-center text-xs">
                   <span className="text-gray-500">{item.label}</span>
@@ -114,25 +114,25 @@ export default function PremiumPage() {
             {!notified ? (
               <button onClick={notifyPayment} disabled={notifying} className="w-full py-3 rounded-2xl font-bold text-white flex items-center justify-center gap-2 disabled:opacity-50" style={{ background: "linear-gradient(135deg,#10b981,#059669)" }}>
                 {notifying ? <Loader2 className="w-4 h-4 animate-spin" /> : <Bell className="w-4 h-4" />}
-                {notifying ? "Dang gui..." : "Da chuyen khoan - Thong bao admin"}
+                {notifying ? "Đang gửi..." : "Đã chuyển khoản · Thông báo admin"}
               </button>
             ) : (
               <div className="w-full rounded-2xl p-3 text-center" style={{ background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.3)" }}>
-                <p className="text-green-400 font-semibold text-sm">Da gui thong bao!</p>
-                <p className="text-gray-400 text-xs mt-1">Admin se xac nhan va kich hoat VIP trong 1-24 gio.</p>
+                <p className="text-green-400 font-semibold text-sm">Đã gửi thông báo!</p>
+                <p className="text-gray-400 text-xs mt-1">Admin sẽ xác nhận và kích hoạt VIP trong 1-24 giờ.</p>
               </div>
             )}
             <div className="rounded-xl p-3 w-full" style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)" }}>
-              <p className="text-yellow-300 text-xs">Noi dung CK: <span className="font-mono font-bold">{qrData["addInfo"] as string}</span></p>
+              <p className="text-yellow-300 text-xs">Nội dung CK: <span className="font-mono font-bold">{qrData["addInfo"] as string}</span></p>
             </div>
-            <button onClick={() => { setQrData(null); setNotified(false); }} className="text-gray-500 text-xs hover:text-gray-300">Tao lai QR</button>
+            <button onClick={() => { setQrData(null); setNotified(false); }} className="text-gray-500 text-xs hover:text-gray-300">Tạo lại QR</button>
           </div>
         )}
-        <p className="text-center text-xs text-gray-600">Chuyen khoan an toan - Hoan tien 7 ngay</p>
+        <p className="text-center text-xs text-gray-600">Chuyển khoản an toàn · Hoàn tiền 7 ngày</p>
         <div className="rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.06)" }}>
           <div className="grid grid-cols-3 text-xs font-bold" style={{ background: "rgba(15,10,30,0.8)" }}>
-            <div className="px-4 py-3 text-gray-500">Tinh nang</div>
-            <div className="px-3 py-3 text-center text-gray-500">Mien phi</div>
+            <div className="px-4 py-3 text-gray-500">Tính năng</div>
+            <div className="px-3 py-3 text-center text-gray-500">Miễn phí</div>
             <div className="px-3 py-3 text-center text-yellow-400">VIP</div>
           </div>
           {ROWS.map((row, i) => (
