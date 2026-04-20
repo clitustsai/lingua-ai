@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Loader2, Mail, ArrowLeft, CheckCircle2, Sparkles, Zap, Brain, Globe, Mic, BookOpen } from "lucide-react";
+import { Eye, EyeOff, Loader2, Mail, ArrowLeft, CheckCircle2, Sparkles, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -341,52 +341,37 @@ export default function AuthPage() {
       <div className="w-full max-w-sm relative z-10 mt-14" style={{ animation: "fadeUp 0.6s ease-out" }}>
 
         {/* ── LOGO HERO ── */}
-        <div className="flex flex-col items-center mb-7">
+        <div className="flex flex-col items-center mb-5">
           {/* Animated logo */}
-          <div className="relative mb-5">
-            {/* Outer ring */}
-            <div className="absolute -inset-3 rounded-[28px] opacity-40"
-              style={{ background: "linear-gradient(135deg,#7c3aed,#6366f1,#7c3aed)", animation: "glowPulse 3s ease-in-out infinite", filter: "blur(12px)" }} />
-            {/* Scan line effect */}
-            <div className="absolute inset-0 rounded-3xl overflow-hidden">
-              <div className="absolute left-0 right-0 h-8 opacity-20"
+          <div className="relative mb-3">
+            <div className="absolute -inset-2 rounded-[22px] opacity-40"
+              style={{ background: "linear-gradient(135deg,#7c3aed,#6366f1,#7c3aed)", animation: "glowPulse 3s ease-in-out infinite", filter: "blur(10px)" }} />
+            <div className="absolute inset-0 rounded-2xl overflow-hidden">
+              <div className="absolute left-0 right-0 h-6 opacity-20"
                 style={{ background: "linear-gradient(180deg,transparent,rgba(167,139,250,0.6),transparent)", animation: "scanLine 3s linear infinite" }} />
             </div>
-            <div className="w-20 h-20 rounded-3xl flex items-center justify-center relative"
-              style={{ background: "linear-gradient(135deg,#5b21b6,#4f46e5)", boxShadow: "0 0 0 1px rgba(139,92,246,0.4), 0 16px 48px rgba(124,58,237,0.5)" }}>
-              <Sparkles className="w-9 h-9 text-white" />
-              <div className="absolute inset-0 rounded-3xl" style={{ background: "linear-gradient(135deg,rgba(255,255,255,0.15),transparent 60%)" }} />
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center relative"
+              style={{ background: "linear-gradient(135deg,#5b21b6,#4f46e5)", boxShadow: "0 0 0 1px rgba(139,92,246,0.4), 0 12px 32px rgba(124,58,237,0.5)" }}>
+              <Sparkles className="w-7 h-7 text-white" />
+              <div className="absolute inset-0 rounded-2xl" style={{ background: "linear-gradient(135deg,rgba(255,255,255,0.15),transparent 60%)" }} />
             </div>
           </div>
 
-          {/* Title */}
-          <h1 className="text-4xl font-black tracking-tight mb-1"
+          <h1 className="text-3xl font-black tracking-tight"
             style={{ background: "linear-gradient(135deg,#ffffff 20%,#c4b5fd 60%,#818cf8 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
             LinguaAI
           </h1>
 
-          {/* Typing subtitle */}
-          <div className="text-sm h-6 flex items-center">
+          <div className="text-xs h-5 flex items-center mt-0.5">
             <TypingText />
           </div>
 
-          {/* Stats row */}
-          <div className="flex items-center gap-3 mt-5">
-            {STATS.map((s, i) => (
-              <div key={i} className="flex flex-col items-center px-3 py-2 rounded-2xl"
-                style={{ background: "rgba(124,58,237,0.08)", border: "1px solid rgba(139,92,246,0.15)" }}>
-                <span className="text-sm font-black text-white">{s.value}</span>
-                <span className="text-[10px] text-white/40">{s.label}</span>
-              </div>
-            ))}
-          </div>
-
           {/* AI live badge */}
-          <div className="flex items-center gap-2 mt-4 px-4 py-2 rounded-full"
+          <div className="flex items-center gap-1.5 mt-3 px-3 py-1.5 rounded-full"
             style={{ background: "rgba(124,58,237,0.12)", border: "1px solid rgba(139,92,246,0.25)" }}>
-            <span className="w-2 h-2 rounded-full bg-green-400 shrink-0" style={{ animation: "aiDot 2s ease-in-out infinite" }} />
+            <span className="w-1.5 h-1.5 rounded-full bg-green-400 shrink-0" style={{ animation: "aiDot 2s ease-in-out infinite" }} />
             <Zap className="w-3 h-3 text-purple-400" />
-            <span className="text-xs font-semibold text-purple-300">AI đang hoạt động · 100% tự động</span>
+            <span className="text-xs font-semibold text-purple-300">AI 100% · Tự động · 24/7</span>
           </div>
         </div>
 
@@ -414,7 +399,7 @@ export default function AuthPage() {
             ))}
           </div>
 
-          <div className="p-5">
+          <div className="p-4">
             {step === "otp" ? (
               <div className="flex flex-col gap-5">
                 <button onClick={() => { setStep("form"); setOtp(""); setError(""); }}
@@ -552,23 +537,7 @@ export default function AuthPage() {
           </div>
         </div>
 
-        {/* Feature pills */}
-        <div className="flex justify-center gap-2 mt-5 flex-wrap">
-          {[
-            { icon: Brain, label: "AI thông minh" },
-            { icon: Globe, label: "10+ ngôn ngữ" },
-            { icon: Mic, label: "Luyện nói" },
-            { icon: BookOpen, label: "Bài học AI" },
-          ].map(({ icon: Icon, label }) => (
-            <div key={label} className="flex items-center gap-1.5 px-2.5 py-1 rounded-full"
-              style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-              <Icon className="w-3 h-3 text-purple-400" />
-              <span className="text-xs text-white/30">{label}</span>
-            </div>
-          ))}
-        </div>
-
-        <p className="text-center text-xs text-white/15 mt-4">
+        <p className="text-center text-xs text-white/15 mt-3">
           LinguaAI &copy; 2026 · <a href="/terms" className="hover:text-white/30 transition-colors">Điều khoản</a>
         </p>
       </div>
