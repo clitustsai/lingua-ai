@@ -65,23 +65,7 @@ export default function NotificationManager() {
 
   return (
     <>
-      {/* In-app banner */}
-      {banner && (
-        <div className="fixed top-3 right-3 z-[100] max-w-[320px] w-[calc(100vw-24px)] md:max-w-sm"
-          style={{ filter: "drop-shadow(0 4px 20px rgba(0,0,0,0.5))" }}>
-          <div className="rounded-2xl px-4 py-3 flex items-start gap-3"
-            style={{ background: "rgba(26,16,53,0.97)", border: "1px solid rgba(139,92,246,0.4)" }}>
-            <span className="text-xl shrink-0 mt-0.5">🔔</span>
-            <p className="text-sm text-gray-200 flex-1 leading-relaxed">{banner}</p>
-            <button onClick={() => setBanner(null)}
-              className="text-gray-400 hover:text-white shrink-0 mt-0.5 p-1 rounded-lg hover:bg-white/10 transition-colors">
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Notification toggle in settings - exported as component */}
+      {/* In-app banner removed - was covering UI elements */}
     </>
   );
 }
