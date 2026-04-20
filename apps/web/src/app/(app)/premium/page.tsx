@@ -22,8 +22,8 @@ const ROWS = [
 
 export default function PremiumPage() {
   const { user } = useAuthStore();
-  const [plan, setPlan] = useState("monthly");
-  const [qrData, setQrData] = useState(null);
+  const [plan, setPlan] = useState<"monthly" | "yearly">("monthly");
+  const [qrData, setQrData] = useState<Record<string,any>|null>(null);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState("");
   const [notified, setNotified] = useState(false);
