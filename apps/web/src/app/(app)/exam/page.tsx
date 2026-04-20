@@ -327,19 +327,32 @@ export default function ExamPage() {
             {sKey === "writing" && questions.map((q: any) => (
               <div key={q.id} className="rounded-2xl p-4"
                 style={{ background: "rgba(20,12,40,0.95)", border: "1px solid rgba(245,158,11,0.2)" }}>
-                <p className="text-yellow-300 text-sm font-medium mb-3">✍️ {q.prompt}</p>
+                <p className="text-yellow-300 text-sm font-medium mb-2">✍️ {q.prompt}</p>
+                {q.example && (
+                  <div className="rounded-xl p-2.5 mb-3" style={{ background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.15)" }}>
+                    <p className="text-xs text-yellow-400/60 mb-1">Ví dụ:</p>
+                    <p className="text-xs text-gray-400 italic">{q.example}</p>
+                  </div>
+                )}
                 <textarea value={writingAnswers[q.id] ?? ""} onChange={e => setWritingAnswers(p => ({ ...p, [q.id]: e.target.value }))}
                   placeholder="Viết câu trả lời của bạn ở đây..." rows={4}
                   className="w-full rounded-xl px-3 py-2.5 text-sm text-white placeholder-white/25 border border-white/10 focus:outline-none focus:border-yellow-500/50 resize-none"
                   style={{ background: "rgba(255,255,255,0.05)" }} />
-                <p className="text-xs text-gray-600 mt-1">{(writingAnswers[q.id] ?? "").split(" ").filter(Boolean).length} từ</p>
+                <p className="text-xs text-gray-600 mt-1">{(writingAnswers[q.id] ?? "").split(" ").filter(Boolean).length} từ {q.minWords ? `(tối thiểu ${q.minWords})` : ""}</p>
               </div>
             ))}
 
             {sKey === "speaking" && questions.map((q: any) => (
               <div key={q.id} className="rounded-2xl p-4"
                 style={{ background: "rgba(20,12,40,0.95)", border: "1px solid rgba(236,72,153,0.2)" }}>
-                <p className="text-pink-300 text-sm font-medium mb-3">🎤 {q.prompt}</p>
+                <p className="text-pink-300 text-sm font-medium mb-2">🎤 {q.prompt}</p>
+                {q.example && (
+                  <div className="rounded-xl p-2.5 mb-2" style={{ background: "rgba(236,72,153,0.06)", border: "1px solid rgba(236,72,153,0.15)" }}>
+                    <p className="text-xs text-pink-400/60 mb-1">Ví dụ câu trả lời:</p>
+                    <p className="text-xs text-gray-400 italic">"{q.example}"</p>
+                  </div>
+                )}
+                {q.tips && <p className="text-xs text-yellow-400/70 mb-3">💡 {q.tips}</p>}
                 <div className="flex gap-2 mb-2">
                   <MicButton onTranscript={(t) => setAnswers(p => ({ ...p, [q.id]: (p[q.id] ? p[q.id] + " " : "") + t }))} />
                 </div>
