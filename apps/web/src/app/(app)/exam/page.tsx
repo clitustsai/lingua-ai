@@ -57,6 +57,17 @@ export default function ExamPage() {
   const [grading, setGrading] = useState(false);
   const [finalScore, setFinalScore] = useState(0);
   const [allResults, setAllResults] = useState<Record<string, SectionResult>>({});
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [timerActive, setTimerActive] = useState(false);
+
+  // Timer per section: 5 min for MCQ, 8 min for writing/speaking
+  useEffect(() => {
+    if (!timerActive || timeLeft <= 0) return;
+    const t = setInterval(() => setTimeLeft(s => s - 1), 1000);
+    return () => clearInterval(t);
+  }, [timerActive, timeLeft]);
+
+  const fmt = (s: number) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
 
   const alreadyPassed = (examResults as any)?.[selectedLevel]?.passed;
 
@@ -79,6 +90,10 @@ export default function ExamPage() {
       setQuestions([]);
     }
     setPhase("section");
+    const sKey = SECTIONS[sectionIdx].key;
+    const mins = (sKey === "writing" || sKey === "speaking") ? 8 : 5;
+    setTimeLeft(mins * 60);
+    setTimerActive(true);
   };
 
   const startExam = () => {
@@ -90,6 +105,7 @@ export default function ExamPage() {
 
   const submitSection = async () => {
     setGrading(true);
+    setTimerActive(false);
     const section = SECTIONS[currentSection];
     const qs = questions;
 
@@ -250,11 +266,18 @@ export default function ExamPage() {
             <p className="text-xs text-gray-500">Phần {currentSection + 1}/{SECTIONS.length} · {selectedLevel}</p>
             <h2 className="text-white font-bold">{section.label}</h2>
           </div>
-          <div className="ml-auto flex gap-1">
-            {SECTIONS.map((s, i) => (
-              <div key={s.key} className="w-2 h-2 rounded-full"
-                style={{ background: i < currentSection ? "#10b981" : i === currentSection ? section.color : "rgba(255,255,255,0.1)" }} />
-            ))}
+          <div className="ml-auto flex items-center gap-2">
+            {/* Timer */}
+            <div className={cn("flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-mono font-bold",
+              timeLeft <= 60 ? "text-red-400 bg-red-900/20" : timeLeft <= 120 ? "text-yellow-400 bg-yellow-900/20" : "text-gray-400 bg-white/5")}>
+              ⏱ {fmt(timeLeft)}
+            </div>
+            <div className="flex gap-1">
+              {SECTIONS.map((s, i) => (
+                <div key={s.key} className="w-2 h-2 rounded-full"
+                  style={{ background: i < currentSection ? "#10b981" : i === currentSection ? section.color : "rgba(255,255,255,0.1)" }} />
+              ))}
+            </div>
           </div>
         </div>
 

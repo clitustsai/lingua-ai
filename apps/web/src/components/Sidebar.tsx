@@ -5,7 +5,7 @@ import {
   MessageCircle, BookOpen, Settings, Brain, Flame,
   GraduationCap, CheckSquare, History, LayoutDashboard,
   Languages, BookMarked, Headphones, Mic2, RotateCcw,
-  Compass, Youtube, Sparkles, Camera, TrendingUp, Bookmark, Share2, Phone, Users, Wand2, Globe, Target, Video, DollarSign, Banknote, Heart, Crown, Gamepad2, Star, PenLine, Trophy, Award, Zap, ChevronRight,
+  Compass, Youtube, Sparkles, Camera, TrendingUp, Bookmark, Share2, Phone, Users, Wand2, Globe, Target, Video, DollarSign, Banknote, Heart, Crown, Gamepad2, Star, PenLine, Trophy, Award, Zap, ChevronRight, Bell,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/useAppStore";
@@ -118,6 +118,17 @@ export default function Sidebar() {
           <span className="font-black text-white text-base leading-none">LinguaAI</span>
           <span className="text-[10px] text-purple-400/70 font-medium">AI · 100% tự động</span>
         </div>
+        {/* Bell notification */}
+        <button className="ml-auto hidden md:flex items-center justify-center w-7 h-7 rounded-lg relative hover:bg-white/10 transition-colors"
+          onClick={() => {
+            if (typeof Notification !== "undefined" && Notification.permission !== "granted") {
+              Notification.requestPermission();
+            }
+          }}>
+          <Bell className="w-3.5 h-3.5 text-white/40" />
+          {/* Unread dot */}
+          <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 rounded-full bg-purple-400" />
+        </button>
       </div>
 
       {/* User card */}
