@@ -26,9 +26,11 @@ export async function POST(req: NextRequest) {
 
   // VietQR API - tạo QR image URL (public, không cần key)
   const qrUrl = `https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NO}-compact2.png?amount=${amount}&addInfo=${encodeURIComponent(addInfo)}&accountName=${encodeURIComponent(ACCOUNT_NAME)}`;
+  // Proxy through our API to avoid CSP issues
+  const proxyQrUrl = `/api/payment/qr-proxy?url=${encodeURIComponent(qrUrl)}`;
 
   return NextResponse.json({
-    qrUrl,
+    qrUrl: proxyQrUrl,
     amount,
     accountNo: ACCOUNT_NO,
     accountName: ACCOUNT_NAME,
