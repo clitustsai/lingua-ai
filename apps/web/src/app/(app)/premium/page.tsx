@@ -1,13 +1,14 @@
 ﻿"use client";
 import { useState } from "react";
+import Image from "next/image";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Crown, Loader2, Copy, Check, QrCode, Bell } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { FREE_LIMITS } from "@/lib/usageLimit";
 
 const PLANS = [
-  { id: "monthly", label: "1 thang", price: "99.000d", badge: null as string | null },
-  { id: "yearly", label: "1 nam", price: "1.000.000d", badge: "Tiet kiem 16%" as string | null },
+  { id: "monthly", label: "1 thang (99k)", price: "99.000d/thang", badge: null as string | null },
+  { id: "yearly", label: "1 nam (1tr)", price: "1.000.000d/nam", badge: "Tiet kiem 16%" as string | null },
 ];
 
 const ROWS = [
@@ -86,7 +87,9 @@ export default function PremiumPage() {
         ) : (
           <div className="rounded-2xl p-5 flex flex-col items-center gap-4" style={{ background: "rgba(20,12,40,0.95)", border: "1px solid rgba(245,158,11,0.3)" }}>
             <p className="text-yellow-300 font-bold text-sm">Quet QR de chuyen khoan</p>
-            <div className="rounded-2xl overflow-hidden bg-white p-2"><img src={qrData["qrUrl"] as string} alt="VietQR" className="w-56 h-56 object-contain" /></div>
+            <div className="rounded-2xl overflow-hidden bg-white p-3 flex items-center justify-center" style={{ width: 240, height: 240 }}>
+              <Image src={qrData["qrUrl"] as string} alt="VietQR ACB" width={220} height={220} unoptimized />
+            </div>
             <div className="w-full rounded-xl p-3 space-y-2" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
               {[
                 { label: "Ngan hang", value: "ACB", key: "bank" },
@@ -120,7 +123,7 @@ export default function PremiumPage() {
               </div>
             )}
             <div className="rounded-xl p-3 w-full" style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)" }}>
-              <p className="text-yellow-300 text-xs">Nhap dung noi dung: <span className="font-mono font-bold">{qrData["addInfo"] as string}</span></p>
+              <p className="text-yellow-300 text-xs">Noi dung CK: <span className="font-mono font-bold">{qrData["addInfo"] as string}</span></p>
             </div>
             <button onClick={() => { setQrData(null); setNotified(false); }} className="text-gray-500 text-xs hover:text-gray-300">Tao lai QR</button>
           </div>
