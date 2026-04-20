@@ -21,7 +21,7 @@ const DAYS_OPTIONS = [3, 5, 7];
 
 export default function LearningPathPage() {
   const router = useRouter();
-  const { settings, learningPath, pathDaysDone, setLearningPath, markPathDay, clearLearningPath, incrementWords, checkAchievements } = useAppStore();
+  const { settings, learningPath, pathDaysDone, setLearningPath, markPathDay, clearLearningPath, incrementWords, checkAchievements, canAccessLevel, examResults = {} } = useAppStore() as any;
   const { user } = useAuthStore();
   const isPremium = user?.isPremium ?? false;
 
@@ -191,14 +191,24 @@ export default function LearningPathPage() {
         <div>
           <p className="text-sm font-semibold text-gray-300 mb-3">📊 Trình độ hiện tại</p>
           <div className="flex gap-2 flex-wrap">
-            {LEVELS.map(l => (
-              <button key={l} onClick={() => setSelectedLevel(l)}
-                className={cn("px-4 py-2 rounded-xl border text-sm font-medium transition-colors",
-                  selectedLevel === l ? "border-primary-500 bg-primary-600/20 text-primary-300" : "border-gray-700 bg-gray-800 text-gray-400 hover:border-gray-600")}>
-                {l}
-              </button>
-            ))}
+            {LEVELS.map(l => {
+              const locked = !canAccessLevel(l);
+              return (
+                <button key={l}
+                  onClick={() => !locked && setSelectedLevel(l)}
+                  title={locked ? `Thi đạt ${LEVELS[LEVELS.indexOf(l) - 1]} trước` : ""}
+                  className={cn("px-4 py-2 rounded-xl border text-sm font-medium transition-colors relative",
+                    locked ? "border-gray-700 bg-gray-800/40 text-gray-600 cursor-not-allowed opacity-50" :
+                    selectedLevel === l ? "border-primary-500 bg-primary-600/20 text-primary-300" :
+                    "border-gray-700 bg-gray-800 text-gray-400 hover:border-gray-600")}>
+                  {locked ? "🔒 " : ""}{l}
+                </button>
+              );
+            })}
           </div>
+          {LEVELS.some(l => !canAccessLevel(l)) && (
+            <p className="text-xs text-yellow-400/70 mt-2">🔒 Thi đạt trình độ hiện tại để mở khóa trình độ tiếp theo</p>
+          )}
         </div>
 
         <div>

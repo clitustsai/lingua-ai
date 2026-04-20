@@ -34,10 +34,21 @@ export default function WelcomePopup() {
   }, [isLoggedIn, user]);
 
   const confirm = (level: string) => {
-    setSettings({ level });
-    localStorage.setItem(`${ONBOARD_KEY}-${user!.id}`, level);
+    // Always start from A1 unless they've passed previous levels
+    const ORDER = ["A1","A2","B1","B2","C1","C2"];
+    const idx = ORDER.indexOf(level);
+    let actualLevel = level;
+    if (idx > 0) {
+      // Check if they can actually access this level
+      const prevLevel = ORDER[idx - 1];
+      if (!(examResults as any)?.[prevLevel]?.passed) {
+        actualLevel = "A1"; // Force back to A1
+      }
+    }
+    setSettings({ level: actualLevel });
+    localStorage.setItem(`${ONBOARD_KEY}-${user!.id}`, actualLevel);
     setShow(false);
-    if (level === "A1") {
+    if (actualLevel === "A1") {
       router.push("/exam");
     }
   };
@@ -69,21 +80,24 @@ export default function WelcomePopup() {
 
           {/* Level options */}
           <div className="flex flex-col gap-2">
-            {LEVELS.map((lv) => {
+            {LEVELS.map((lv, idx) => {
               const examPassed = (examResults as any)?.[lv.id]?.passed;
+              const prevPassed = idx === 0 ? true : (examResults as any)?.[LEVELS[idx-1].id]?.passed;
+              const isLocked = idx > 0 && !prevPassed;
               return (
-                <button key={lv.id} onClick={() => setPicked(lv.id)}
+                <button key={lv.id} onClick={() => !isLocked && setPicked(lv.id)}
+                  disabled={isLocked}
                   className={cn("flex items-center gap-3 p-3 rounded-2xl border text-left transition-all",
-                    picked === lv.id
-                      ? "border-purple-500 bg-purple-900/30"
-                      : "border-white/8 bg-white/3 hover:border-white/20")}>
-                  <span className="text-xl shrink-0">{lv.emoji}</span>
+                    isLocked ? "border-white/5 bg-white/2 opacity-40 cursor-not-allowed" :
+                    picked === lv.id ? "border-purple-500 bg-purple-900/30" :
+                    "border-white/8 bg-white/3 hover:border-white/20")}>
+                  <span className="text-xl shrink-0">{isLocked ? "🔒" : lv.emoji}</span>
                   <div className="flex-1 min-w-0">
-                    <p className={cn("text-sm font-semibold", picked === lv.id ? "text-white" : "text-gray-300")}>{lv.label}</p>
-                    <p className="text-xs text-gray-500 truncate">{lv.desc}</p>
+                    <p className={cn("text-sm font-semibold", isLocked ? "text-gray-600" : picked === lv.id ? "text-white" : "text-gray-300")}>{lv.label}</p>
+                    <p className="text-xs text-gray-500 truncate">{isLocked ? `Thi đạt ${LEVELS[idx-1].id} trước` : lv.desc}</p>
                   </div>
                   {examPassed && <CheckCircle2 className="w-4 h-4 text-green-400 shrink-0" />}
-                  {picked === lv.id && !examPassed && <div className="w-2 h-2 rounded-full bg-purple-400 shrink-0" />}
+                  {!isLocked && picked === lv.id && !examPassed && <div className="w-2 h-2 rounded-full bg-purple-400 shrink-0" />}
                 </button>
               );
             })}

@@ -172,6 +172,8 @@ type AppStore = {
   addCorrection: (postId: string, correction: CommunityCorrection) => void;
   examResults: Record<string, { passed: boolean; score: number; date: string }>;
   saveExamResult: (level: string, result: { passed: boolean; score: number; date: string }) => void;
+  getUnlockedLevel: () => string;
+  canAccessLevel: (level: string) => boolean;
 };
 
 function todayStr() { return new Date().toISOString().slice(0, 10); }
@@ -232,7 +234,23 @@ export const useAppStore = create<AppStore>()(
         { day: 60, xp: 500, emoji: "👑", claimed: false },
       ],
 
-      setSettings: (s) => set((state) => ({ settings: { ...state.settings, ...s } })),
+      setSettings: (s) => set((state) => {
+        // If trying to set a higher level, check if allowed
+        if (s.level) {
+          const ORDER = ["A1","A2","B1","B2","C1","C2"];
+          const idx = ORDER.indexOf(s.level);
+          if (idx > 0) {
+            const prevLevel = ORDER[idx - 1];
+            const results = state.examResults ?? {};
+            if (!(results as any)[prevLevel]?.passed) {
+              // Block — keep current level
+              const { level, ...rest } = s;
+              return { settings: { ...state.settings, ...rest } };
+            }
+          }
+        }
+        return { settings: { ...state.settings, ...s } };
+      }),
       addMessage: (m) => set((state) => ({ messages: [...state.messages, m] })),
       updateMessage: (id, updates) => set((state) => ({
         messages: state.messages.map(m => m.id === id ? { ...m, ...updates } : m)
@@ -467,6 +485,33 @@ export const useAppStore = create<AppStore>()(
         examResults: { ...state.examResults, [level]: result },
         totalXp: result.passed ? state.totalXp + 200 : state.totalXp,
       })),
+      getUnlockedLevel: () => {
+        const ORDER = ["A1","A2","B1","B2","C1","C2"];
+        const s = get();
+        const results = s.examResults ?? {};
+        // Find highest passed level
+        let highest = "A1";
+        for (const lv of ORDER) {
+          if ((results as any)[lv]?.passed) highest = lv;
+          else break;
+        }
+        // Next unlocked = one above highest passed, or A1 if none passed
+        const idx = ORDER.indexOf(highest);
+        const passed = (results as any)[highest]?.passed;
+        if (passed && idx < ORDER.length - 1) return ORDER[idx + 1];
+        if (!passed) return "A1";
+        return highest;
+      },
+      canAccessLevel: (level: string) => {
+        const ORDER = ["A1","A2","B1","B2","C1","C2"];
+        const s = get();
+        const results = s.examResults ?? {};
+        const idx = ORDER.indexOf(level);
+        if (idx === 0) return true; // A1 always accessible
+        // Can access if previous level is passed
+        const prevLevel = ORDER[idx - 1];
+        return !!(results as any)[prevLevel]?.passed;
+      },
     }),
     { name: "ai-lang-store-v2" }
   )
