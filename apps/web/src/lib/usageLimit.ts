@@ -5,8 +5,9 @@ export const FREE_LIMITS = {
   homework: 5,       // bài tập AI/ngày
   translate: 20,     // lần dịch/ngày
   solve: 80,         // giải bài tập/ngày
-  generateLesson: 3, // tạo bài học/ngày
+  generateLesson: 20, // tạo bài học/ngày
   grammar: 10,       // kiểm tra ngữ pháp/ngày
+  lesson: 20,        // tạo bài học (lessons page)/ngày
 };
 
 export type LimitKey = keyof typeof FREE_LIMITS;
@@ -15,8 +16,21 @@ function todayStr() {
   return new Date().toISOString().slice(0, 10);
 }
 
+function getUserId(): string {
+  if (typeof window === "undefined") return "anon";
+  try {
+    const auth = localStorage.getItem("lingua-auth");
+    if (auth) {
+      const parsed = JSON.parse(auth);
+      return parsed?.state?.user?.id ?? "anon";
+    }
+  } catch {}
+  return "anon";
+}
+
 function storageKey(feature: LimitKey) {
-  return `lingua_usage_${feature}`;
+  const uid = getUserId();
+  return `lingua_usage_${uid}_${feature}`;
 }
 
 export function getUsageCount(feature: LimitKey): number {

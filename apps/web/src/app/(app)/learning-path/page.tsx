@@ -7,6 +7,7 @@ import { Loader2, Sparkles, ChevronRight, CheckCircle2, RotateCcw, BookOpen, Mic
 import { speakText } from "@/components/VoiceButton";
 import { cn } from "@/lib/utils";
 import { LEVELS } from "@ai-lang/shared";
+import { canUseFeature, getRemainingUses, incrementUsage, FREE_LIMITS } from "@/lib/usageLimit";
 
 const GOALS = [
   { id: "travel", label: "Du lịch", emoji: "✈️", desc: "Giao tiếp khi đi du lịch" },
@@ -88,6 +89,10 @@ export default function LearningPathPage() {
   };
 
   const generate = async () => {
+    if (!isPremium && !canUseFeature("lesson", isPremium)) {
+      alert(`Đã dùng hết ${FREE_LIMITS.lesson} lần tạo lộ trình hôm nay. Nâng cấp VIP để dùng không giới hạn!`);
+      return;
+    }
     setStep("generating");
     const goal = GOALS.find(g => g.id === selectedGoal);
     try {
@@ -103,6 +108,7 @@ export default function LearningPathPage() {
         }),
       });
       const data = await res.json();
+      if (!isPremium) incrementUsage("lesson");
       setLearningPath({ ...data, goal: goal?.label ?? selectedGoal, level: selectedLevel, createdAt: new Date().toISOString() });
       setStep("path");
     } catch {
@@ -236,6 +242,11 @@ export default function LearningPathPage() {
           className="w-full py-4 rounded-2xl bg-primary-600 hover:bg-primary-500 text-white font-bold text-base flex items-center justify-center gap-2 transition-colors">
           <Sparkles className="w-5 h-5" /> Tạo lộ trình của tôi
         </button>
+        {!isPremium && (
+          <p className="text-center text-xs text-gray-600">
+            Còn {getRemainingUses("lesson", isPremium)}/{FREE_LIMITS.lesson} lần hôm nay
+          </p>
+        )}
       </div>
     </div>
   );

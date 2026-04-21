@@ -7,6 +7,7 @@ import { Loader2, BookOpen, ChevronDown, ChevronUp, Plus, Volume2, Star, Zap, Ta
 import { cn } from "@/lib/utils";
 import { speakText } from "@/components/VoiceButton";
 import PremiumGate from "@/components/PremiumGate";
+import { canUseFeature, getRemainingUses, incrementUsage, FREE_LIMITS } from "@/lib/usageLimit";
 
 interface Vocab { word: string; translation: string; example: string; pronunciation?: string; romanization?: string; }
 interface DialogueLine { speaker: string; text: string; translation: string; }
@@ -41,6 +42,7 @@ type Tab = "vocab" | "grammar" | "dialogue" | "exercises";
 export default function LessonsPage() {
   const { settings, addFlashcard, incrementLessons, checkAchievements } = useAppStore();
   const { user } = useAuthStore();
+  const isPremium = user?.isPremium ?? false;
   const [selectedTopic, setSelectedTopic] = useState(LESSON_TOPICS[0]);
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [loading, setLoading] = useState(false);
@@ -50,6 +52,10 @@ export default function LessonsPage() {
   const [completed, setCompleted] = useState(false);
 
   const generate = async () => {
+    if (!isPremium && !canUseFeature("lesson", isPremium)) {
+      alert(`Đã dùng hết ${FREE_LIMITS.lesson} lần/ngày. Nâng cấp VIP để dùng không giới hạn!`);
+      return;
+    }
     setLoading(true);
     setLesson(null);
     setShowAnswers({});
@@ -68,6 +74,7 @@ export default function LessonsPage() {
         }),
       });
       const data = await res.json();
+      if (!isPremium) incrementUsage("lesson");
       setLesson(data);
     } finally {
       setLoading(false);
@@ -117,13 +124,18 @@ export default function LessonsPage() {
 
       {/* Generate button */}
       <button onClick={generate} disabled={loading}
-        className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold text-white transition-all disabled:opacity-50 mb-5"
+        className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold text-white transition-all disabled:opacity-50 mb-2"
         style={{ background: `linear-gradient(135deg, ${selectedTopic.color}, ${selectedTopic.color}cc)` }}>
         {loading
           ? <><Loader2 className="w-4 h-4 animate-spin" /> AI đang tạo bài học...</>
           : <><Zap className="w-4 h-4" /> Tạo bài học: {selectedTopic.emoji} {selectedTopic.label}</>
         }
       </button>
+      {!isPremium && (
+        <p className="text-center text-xs text-gray-600 mb-4">
+          Còn {getRemainingUses("lesson", isPremium)}/{FREE_LIMITS.lesson} lần hôm nay
+        </p>
+      )}
 
       {/* Loading state */}
       {loading && (
