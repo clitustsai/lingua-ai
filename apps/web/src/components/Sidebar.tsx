@@ -5,7 +5,7 @@ import { useState } from "react";
 import {
   MessageCircle, BookOpen, Settings, Brain, Flame,
   GraduationCap, CheckSquare, History, LayoutDashboard,
-  Languages, BookMarked, Headphones, Mic2, RotateCcw,
+  Languages, BookMarked, Headphones, Mic2, RotateCcw, BookType,
   Compass, Youtube, Sparkles, Camera, TrendingUp, Bookmark, Share2, Phone, Users, Wand2, Globe, Target, Video, DollarSign, Banknote, Heart, Crown, Gamepad2, Star, PenLine, Trophy, Award, Zap, ChevronRight, Bell,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -33,6 +33,7 @@ const NAV_GROUPS = (tr: any) => [
       { href: "/flashcards",    icon: BookOpen,        label: tr.flashcards },
       { href: "/review",        icon: RotateCcw,       label: tr.review, badge: true },
       { href: "/pronunciation", icon: Mic2,            label: tr.pronunciation },
+      { href: "/alphabet",      icon: BookType,        label: "Chữ cái" },
       { href: "/listening",     icon: Headphones,      label: tr.listening },
       { href: "/reading",       icon: BookMarked,      label: tr.reading },
       { href: "/writing",       icon: PenLine,         label: tr.writing },
