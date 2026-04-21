@@ -1,8 +1,11 @@
 "use client";
 import { useState } from "react";
-import { Volume2, X, ChevronRight } from "lucide-react";
+import { Volume2, X, ChevronRight, Crown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/useAppStore";
+import { useAuthStore } from "@/store/useAuthStore";
+import { useRouter } from "next/navigation";
+import { canUseFeature, getRemainingUses, incrementUsage, FREE_LIMITS } from "@/lib/usageLimit";
 
 const VOWELS = [
   { symbol: "ɑ",  example: "hot",   audio: "hot" },
@@ -59,6 +62,9 @@ function buildQuiz(sound: Sound, allSounds: Sound[]) {
 
 export default function AlphabetPage() {
   const { incrementWords, checkAchievements } = useAppStore();
+  const { user } = useAuthStore();
+  const router = useRouter();
+  const isPremium = user?.isPremium ?? false;
   const allSounds = [...VOWELS, ...CONSONANTS];
 
   const [quiz, setQuiz] = useState<{ sound: Sound; options: Sound[] } | null>(null);
@@ -77,6 +83,11 @@ export default function AlphabetPage() {
   };
 
   const startSession = () => {
+    if (!isPremium && !canUseFeature("alphabet", isPremium)) {
+      router.push("/premium");
+      return;
+    }
+    if (!isPremium) incrementUsage("alphabet");
     const shuffled = [...allSounds].sort(() => Math.random() - 0.5).slice(0, 10);
     setQuizQueue(shuffled);
     setQuizIdx(0);
@@ -201,6 +212,16 @@ export default function AlphabetPage() {
           style={{ background: "#38bdf8", boxShadow: "0 4px 0 #0284c7" }}>
           BẮT ĐẦU +10 KN
         </button>
+        {!isPremium && (
+          <p className="text-xs text-gray-600 mt-2">
+            Còn {getRemainingUses("alphabet", isPremium)}/{FREE_LIMITS.alphabet} lần hôm nay
+            {getRemainingUses("alphabet", isPremium) === 0 && (
+              <button onClick={() => router.push("/premium")} className="ml-1 text-yellow-500 underline inline-flex items-center gap-0.5">
+                <Crown className="w-3 h-3" /> Nâng cấp VIP
+              </button>
+            )}
+          </p>
+        )}
       </div>
 
       <div className="mb-6">

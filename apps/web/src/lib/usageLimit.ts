@@ -8,6 +8,7 @@ export const FREE_LIMITS = {
   generateLesson: 20, // tạo bài học/ngày
   grammar: 10,       // kiểm tra ngữ pháp/ngày
   lesson: 20,        // tạo bài học (lessons page)/ngày
+  alphabet: 4,       // luyện chữ cái/ngày
 };
 
 export type LimitKey = keyof typeof FREE_LIMITS;
