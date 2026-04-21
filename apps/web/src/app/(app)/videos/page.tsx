@@ -35,7 +35,7 @@ function VideoCard({ v, locked, onClick }: {
       locked ? "border-yellow-700/40" : "border-gray-700/60")}
       style={{ background: "rgba(18,12,36,0.9)" }}>
       {/* Thumbnail */}
-      <div className="relative overflow-hidden bg-gray-900" style={{ aspectRatio: "16/9" }} onClick={onClick}>
+      <div className="relative w-full aspect-video overflow-hidden bg-gray-900" onClick={onClick}>
         {isAudio ? (
           <div className="absolute inset-0 flex items-center justify-center"
             style={{ background: "linear-gradient(135deg,#1e3a5f,#0f2040)" }}>
