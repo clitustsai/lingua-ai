@@ -1,9 +1,12 @@
-"use client";
+﻿"use client";
 import { useState } from "react";
 import { useAppStore } from "@/store/useAppStore";
+import { useAuthStore } from "@/store/useAuthStore";
+import { useRouter } from "next/navigation";
 import { Sparkles, Loader2, Volume2, Copy, Check, BookOpen, Mic, ChevronDown, ChevronUp, Plus } from "lucide-react";
 import { speakText } from "@/components/VoiceButton";
 import { cn } from "@/lib/utils";
+import { canUseFeature, getRemainingUses, incrementUsage, FREE_LIMITS } from "@/lib/usageLimit";
 
 const QUICK_TOPICS = [
   { label: "IELTS Speaking Part 1", emoji: "🎤" },
@@ -22,6 +25,9 @@ const QUICK_TOPICS = [
 
 export default function GenerateLessonPage() {
   const { settings, addFlashcard } = useAppStore();
+  const { user } = useAuthStore();
+  const router = useRouter();
+  const isPremium = user?.isPremium ?? false;
   const [topic, setTopic] = useState("");
   const [loading, setLoading] = useState(false);
   const [lesson, setLesson] = useState<any>(null);
@@ -32,6 +38,10 @@ export default function GenerateLessonPage() {
   const generate = async (t?: string) => {
     const finalTopic = t ?? topic.trim();
     if (!finalTopic) return;
+    if (!isPremium && !canUseFeature("generateLesson", isPremium)) {
+      setError(`Đã dùng hết ${FREE_LIMITS.generateLesson} lần/ngày. Nâng cấp VIP để dùng không giới hạn!`);
+      return;
+    }
     setTopic(finalTopic);
     setLoading(true);
     setLesson(null);
@@ -52,6 +62,7 @@ export default function GenerateLessonPage() {
         setError("AI không tạo được bài học. Thử lại nhé!");
         return;
       }
+      if (!isPremium) incrementUsage("generateLesson");
       setLesson(data);
     } catch {
       setError("Lỗi kết nối. Vui lòng thử lại!");
@@ -89,6 +100,14 @@ export default function GenerateLessonPage() {
           style={{ background: "linear-gradient(135deg,#7c3aed,#6366f1)" }}>
           {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Đang tạo bài học...</> : <><Sparkles className="w-4 h-4" /> Tạo bài học</>}
         </button>
+        {!isPremium && (
+          <p className="text-center text-xs text-gray-600 mt-2">
+            Còn {getRemainingUses("generateLesson", isPremium)}/{FREE_LIMITS.generateLesson} lần hôm nay
+            {getRemainingUses("generateLesson", isPremium) === 0 && (
+              <button onClick={() => router.push("/premium")} className="ml-1 text-yellow-500 underline">Nâng cấp VIP</button>
+            )}
+          </p>
+        )}
       </div>
 
       {/* Quick topics */}

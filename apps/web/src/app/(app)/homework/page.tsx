@@ -1,10 +1,13 @@
 ﻿"use client";
 import { useState, useEffect, useRef } from "react";
 import { useAppStore } from "@/store/useAppStore";
-import { GraduationCap, CheckCircle2, XCircle, Star, RefreshCw, ChevronRight, Timer, Volume2 } from "lucide-react";
+import { useAuthStore } from "@/store/useAuthStore";
+import { useRouter } from "next/navigation";
+import { GraduationCap, CheckCircle2, XCircle, Star, RefreshCw, ChevronRight, Timer, Volume2, Crown, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import AIErrorToast from "@/components/AIErrorToast";
 import { speakText } from "@/components/VoiceButton";
+import { canUseFeature, getRemainingUses, incrementUsage, FREE_LIMITS } from "@/lib/usageLimit";
 
 type Exercise = {
   id: string; type: string; instruction: string; question: string;
@@ -58,6 +61,9 @@ const GRADE_COLORS: Record<string, string> = {
 
 export default function HomeworkPage() {
   const { settings, tutorMemory, incrementWords, checkAchievements } = useAppStore();
+  const { user } = useAuthStore();
+  const router = useRouter();
+  const isPremium = user?.isPremium ?? false;
   const [homework, setHomework] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -86,6 +92,10 @@ export default function HomeworkPage() {
   const fmt = (s: number) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
 
   const generate = async () => {
+    if (!isPremium && !canUseFeature("homework", isPremium)) {
+      setError(`Đã dùng hết ${FREE_LIMITS.homework} lần/ngày. Nâng cấp VIP để dùng không giới hạn!`);
+      return;
+    }
     setLoading(true); setHomework(null); setAnswers({}); setGradeResult(null);
     setElapsed(0); setTimerActive(false); setShowHints({}); setError(null);
     try {
@@ -110,6 +120,7 @@ export default function HomeworkPage() {
         return;
       }
       setHomework(data);
+      if (!isPremium) incrementUsage("homework");
       setTimerActive(true);
     } catch (e: any) {
       const msg = String(e?.message ?? "");
@@ -246,6 +257,14 @@ export default function HomeworkPage() {
             style={{ background: "linear-gradient(135deg,#ca8a04,#d97706)", boxShadow: "0 4px 20px rgba(202,138,4,0.3)" }}>
             <GraduationCap className="w-5 h-5" /> Nhận bài tập hôm nay
           </button>
+          {!isPremium && (
+            <p className="text-center text-xs text-gray-600 mt-1">
+              Còn {getRemainingUses("homework", isPremium)}/{FREE_LIMITS.homework} lần hôm nay
+              {getRemainingUses("homework", isPremium) === 0 && (
+                <button onClick={() => router.push("/premium")} className="ml-1 text-yellow-500 underline">Nâng cấp VIP</button>
+              )}
+            </p>
+          )}
         </div>
       )}
 
