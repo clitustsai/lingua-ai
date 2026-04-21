@@ -1,14 +1,15 @@
 // Centralized daily usage limits for free vs premium users
 
 export const FREE_LIMITS = {
-  chat: 30,          // tin nhắn chat/ngày
-  homework: 5,       // bài tập AI/ngày
-  translate: 20,     // lần dịch/ngày
-  solve: 80,         // giải bài tập/ngày
-  generateLesson: 20, // tạo bài học/ngày
-  grammar: 10,       // kiểm tra ngữ pháp/ngày
-  lesson: 20,        // tạo bài học (lessons page)/ngày
+  chat: 4,           // tin nhắn chat/ngày
+  homework: 4,       // bài tập AI/ngày
+  translate: 4,      // lần dịch/ngày
+  solve: 4,          // giải bài tập/ngày
+  generateLesson: 4, // tạo bài học/ngày
+  grammar: 4,        // kiểm tra ngữ pháp/ngày
+  lesson: 4,         // tạo bài học (lessons page)/ngày
   alphabet: 4,       // luyện chữ cái/ngày
+  reading: 4,        // đọc hiểu/ngày
 };
 
 export type LimitKey = keyof typeof FREE_LIMITS;

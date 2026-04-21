@@ -1,10 +1,13 @@
 ﻿"use client";
 import { useState } from "react";
 import { useAppStore } from "@/store/useAppStore";
+import { useAuthStore } from "@/store/useAuthStore";
+import { useRouter } from "next/navigation";
 import { Loader2, BookOpen, Volume2, Plus, Eye, EyeOff, Sparkles, RefreshCw, Bookmark, BookmarkCheck, CheckCircle2 } from "lucide-react";
 import { speakText } from "@/components/VoiceButton";
 import { cn } from "@/lib/utils";
 import { TOPIC_SUGGESTIONS } from "@/lib/readingLessons";
+import { canUseFeature, getRemainingUses, incrementUsage, FREE_LIMITS } from "@/lib/usageLimit";
 
 const LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"] as const;
 type Level = typeof LEVELS[number];
@@ -22,6 +25,9 @@ const OPT_LABELS = ["A", "B", "C", "D"];
 
 export default function ReadingPage() {
   const { settings, addFlashcard, incrementLessons, checkAchievements, canAccessLevel } = useAppStore() as any;
+  const { user } = useAuthStore();
+  const router = useRouter();
+  const isPremium = user?.isPremium ?? false;
   const [level, setLevel] = useState<Level>((settings.level as Level) || "A1");
   const [customTopic, setCustomTopic] = useState("");
   const [selectedTopic, setSelectedTopic] = useState("");
@@ -36,6 +42,9 @@ export default function ReadingPage() {
   const suggestions = TOPIC_SUGGESTIONS[level] ?? TOPIC_SUGGESTIONS.A1;
 
   const generate = async (topicOverride?: string) => {
+    if (!isPremium && !canUseFeature("reading", isPremium)) {
+      router.push("/premium"); return;
+    }
     const topic = topicOverride ?? customTopic ?? selectedTopic ?? suggestions[0].topic;
     setLoading(true); setData(null); setShowTranslation(false);
     setAnswers({}); setChecked(false); setBookmarked(new Set()); setCompleted(false);
@@ -45,6 +54,7 @@ export default function ReadingPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ topic, targetLanguage: settings.targetLanguage.name, nativeLanguage: settings.nativeLanguage.name, level }),
       });
+      if (!isPremium) incrementUsage("reading");
       setData(await res.json());
     } catch {
       setData({ error: "Không thể tạo bài. Thử lại nhé!" });
@@ -112,6 +122,14 @@ export default function ReadingPage() {
           {loading ? "Đang tạo..." : "Tạo bài"}
         </button>
       </div>
+      {!isPremium && (
+        <p className="text-xs text-gray-600 mb-3">
+          Còn {getRemainingUses("reading", isPremium)}/{FREE_LIMITS.reading} lần hôm nay
+          {getRemainingUses("reading", isPremium) === 0 && (
+            <button onClick={() => router.push("/premium")} className="ml-1 text-yellow-500 underline">Nâng cấp VIP</button>
+          )}
+        </p>
+      )}
 
       {loading && (
         <div className="flex flex-col items-center py-16 gap-3">

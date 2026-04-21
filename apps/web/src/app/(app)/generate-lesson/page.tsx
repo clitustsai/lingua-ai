@@ -39,8 +39,7 @@ export default function GenerateLessonPage() {
     const finalTopic = t ?? topic.trim();
     if (!finalTopic) return;
     if (!isPremium && !canUseFeature("generateLesson", isPremium)) {
-      setError(`Đã dùng hết ${FREE_LIMITS.generateLesson} lần/ngày. Nâng cấp VIP để dùng không giới hạn!`);
-      return;
+      router.push("/premium"); return;
     }
     setTopic(finalTopic);
     setLoading(true);

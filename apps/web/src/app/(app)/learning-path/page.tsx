@@ -90,8 +90,7 @@ export default function LearningPathPage() {
 
   const generate = async () => {
     if (!isPremium && !canUseFeature("lesson", isPremium)) {
-      alert(`Đã dùng hết ${FREE_LIMITS.lesson} lần tạo lộ trình hôm nay. Nâng cấp VIP để dùng không giới hạn!`);
-      return;
+      router.push("/premium"); return;
     }
     setStep("generating");
     const goal = GOALS.find(g => g.id === selectedGoal);

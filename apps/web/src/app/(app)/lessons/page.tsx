@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useAppStore } from "@/store/useAppStore";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useRouter } from "next/navigation";
 import { CONVERSATION_TOPICS } from "@ai-lang/shared";
 import { Loader2, BookOpen, ChevronDown, ChevronUp, Plus, Volume2, Star, Zap, Target } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -44,6 +45,7 @@ type Tab = "vocab" | "grammar" | "dialogue" | "exercises" | "reading";
 export default function LessonsPage() {
   const { settings, addFlashcard, incrementLessons, checkAchievements } = useAppStore();
   const { user } = useAuthStore();
+  const router = useRouter();
   const isPremium = user?.isPremium ?? false;
   const [selectedTopic, setSelectedTopic] = useState(LESSON_TOPICS[0]);
   const [lesson, setLesson] = useState<Lesson | null>(null);
@@ -57,8 +59,7 @@ export default function LessonsPage() {
 
   const generate = async () => {
     if (!isPremium && !canUseFeature("lesson", isPremium)) {
-      alert(`Đã dùng hết ${FREE_LIMITS.lesson} lần/ngày. Nâng cấp VIP để dùng không giới hạn!`);
-      return;
+      router.push("/premium"); return;
     }
     setLoading(true);
     setLesson(null);
@@ -141,6 +142,9 @@ export default function LessonsPage() {
       {!isPremium && (
         <p className="text-center text-xs text-gray-600 mb-4">
           Còn {getRemainingUses("lesson", isPremium)}/{FREE_LIMITS.lesson} lần hôm nay
+          {getRemainingUses("lesson", isPremium) === 0 && (
+            <button onClick={() => router.push("/premium")} className="ml-1 text-yellow-500 underline">Nâng cấp VIP</button>
+          )}
         </p>
       )}
 

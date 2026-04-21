@@ -16,7 +16,9 @@ const ROWS = [
   { feature: "Dịch thuật", free: FREE_LIMITS.translate + " lần/ngày", vip: "Không giới hạn", hi: true },
   { feature: "AI Teacher", free: FREE_LIMITS.homework + " bài/ngày", vip: "Không giới hạn", hi: true },
   { feature: "Tạo bài học AI", free: FREE_LIMITS.generateLesson + " lần/ngày", vip: "Không giới hạn", hi: true },
+  { feature: "Đọc hiểu", free: FREE_LIMITS.reading + " lần/ngày", vip: "Không giới hạn", hi: true },
   { feature: "Giải bài tập", free: FREE_LIMITS.solve + " lần/ngày", vip: "Không giới hạn", hi: false },
+  { feature: "Chữ cái IPA", free: FREE_LIMITS.alphabet + " lần/ngày", vip: "Không giới hạn", hi: false },
   { feature: "Voice", free: "Có giới hạn", vip: "Liên tục", hi: false },
   { feature: "Khóa học", free: "1 khóa miễn phí", vip: "Tất cả", hi: false },
 ];
