@@ -46,35 +46,34 @@ export default function SettingsPage() {
 
         {/* ── PROFILE ── */}
         {user && (
-          <div className="rounded-2xl p-4" style={{ background: "rgba(26,16,53,0.8)", border: "1px solid rgba(139,92,246,0.25)" }}>
-            <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-3">Hồ sơ</p>
+          <div className="rounded-2xl overflow-hidden" style={{ background: "rgba(26,16,53,0.8)", border: "1px solid rgba(139,92,246,0.25)" }}>
+            <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide px-4 pt-4 pb-3">Hồ sơ</p>
 
-            {/* Avatar picker */}
-            <div className="flex items-center gap-4 mb-4">
-              <div className="relative">
-                <div className="w-16 h-16 rounded-2xl bg-primary-600/30 flex items-center justify-center overflow-hidden cursor-pointer hover:opacity-80 transition-opacity"
+            {/* Avatar + info row */}
+            <div className="flex items-center gap-4 px-4 pb-4 border-b border-white/5">
+              <div className="relative shrink-0">
+                <div className="w-16 h-16 rounded-2xl bg-primary-600/40 flex items-center justify-center overflow-hidden cursor-pointer hover:opacity-80 transition-opacity"
                   style={{ border: "1px solid rgba(139,92,246,0.4)" }}
                   onClick={() => setShowAvatarPicker(!showAvatarPicker)}>
                   {isAvatarUrl
                     ? <img src={user.avatar} alt="avatar" className="w-full h-full object-cover" />
-                    : <span className="text-4xl">{user.avatar}</span>
+                    : <span className="text-4xl">{user.avatar || user.name?.[0]?.toUpperCase()}</span>
                   }
                 </div>
-                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-primary-600 rounded-full flex items-center justify-center cursor-pointer"
+                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center cursor-pointer shadow-lg"
                   onClick={() => setShowAvatarPicker(!showAvatarPicker)}>
                   <Camera className="w-3 h-3 text-white" />
                 </div>
               </div>
-              <div className="flex-1">
-                <p className="text-white font-semibold">{user.name}</p>
-                {user.nickname && <p className="text-primary-400 text-sm">@{user.nickname}</p>}
-                <p className="text-gray-500 text-xs">{user.email}</p>
+              <div className="flex-1 min-w-0">
+                <p className="text-white font-bold text-base truncate">{user.name}</p>
+                <p className="text-gray-500 text-xs truncate">{user.email}</p>
               </div>
             </div>
 
             {/* Avatar grid */}
             {showAvatarPicker && (
-              <div className="grid grid-cols-11 gap-1.5 mb-4 p-3 rounded-xl" style={{ background: "rgba(15,10,30,0.6)" }}>
+              <div className="grid grid-cols-11 gap-1.5 mx-4 my-3 p-3 rounded-xl" style={{ background: "rgba(15,10,30,0.6)" }}>
                 {AVATARS.map(a => (
                   <button key={a} onClick={() => { updateProfile({ avatar: a }); setShowAvatarPicker(false); }}
                     className={cn("text-2xl w-9 h-9 rounded-lg flex items-center justify-center transition-colors hover:bg-primary-600/30",
@@ -85,49 +84,45 @@ export default function SettingsPage() {
               </div>
             )}
 
-            {/* Name */}
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-xs text-gray-500 w-16 shrink-0">Tên</span>
+            {/* Name row */}
+            <div className="flex items-center gap-3 px-4 py-3 border-b border-white/5">
+              <span className="text-xs text-gray-500 w-20 shrink-0">Tên</span>
               {editingName ? (
                 <div className="flex-1 flex gap-2">
                   <input value={nameVal} onChange={e => setNameVal(e.target.value)}
                     className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-primary-500"
-                    onKeyDown={e => e.key === "Enter" && saveName()}
-                    autoFocus
-                  />
-                  <button onClick={saveName} className="p-1.5 rounded-lg bg-primary-600/30 text-primary-300 hover:bg-primary-600/50"><Check className="w-3.5 h-3.5" /></button>
-                  <button onClick={() => setEditingName(false)} className="p-1.5 rounded-lg bg-gray-800 text-gray-500 hover:text-gray-300"><X className="w-3.5 h-3.5" /></button>
+                    onKeyDown={e => e.key === "Enter" && saveName()} autoFocus />
+                  <button onClick={saveName} className="p-1.5 rounded-lg bg-primary-600/30 text-primary-300"><Check className="w-3.5 h-3.5" /></button>
+                  <button onClick={() => setEditingName(false)} className="p-1.5 rounded-lg bg-gray-800 text-gray-500"><X className="w-3.5 h-3.5" /></button>
                 </div>
               ) : (
                 <div className="flex-1 flex items-center justify-between">
-                  <span className="text-white text-sm">{user.name}</span>
+                  <span className="text-white text-sm font-medium">{user.name}</span>
                   <button onClick={() => { setNameVal(user.name); setEditingName(true); }}
-                    className="p-1.5 rounded-lg text-gray-600 hover:text-gray-300 hover:bg-gray-800 transition-colors">
+                    className="p-1.5 rounded-lg text-gray-600 hover:text-gray-300 transition-colors">
                     <Pencil className="w-3.5 h-3.5" />
                   </button>
                 </div>
               )}
             </div>
 
-            {/* Nickname */}
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-500 w-16 shrink-0">Nickname</span>
+            {/* Nickname row */}
+            <div className="flex items-center gap-3 px-4 py-3">
+              <span className="text-xs text-gray-500 w-20 shrink-0">Nickname</span>
               {editingNick ? (
                 <div className="flex-1 flex gap-2">
                   <input value={nickVal} onChange={e => setNickVal(e.target.value)}
                     placeholder="@nickname"
                     className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-primary-500"
-                    onKeyDown={e => e.key === "Enter" && saveNick()}
-                    autoFocus
-                  />
-                  <button onClick={saveNick} className="p-1.5 rounded-lg bg-primary-600/30 text-primary-300 hover:bg-primary-600/50"><Check className="w-3.5 h-3.5" /></button>
-                  <button onClick={() => setEditingNick(false)} className="p-1.5 rounded-lg bg-gray-800 text-gray-500 hover:text-gray-300"><X className="w-3.5 h-3.5" /></button>
+                    onKeyDown={e => e.key === "Enter" && saveNick()} autoFocus />
+                  <button onClick={saveNick} className="p-1.5 rounded-lg bg-primary-600/30 text-primary-300"><Check className="w-3.5 h-3.5" /></button>
+                  <button onClick={() => setEditingNick(false)} className="p-1.5 rounded-lg bg-gray-800 text-gray-500"><X className="w-3.5 h-3.5" /></button>
                 </div>
               ) : (
                 <div className="flex-1 flex items-center justify-between">
                   <span className="text-sm">{user.nickname ? <span className="text-primary-400">@{user.nickname}</span> : <span className="text-gray-600">Chưa đặt</span>}</span>
                   <button onClick={() => { setNickVal(user.nickname ?? ""); setEditingNick(true); }}
-                    className="p-1.5 rounded-lg text-gray-600 hover:text-gray-300 hover:bg-gray-800 transition-colors">
+                    className="p-1.5 rounded-lg text-gray-600 hover:text-gray-300 transition-colors">
                     <Pencil className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -135,7 +130,6 @@ export default function SettingsPage() {
             </div>
           </div>
         )}
-
         {/* Stats */}
         <div className="grid grid-cols-3 gap-3">
           <div className="bg-gray-800 rounded-xl p-3 text-center">
