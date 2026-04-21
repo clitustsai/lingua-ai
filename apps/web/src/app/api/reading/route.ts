@@ -21,13 +21,13 @@ Requirements:
 - Include interesting facts, descriptions, or a short story
 - Use varied sentence structures appropriate for ${level}
 - Include at least 8-10 key vocabulary words
-- Create 5-6 comprehension questions of different types (factual, inferential, opinion)
+- Create 5-6 multiple choice comprehension questions (A/B/C/D options)
 
 IMPORTANT LANGUAGE RULES:
 - "passage" MUST be written entirely in ${targetLanguage}
 - "vocabulary.word" and "vocabulary.example" MUST be in ${targetLanguage}
-- "questions.question" MUST be written in ${targetLanguage} (the language being learned)
-- "translation", "vocabulary.translation", "questions.answer" should be in ${nativeLanguage} to help the learner understand
+- "questions.question" and "questions.options" MUST be in ${targetLanguage}
+- "translation", "vocabulary.translation", "questions.explanation" should be in ${nativeLanguage}
 
 Return JSON:
 {
@@ -38,7 +38,12 @@ Return JSON:
     {"word":"word in ${targetLanguage}","translation":"meaning in ${nativeLanguage}","example":"example sentence in ${targetLanguage}"}
   ],
   "questions": [
-    {"question":"question in ${targetLanguage}","answer":"detailed answer in ${nativeLanguage}","type":"comprehension"}
+    {
+      "question": "question in ${targetLanguage}",
+      "options": ["option A", "option B", "option C", "option D"],
+      "correct": 0,
+      "explanation": "why this answer is correct, in ${nativeLanguage}"
+    }
   ]
 }
 
