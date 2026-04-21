@@ -12,13 +12,13 @@ const PLANS = [
 ];
 
 const ROWS = [
-  { feature: " param($m) $m.Value -replace 'tin/ngay', 'tin/ngày' ", vip: "Không giới hạn", hi: true },
-  { feature: "Dịch thuật", free: FREE_LIMITS.translate + " lan/ngay", vip: "Không giới hạn", hi: true },
-  { feature: "AI Teacher", free: FREE_LIMITS.homework + " bai/ngay", vip: "Không giới hạn", hi: true },
-  { feature: "Tạo bài học AI", free: FREE_LIMITS.generateLesson + " lan/ngay", vip: "Không giới hạn", hi: true },
-  { feature: "Giải bài tập", free: FREE_LIMITS.solve + " lan/ngay", vip: "Không giới hạn", hi: false },
-  { feature: "Voice", free: "Co gioi han", vip: "Liên tục", hi: false },
-  { feature: "Khóa học", free: "1 khoa Miễn phí", vip: "Tất cả", hi: false },
+  { feature: "Chat AI", vip: "Không giới hạn", hi: true },
+  { feature: "Dịch thuật", free: FREE_LIMITS.translate + " lần/ngày", vip: "Không giới hạn", hi: true },
+  { feature: "AI Teacher", free: FREE_LIMITS.homework + " bài/ngày", vip: "Không giới hạn", hi: true },
+  { feature: "Tạo bài học AI", free: FREE_LIMITS.generateLesson + " lần/ngày", vip: "Không giới hạn", hi: true },
+  { feature: "Giải bài tập", free: FREE_LIMITS.solve + " lần/ngày", vip: "Không giới hạn", hi: false },
+  { feature: "Voice", free: "Có giới hạn", vip: "Liên tục", hi: false },
+  { feature: "Khóa học", free: "1 khóa miễn phí", vip: "Tất cả", hi: false },
 ];
 
 export default function PremiumPage() {
@@ -55,7 +55,7 @@ export default function PremiumPage() {
     <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center gap-5">
       <Crown className="w-16 h-16 text-yellow-400" />
       <h2 className="text-white font-black text-2xl">Bạn đang dùng VIP</h2>
-      <p className="text-gray-400 text-sm">Tan huong Không giới hạn luot dung AI!</p>
+      <p className="text-gray-400 text-sm">Tận hưởng không giới hạn lượt dùng AI!</p>
     </div>
   );
 
