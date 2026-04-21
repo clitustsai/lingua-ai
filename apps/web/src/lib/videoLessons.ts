@@ -1,104 +1,151 @@
 ﻿export type VideoLesson = {
   id: string; youtubeId: string; title: string; teacher: string;
   country: string; flag: string; topic: string;
-  category: "grammar"|"conversation"|"vocabulary"|"pronunciation"|"listening";
-  level: string; durationSec: number; tags: string[]; language: string;
+  category: string;
+  level: string; durationSec: number; views: number; tags: string[]; language: string;
+  isPro?: boolean;
 };
 
-// English videos - Grammar Monster channel
-const EN: VideoLesson[] = [
-  { id:"v1",  language:"English", youtubeId:"2wlKKsA1HMQ", title:"Parts of Speech",          teacher:"Grammar Monster", country:"UK", flag:"GB", topic:"9 parts of speech",         category:"grammar",       level:"A1-B1", durationSec:480, tags:["grammar","beginner"] },
-  { id:"v2",  language:"English", youtubeId:"q9aFVmzRgLg", title:"Nouns: Types and Usage",    teacher:"Grammar Monster", country:"UK", flag:"GB", topic:"Types of nouns",             category:"grammar",       level:"A1-A2", durationSec:360, tags:["nouns","grammar"] },
-  { id:"v3",  language:"English", youtubeId:"-lfdDD9lpds", title:"Verbs: Action & Linking",   teacher:"Grammar Monster", country:"UK", flag:"GB", topic:"Types of verbs",             category:"grammar",       level:"A1-B1", durationSec:420, tags:["verbs","grammar"] },
-  { id:"v4",  language:"English", youtubeId:"ssHY3f7FOJM", title:"Adjectives Explained",      teacher:"Grammar Monster", country:"UK", flag:"GB", topic:"Using adjectives",           category:"grammar",       level:"A1-A2", durationSec:390, tags:["adjectives","grammar"] },
-  { id:"v5",  language:"English", youtubeId:"o-LbqRag28c", title:"Adverbs Explained",         teacher:"Grammar Monster", country:"UK", flag:"GB", topic:"How adverbs work",           category:"grammar",       level:"A2-B1", durationSec:400, tags:["adverbs","grammar"] },
-  { id:"v6",  language:"English", youtubeId:"PkiyAulrfCo", title:"Pronouns All Types",        teacher:"Grammar Monster", country:"UK", flag:"GB", topic:"All pronoun types",          category:"grammar",       level:"A1-B1", durationSec:450, tags:["pronouns","grammar"] },
-  { id:"v7",  language:"English", youtubeId:"nIJK_lUYUS0", title:"Prepositions: In On At",    teacher:"Grammar Monster", country:"UK", flag:"GB", topic:"Common prepositions",        category:"grammar",       level:"A1-A2", durationSec:380, tags:["prepositions","grammar"] },
-  { id:"v8",  language:"English", youtubeId:"5sQlZNhP5OU", title:"Conjunctions",              teacher:"Grammar Monster", country:"UK", flag:"GB", topic:"Joining words",              category:"grammar",       level:"A2-B1", durationSec:360, tags:["conjunctions","grammar"] },
-  { id:"v9",  language:"English", youtubeId:"XMf1OkdruEY", title:"Present Simple Tense",      teacher:"Grammar Monster", country:"UK", flag:"GB", topic:"Present simple",             category:"grammar",       level:"A1",    durationSec:420, tags:["tenses","grammar"] },
-  { id:"v10", language:"English", youtubeId:"BNSoDln1FQ8", title:"Present Continuous Tense",  teacher:"Grammar Monster", country:"UK", flag:"GB", topic:"Present continuous",         category:"grammar",       level:"A1-A2", durationSec:390, tags:["tenses","grammar"] },
-  { id:"v11", language:"English", youtubeId:"odDSbWHUGYk", title:"Past Simple Tense",         teacher:"Grammar Monster", country:"UK", flag:"GB", topic:"Past simple",                category:"grammar",       level:"A1-A2", durationSec:440, tags:["tenses","grammar"] },
-  { id:"v12", language:"English", youtubeId:"QJC5dd1ODBQ", title:"Past Continuous Tense",     teacher:"Grammar Monster", country:"UK", flag:"GB", topic:"Past continuous",            category:"grammar",       level:"A2-B1", durationSec:380, tags:["tenses","grammar"] },
-  { id:"v13", language:"English", youtubeId:"ud2wlMNmhVE", title:"Future: Will vs Going To",  teacher:"Grammar Monster", country:"UK", flag:"GB", topic:"Future tense",               category:"grammar",       level:"A2-B1", durationSec:420, tags:["future","grammar"] },
-  { id:"v14", language:"English", youtubeId:"EeNL95YOlmE", title:"Present Perfect Tense",     teacher:"Grammar Monster", country:"UK", flag:"GB", topic:"Present perfect",            category:"grammar",       level:"B1",    durationSec:460, tags:["tenses","grammar"] },
-  { id:"v15", language:"English", youtubeId:"6jexvI0-uTU", title:"Passive Voice",             teacher:"Grammar Monster", country:"UK", flag:"GB", topic:"Active vs passive",          category:"grammar",       level:"B1-B2", durationSec:400, tags:["passive","grammar"] },
-  { id:"v16", language:"English", youtubeId:"I28MDrOMxNM", title:"Vocabulary A1 Basics",      teacher:"Grammar Monster", country:"UK", flag:"GB", topic:"Beginner vocabulary",        category:"vocabulary",    level:"A1",    durationSec:480, tags:["vocabulary","beginner"] },
-  { id:"v17", language:"English", youtubeId:"BK9vaLQ1Lgo", title:"Describing People",         teacher:"Grammar Monster", country:"UK", flag:"GB", topic:"Appearance vocabulary",      category:"vocabulary",    level:"A2",    durationSec:420, tags:["vocabulary","people"] },
-  { id:"v18", language:"English", youtubeId:"SiVe_3dWZ48", title:"Food and Cooking Vocab",    teacher:"Grammar Monster", country:"UK", flag:"GB", topic:"Food vocabulary",            category:"vocabulary",    level:"A1-A2", durationSec:390, tags:["vocabulary","food"] },
-  { id:"v19", language:"English", youtubeId:"oXh6HJRl-Wc", title:"Travel and Transport",      teacher:"Grammar Monster", country:"UK", flag:"GB", topic:"Travel vocabulary",          category:"vocabulary",    level:"A2-B1", durationSec:440, tags:["vocabulary","travel"] },
-  { id:"v20", language:"English", youtubeId:"x-e6XDQu2Ds", title:"Work and Jobs Vocab",       teacher:"Grammar Monster", country:"UK", flag:"GB", topic:"Workplace vocabulary",       category:"vocabulary",    level:"B1",    durationSec:460, tags:["vocabulary","work"] },
-  { id:"v21", language:"English", youtubeId:"39TX3uXhkw4", title:"Health and Body Vocab",     teacher:"Grammar Monster", country:"UK", flag:"GB", topic:"Medical vocabulary",         category:"vocabulary",    level:"A2-B1", durationSec:400, tags:["vocabulary","health"] },
-  { id:"v22", language:"English", youtubeId:"dNE_DqegeuI", title:"Pronunciation Basics",      teacher:"Grammar Monster", country:"UK", flag:"GB", topic:"Key pronunciation rules",    category:"pronunciation", level:"A1-B1", durationSec:450, tags:["pronunciation","sounds"] },
-  { id:"v23", language:"English", youtubeId:"wQtfXWVy_m0", title:"Vowel Sounds",              teacher:"Grammar Monster", country:"UK", flag:"GB", topic:"Long and short vowels",      category:"pronunciation", level:"A1-A2", durationSec:380, tags:["vowels","pronunciation"] },
-  { id:"v24", language:"English", youtubeId:"IrcF51yp-tE", title:"Consonant Sounds",          teacher:"Grammar Monster", country:"UK", flag:"GB", topic:"Tricky consonants",          category:"pronunciation", level:"A1-B1", durationSec:360, tags:["consonants","pronunciation"] },
-  { id:"v25", language:"English", youtubeId:"K1sp_Y9Fw2M", title:"Word Stress",               teacher:"Grammar Monster", country:"UK", flag:"GB", topic:"Stress and intonation",      category:"pronunciation", level:"B1-B2", durationSec:420, tags:["stress","pronunciation"] },
-  { id:"v26", language:"English", youtubeId:"WTHILTNE1yo", title:"Silent Letters",            teacher:"Grammar Monster", country:"UK", flag:"GB", topic:"Silent letters",             category:"pronunciation", level:"A2-B1", durationSec:360, tags:["silent letters","pronunciation"] },
-  { id:"v27", language:"English", youtubeId:"W4Tu9CMCnRs", title:"Interjections",             teacher:"Grammar Monster", country:"UK", flag:"GB", topic:"Oh Wow Hmm",                 category:"conversation",  level:"A2-B1", durationSec:340, tags:["conversation","speaking"] },
-  { id:"v28", language:"English", youtubeId:"kNW_gP_Qjjo", title:"Asking Questions",          teacher:"Grammar Monster", country:"UK", flag:"GB", topic:"Forming questions",          category:"conversation",  level:"A1-A2", durationSec:420, tags:["questions","conversation"] },
-  { id:"v29", language:"English", youtubeId:"N3AViIPrT08", title:"Reported Speech",           teacher:"Grammar Monster", country:"UK", flag:"GB", topic:"Direct vs indirect speech",  category:"conversation",  level:"B1-B2", durationSec:460, tags:["reported speech","grammar"] },
-  { id:"v30", language:"English", youtubeId:"a6RIGeHd_qQ", title:"Conditionals",              teacher:"Grammar Monster", country:"UK", flag:"GB", topic:"If clauses",                 category:"conversation",  level:"B1-B2", durationSec:440, tags:["conditionals","grammar"] },
-  { id:"v31", language:"English", youtubeId:"U2LUm1YB-fc", title:"Writing Clear Sentences",   teacher:"Grammar Monster", country:"UK", flag:"GB", topic:"Clear writing",              category:"listening",     level:"B1-B2", durationSec:480, tags:["writing","advanced"] },
-  { id:"v32", language:"English", youtubeId:"AKI929-3E-M", title:"Common Grammar Mistakes",   teacher:"Grammar Monster", country:"UK", flag:"GB", topic:"Grammar mistakes",           category:"listening",     level:"A2-B2", durationSec:500, tags:["mistakes","grammar"] },
+const v = (id: string, youtubeId: string, title: string, teacher: string, flag: string, category: string, level: string, durationSec: number, views: number, tags: string[], isPro = false): VideoLesson =>
+  ({ id, youtubeId, title, teacher, country: flag, flag, topic: title, category, level, durationSec, views, tags, language: "English", isPro });
+
+export const VIDEO_LESSONS: VideoLesson[] = [
+  // Movie short clip
+  v("mc1","LIfIFAMnJA0","PRINCESS MONONOKE | Official English Trailer","Youtube","US","Movie short clip","A2",64,27192,["movie","trailer"],true),
+  v("mc2","Yt5pBMFBMkA","KIKI'S DELIVERY SERVICE | Official English Trailer","Youtube","US","Movie short clip","B1",50,42524,["movie","trailer"]),
+  v("mc3","_gab_UBcMnU","Stranger Things 5 | Official Trailer | Netflix","Youtube","US","Movie short clip","B1",175,13335,["netflix","trailer"]),
+  v("mc4","puX8dvlyOd4","TOM & JERRY - Official Trailer","Youtube","US","Movie short clip","B2",145,14700,["cartoon","trailer"],true),
+  v("mc5","hA6hldpSTF8","Spider-Man: No Way Home - Official Trailer","Youtube","US","Movie short clip","B1",156,89000,["marvel","trailer"]),
+  v("mc6","d9MyW72ELq0","The Lion King - Official Trailer","Youtube","US","Movie short clip","A2",120,55000,["disney","trailer"]),
+
+  // Daily English Conversation
+  v("dc1","56UR3e3LHKY","Love mom","Youtube","US","Daily English Conversation","A2",144,56074,["family","conversation"]),
+  v("dc2","nfWlot6h_JM","Valentine's Day Story | Culture and History | Stories for Kids","Youtube","US","Daily English Conversation","A2",179,12672,["holiday","story"]),
+  v("dc3","_OBlgSz8sSM","A Dolphin Show Debate","Youtube","US","Daily English Conversation","B1",72,15959,["debate","animals"],true),
+  v("dc4","9bZkp7q19f0","A Sweet Welcome","Youtube","US","Daily English Conversation","A1",34,52992,["greeting","beginner"]),
+  v("dc5","kJQP7kiw5Fk","English Conversation Practice - At the Airport","Youtube","US","Daily English Conversation","A2",180,34000,["airport","travel"]),
+  v("dc6","YQHsXMglC9A","Daily English Conversation - Shopping","Youtube","US","Daily English Conversation","A1",240,28000,["shopping","beginner"]),
+
+  // Learning resources
+  v("lr1","dQw4w9WgXcQ","Day By Day - one minute phrase lesson (series #46) | Learn English - Mark Kulek","Youtube","US","Learning resources","A2",112,20435,["phrases","daily"]),
+  v("lr2","9bZkp7q19f0","9 Ways to Ask for Help in English","Youtube","US","Learning resources","B1",169,17219,["phrases","help"],true),
+  v("lr3","kJQP7kiw5Fk","How to Improve Spelling","Youtube","US","Learning resources","B1",296,20229,["spelling","writing"]),
+  v("lr4","YQHsXMglC9A","How to Pronounce RESUME & RESUME - American English Heteronym","Youtube","US","Learning resources","B1",115,9718,["pronunciation","vocabulary"]),
+  v("lr5","LIfIFAMnJA0","5 Common English Mistakes","Youtube","US","Learning resources","A2",180,45000,["mistakes","grammar"]),
+  v("lr6","Yt5pBMFBMkA","English Idioms in Daily Life","Youtube","US","Learning resources","B2",240,32000,["idioms","advanced"]),
+
+  // Listening Time (Shadowing)
+  v("ls1","56UR3e3LHKY","A1 English Listening Practice - Homes","Youtube","US","Listening Time (Shadowing)","B1",270,23466,["listening","shadowing"]),
+  v("ls2","nfWlot6h_JM","A1 English Listening Practice - Soccer","Youtube","US","Listening Time (Shadowing)","B1",282,9441,["listening","sports"]),
+  v("ls3","_OBlgSz8sSM","A1 English Listening Practice - Supermarket","Youtube","US","Listening Time (Shadowing)","A2",277,14554,["listening","shopping"],true),
+  v("ls4","9bZkp7q19f0","A1 English Listening Practice - Technology","Youtube","US","Listening Time (Shadowing)","B1",278,11075,["listening","tech"]),
+  v("ls5","kJQP7kiw5Fk","English Listening Practice - Daily Routine","Youtube","US","Listening Time (Shadowing)","A2",300,18000,["listening","daily"]),
+
+  // IELTS Listening
+  v("il1","dQw4w9WgXcQ","Cam 20 Test 1 Part 1","Audio","US","IELTS Listening","B2",501,25394,["ielts","test"]),
+  v("il2","9bZkp7q19f0","Cam 20 Test 1 Part 2","Audio","US","IELTS Listening","B1",514,21795,["ielts","test"]),
+  v("il3","kJQP7kiw5Fk","Cam 20 Test 1 Part 3","Audio","US","IELTS Listening","B1",479,9641,["ielts","test"],true),
+  v("il4","YQHsXMglC9A","Cam 20 Test 1 Part 4","Audio","US","IELTS Listening","B1",472,16766,["ielts","test"]),
+  v("il5","LIfIFAMnJA0","IELTS Listening Practice Test 2024","Audio","US","IELTS Listening","B2",600,30000,["ielts","practice"]),
+
+  // US UK songs
+  v("sg1","LIfIFAMnJA0","Alan Walker - Faded","Youtube","US","US UK songs","B1",213,8287,["music","pop"],true),
+  v("sg2","Yt5pBMFBMkA","Alan Walker - The Spectre","Youtube","US","US UK songs","B1",207,2769,["music","pop"]),
+  v("sg3","_gab_UBcMnU","Passenger | Let Her Go","Youtube","UK","US UK songs","A2",255,22168,["music","pop"]),
+  v("sg4","puX8dvlyOd4","See You Again - Wiz Khalifa, Charlie Puth","Youtube","US","US UK songs","B1",238,17658,["music","pop"],true),
+  v("sg5","hA6hldpSTF8","Shape of You - Ed Sheeran","Youtube","UK","US UK songs","B1",234,45000,["music","pop"]),
+  v("sg6","d9MyW72ELq0","Counting Stars - OneRepublic","Youtube","US","US UK songs","B2",257,28000,["music","pop"]),
+
+  // TOEIC Listening
+  v("tl1","56UR3e3LHKY","First-Class Upgrade Perks","Audio","US","TOEIC Listening","B1",55,16377,["toeic","business"]),
+  v("tl2","nfWlot6h_JM","Sarah's Sales Success: MVP Debate","Audio","US","TOEIC Listening","B1",84,15937,["toeic","business"]),
+  v("tl3","_OBlgSz8sSM","Holiday Shipping Hustle","Audio","US","TOEIC Listening","B1",53,12030,["toeic","business"],true),
+  v("tl4","9bZkp7q19f0","Investing in Stocks: A Long-Term Strategy","Audio","US","TOEIC Listening","B1",67,11170,["toeic","finance"]),
+  v("tl5","kJQP7kiw5Fk","TOEIC Part 1 - Photo Description","Audio","US","TOEIC Listening","B1",120,20000,["toeic","photo"]),
+
+  // Entertainment
+  v("en1","dQw4w9WgXcQ","Discover Tet: Exploring Vietnam's Lunar New Year Traditions","Youtube","VN","Entertainment","B2",186,4125,["culture","vietnam"],true),
+  v("en2","9bZkp7q19f0","Nothing Beats a Jet2holiday","Youtube","UK","Entertainment","A2",31,15589,["travel","fun"]),
+  v("en3","kJQP7kiw5Fk","Cardi B appeared in court, answered questions like rap","Youtube","US","Entertainment","B1",148,12511,["celebrity","news"]),
+  v("en4","YQHsXMglC9A","Robert Downey Jr. speech at the Chris Hemsworth Hollywood Walk of Fame","Youtube","US","Entertainment","B1",195,5934,["celebrity","speech"]),
+
+  // BBC learning english
+  v("bb1","LIfIFAMnJA0","Morning routine: Phrasal verbs with Georgie","Youtube","UK","BBC learning english","B2",154,3817,["phrasal verbs","bbc"]),
+  v("bb2","Yt5pBMFBMkA","4 slang words: English in a Minute","Youtube","UK","BBC learning english","B1",57,13032,["slang","bbc"],true),
+  v("bb3","_gab_UBcMnU","Phrasal Verbs for Travel","Youtube","UK","BBC learning english","B1",128,7267,["phrasal verbs","travel"],true),
+  v("bb4","puX8dvlyOd4","'Bored' and 'boring' - Learners' Questions","Youtube","UK","BBC learning english","B1",137,8812,["adjectives","bbc"]),
+
+  // VOA Learning English
+  v("vl1","56UR3e3LHKY","English in a Minute: Pack Rat","Youtube","US","VOA Learning English","A2",60,14757,["idiom","voa"]),
+  v("vl2","nfWlot6h_JM","English in a Minute: Zone Out","Youtube","US","VOA Learning English","A2",60,4224,["idiom","voa"]),
+  v("vl3","_OBlgSz8sSM","The Economics Report: New Clothing Manufacturing Jobs","Youtube","US","VOA Learning English","B1",193,15985,["news","economics"]),
+  v("vl4","9bZkp7q19f0","English in a Minute: Play Up","Youtube","US","VOA Learning English","A2",60,8344,["idiom","voa"],true),
+
+  // Toefl Listening
+  v("tf1","kJQP7kiw5Fk","The Amazing Waggle Dance of Bees","Audio","US","Toefl Listening","C1",300,10565,["toefl","science"],true),
+  v("tf2","YQHsXMglC9A","Fads vs. Trends: Spotting the Difference","Audio","US","Toefl Listening","B2",300,10457,["toefl","social"]),
+  v("tf3","LIfIFAMnJA0","The Amazing Waggle Dance of Bees","Audio","US","Toefl Listening","B1",300,3582,["toefl","science"]),
+  v("tf4","Yt5pBMFBMkA","Rethinking Women's Roles in US History","Audio","US","Toefl Listening","B2",307,11046,["toefl","history"]),
+
+  // Science and Facts
+  v("sf1","_gab_UBcMnU","Where did Halloween Come From?","Youtube","US","Science and Facts","B2",116,7402,["history","culture"]),
+  v("sf2","puX8dvlyOd4","Inside your Body when you Drink Coffee","Youtube","US","Science and Facts","B1",136,14286,["science","health"],true),
+  v("sf3","hA6hldpSTF8","How To Wake Up Better","Youtube","US","Science and Facts","B1",133,9535,["health","tips"]),
+  v("sf4","d9MyW72ELq0","What to Do on a First Date","Youtube","US","Science and Facts","B1",265,11963,["social","tips"]),
+
+  // Fairy Tales
+  v("ft1","56UR3e3LHKY","The Goose That Laid Golden Eggs | Bedtime Moral Story For Kids","Youtube","US","Fairy Tales","B1",84,14241,["story","kids"]),
+  v("ft2","nfWlot6h_JM","Jack and the beanstalk - Kids Stories","Youtube","US","Fairy Tales","A2",205,8258,["story","kids"]),
+  v("ft3","_OBlgSz8sSM","Story for Children | The Wolf and The Lean Dog","Youtube","US","Fairy Tales","B1",191,5367,["story","kids"],true),
+  v("ft4","9bZkp7q19f0","Thanksgiving Story for Kids - The First Thanksgiving","Youtube","US","Fairy Tales","B1",204,11223,["story","holiday"]),
+
+  // IPA
+  v("ip1","kJQP7kiw5Fk","Learn Phonetics (IPA) In under 5 minutes","Youtube","US","IPA","A1",353,34907,["ipa","phonetics"]),
+  v("ip2","YQHsXMglC9A","Consonant 20 - /h/","Youtube","UK","IPA","A2",518,25394,["ipa","consonant"]),
+  v("ip3","LIfIFAMnJA0","Consonant 21 - /j/","Youtube","UK","IPA","A2",518,5006,["ipa","consonant"]),
+  v("ip4","Yt5pBMFBMkA","Consonant 23 - /w/","Youtube","UK","IPA","A2",628,10271,["ipa","consonant"]),
+
+  // News
+  v("nw1","_gab_UBcMnU","This Could be the Most Expensive instrument Ever","Youtube","US","News","B1",90,16142,["news","culture"]),
+  v("nw2","puX8dvlyOd4","TikTok Helps Author Become Bestseller","Youtube","US","News","B1",106,11281,["news","tech"],true),
+  v("nw3","hA6hldpSTF8","Pub Becomes a 'Cheers' for People With Dementia","Youtube","UK","News","B1",91,8623,["news","health"]),
+  v("nw4","d9MyW72ELq0","Little Girl Undergoes 8 Heart Surgeries","Youtube","US","News","B1",61,10652,["news","health"]),
+
+  // Vietnam Today
+  v("vt1","56UR3e3LHKY","Vietnam edge South Korea in shootout for AFC U23 bronze","Youtube","VN","Vietnam Today","B2",79,11366,["vietnam","sports"]),
+  v("vt2","nfWlot6h_JM","New Year 2026 around the world | Vietnam Today","Youtube","VN","Vietnam Today","B2",114,10404,["vietnam","news"]),
+  v("vt3","_OBlgSz8sSM","New York welcomes the New Year's Eve ball | Vietnam Today","Youtube","VN","Vietnam Today","B1",132,13887,["vietnam","news"]),
+  v("vt4","9bZkp7q19f0","Hanoi during Christmas | Vietnam Today","Youtube","VN","Vietnam Today","B1",134,11640,["vietnam","culture"]),
+
+  // TED
+  v("td1","kJQP7kiw5Fk","What are those floaty things in your eye?","Youtube","US","TED","C1",245,5120,["ted","science"]),
+  v("td2","YQHsXMglC9A","How to recognize a dystopia","Youtube","US","TED","B2",358,14257,["ted","society"]),
+  v("td3","LIfIFAMnJA0","How the world's tallest skyscraper was built","Youtube","US","TED","C1",368,12628,["ted","engineering"],true),
+  v("td4","Yt5pBMFBMkA","These animals can hear everything","Youtube","US","TED","C1",326,16281,["ted","animals"]),
+
+  // Travel vlog
+  v("tv1","_gab_UBcMnU","18 Awe-Inspiring Things To Do in ICELAND","Youtube","US","Travel vlog","B1",208,11168,["travel","iceland"],true),
+  v("tv2","puX8dvlyOd4","Tokyo, Japan: Harajuku Tokyo - Takeshita Street","Youtube","JP","Travel vlog","B1",62,10294,["travel","japan"]),
+  v("tv3","hA6hldpSTF8","Tokyo, Japan: Old Tokyo - Asakusa & Senso-Ji","Youtube","JP","Travel vlog","B1",82,10098,["travel","japan"]),
+  v("tv4","d9MyW72ELq0","Oahu Hawaii Top Things To Do | Viator Travel Guide","Youtube","US","Travel vlog","B2",167,9333,["travel","hawaii"]),
+
+  // Animals and wildlife
+  v("aw1","56UR3e3LHKY","Mass Crocodile Hatching","Youtube","US","Animals and wildlife","B2",179,6763,["animals","nature"]),
+  v("aw2","nfWlot6h_JM","Otter Moms Wrap Their Babies in Seaweed Blankets","Youtube","US","Animals and wildlife","B1",189,5900,["animals","cute"]),
+  v("aw3","_OBlgSz8sSM","Baby Penguin Tries To Make Friends","Youtube","US","Animals and wildlife","B2",263,8573,["animals","cute"],true),
+  v("aw4","9bZkp7q19f0","Honey Buzzards Feast on Deadly Hornets","Youtube","UK","Animals and wildlife","B2",197,2965,["animals","nature"]),
+
+  // Business English
+  v("be1","kJQP7kiw5Fk","Top 6 Tips For Your Cover Letter","Youtube","US","Business English","B2",80,18055,["business","career"]),
+  v("be2","YQHsXMglC9A","8 Types of People That Managers HATE To Interview","Youtube","US","Business English","B2",195,6620,["business","interview"]),
+  v("be3","LIfIFAMnJA0","If Job Interviews Were Honest","Youtube","US","Business English","B2",148,4419,["business","humor"]),
+  v("be4","Yt5pBMFBMkA","Job Interview Question: What Is Your Greatest Strength?","Youtube","US","Business English","A2",38,14058,["business","interview"],true),
 ];
-
-// Japanese, Korean, Chinese, French, Spanish, German videos
-const OTHER: VideoLesson[] = [
-  { id:"j1", language:"Japanese", youtubeId:"rGrBHiuPlT0", title:"Hiragana Complete Guide",    teacher:"JapanesePod101", country:"JP", flag:"JP", topic:"All hiragana",          category:"grammar",       level:"A1",    durationSec:600, tags:["hiragana","writing"] },
-  { id:"j2", language:"Japanese", youtubeId:"s6DKRgtVLGA", title:"Japanese Greetings",         teacher:"JapanesePod101", country:"JP", flag:"JP", topic:"Basic greetings",       category:"conversation",  level:"A1",    durationSec:420, tags:["greetings","beginner"] },
-  { id:"j3", language:"Japanese", youtubeId:"y3GBQgFGMSc", title:"Japanese Numbers 1-100",     teacher:"JapanesePod101", country:"JP", flag:"JP", topic:"Counting",              category:"vocabulary",    level:"A1",    durationSec:480, tags:["numbers","vocabulary"] },
-  { id:"j4", language:"Japanese", youtubeId:"4bQHB3XTTBQ", title:"Particles: wa and ga",       teacher:"JapanesePod101", country:"JP", flag:"JP", topic:"Topic/subject markers", category:"grammar",       level:"A2",    durationSec:540, tags:["particles","grammar"] },
-  { id:"j5", language:"Japanese", youtubeId:"rGrBHiuPlT0", title:"Katakana Complete Guide",    teacher:"JapanesePod101", country:"JP", flag:"JP", topic:"All katakana",          category:"grammar",       level:"A1",    durationSec:600, tags:["katakana","writing"] },
-  { id:"j6", language:"Japanese", youtubeId:"s6DKRgtVLGA", title:"Japanese Verb Conjugation",  teacher:"JapanesePod101", country:"JP", flag:"JP", topic:"Present past negative",  category:"grammar",       level:"A2-B1", durationSec:660, tags:["verbs","conjugation"] },
-  { id:"j7", language:"Japanese", youtubeId:"y3GBQgFGMSc", title:"At a Restaurant in Japanese",teacher:"JapanesePod101", country:"JP", flag:"JP", topic:"Ordering food",         category:"conversation",  level:"A2",    durationSec:480, tags:["food","restaurant"] },
-  { id:"j8", language:"Japanese", youtubeId:"4bQHB3XTTBQ", title:"Japanese Pronunciation",     teacher:"JapanesePod101", country:"JP", flag:"JP", topic:"Pitch accent",          category:"pronunciation", level:"A1-B1", durationSec:540, tags:["pronunciation","pitch"] },
-
-  { id:"k1", language:"Korean", youtubeId:"s6DKRgtVLGA", title:"Hangul: Korean Alphabet",      teacher:"TTMIK", country:"KR", flag:"KR", topic:"Read and write Hangul",      category:"grammar",       level:"A1",    durationSec:600, tags:["hangul","alphabet"] },
-  { id:"k2", language:"Korean", youtubeId:"rGrBHiuPlT0", title:"Korean Greetings",             teacher:"TTMIK", country:"KR", flag:"KR", topic:"Hello thank you sorry",      category:"conversation",  level:"A1",    durationSec:480, tags:["greetings","basics"] },
-  { id:"k3", language:"Korean", youtubeId:"y3GBQgFGMSc", title:"Korean Numbers",               teacher:"TTMIK", country:"KR", flag:"KR", topic:"Native and Sino-Korean",     category:"vocabulary",    level:"A1",    durationSec:540, tags:["numbers","vocabulary"] },
-  { id:"k4", language:"Korean", youtubeId:"4bQHB3XTTBQ", title:"Korean Sentence Structure",    teacher:"TTMIK", country:"KR", flag:"KR", topic:"SOV word order",             category:"grammar",       level:"A1-A2", durationSec:480, tags:["sentence","structure"] },
-  { id:"k5", language:"Korean", youtubeId:"s6DKRgtVLGA", title:"Korean Particles",             teacher:"TTMIK", country:"KR", flag:"KR", topic:"Topic and subject markers",  category:"grammar",       level:"A2",    durationSec:540, tags:["particles","grammar"] },
-  { id:"k6", language:"Korean", youtubeId:"rGrBHiuPlT0", title:"Korean Pronunciation",         teacher:"TTMIK", country:"KR", flag:"KR", topic:"Consonant and vowel sounds", category:"pronunciation", level:"A1-B1", durationSec:480, tags:["pronunciation","sounds"] },
-  { id:"k7", language:"Korean", youtubeId:"y3GBQgFGMSc", title:"Korean at a Cafe",             teacher:"TTMIK", country:"KR", flag:"KR", topic:"Ordering drinks and food",   category:"conversation",  level:"A2",    durationSec:420, tags:["cafe","food"] },
-  { id:"k8", language:"Korean", youtubeId:"4bQHB3XTTBQ", title:"Korean Verb Endings",          teacher:"TTMIK", country:"KR", flag:"KR", topic:"Formal and informal speech",  category:"grammar",       level:"A2-B1", durationSec:600, tags:["verbs","speech levels"] },
-
-  { id:"c1", language:"Chinese", youtubeId:"rGrBHiuPlT0", title:"Pinyin Complete Guide",       teacher:"Yoyo Chinese", country:"CN", flag:"CN", topic:"All pinyin",             category:"pronunciation", level:"A1",    durationSec:720, tags:["pinyin","pronunciation"] },
-  { id:"c2", language:"Chinese", youtubeId:"s6DKRgtVLGA", title:"Chinese Tones Explained",     teacher:"Yoyo Chinese", country:"CN", flag:"CN", topic:"4 tones + neutral",      category:"pronunciation", level:"A1",    durationSec:540, tags:["tones","pronunciation"] },
-  { id:"c3", language:"Chinese", youtubeId:"y3GBQgFGMSc", title:"Chinese Greetings",           teacher:"Yoyo Chinese", country:"CN", flag:"CN", topic:"Hello goodbye",          category:"conversation",  level:"A1",    durationSec:480, tags:["greetings","basics"] },
-  { id:"c4", language:"Chinese", youtubeId:"4bQHB3XTTBQ", title:"Chinese Numbers 1-100",       teacher:"Yoyo Chinese", country:"CN", flag:"CN", topic:"Counting in Mandarin",   category:"vocabulary",    level:"A1",    durationSec:480, tags:["numbers","vocabulary"] },
-  { id:"c5", language:"Chinese", youtubeId:"rGrBHiuPlT0", title:"Chinese Sentence Structure",  teacher:"Yoyo Chinese", country:"CN", flag:"CN", topic:"SVO word order",         category:"grammar",       level:"A1-A2", durationSec:540, tags:["sentence","structure"] },
-  { id:"c6", language:"Chinese", youtubeId:"s6DKRgtVLGA", title:"Chinese Measure Words",       teacher:"Yoyo Chinese", country:"CN", flag:"CN", topic:"Using ge and others",    category:"grammar",       level:"A2",    durationSec:600, tags:["measure words","grammar"] },
-  { id:"c7", language:"Chinese", youtubeId:"y3GBQgFGMSc", title:"Chinese at a Restaurant",     teacher:"Yoyo Chinese", country:"CN", flag:"CN", topic:"Ordering food",          category:"conversation",  level:"A2",    durationSec:480, tags:["food","restaurant"] },
-  { id:"c8", language:"Chinese", youtubeId:"4bQHB3XTTBQ", title:"Chinese Characters Radicals", teacher:"Yoyo Chinese", country:"CN", flag:"CN", topic:"Character components",   category:"vocabulary",    level:"A2-B1", durationSec:660, tags:["characters","radicals"] },
-
-  { id:"f1", language:"French", youtubeId:"2wlKKsA1HMQ", title:"French Pronunciation",         teacher:"Alexa", country:"FR", flag:"FR", topic:"French sounds",              category:"pronunciation", level:"A1",    durationSec:480, tags:["pronunciation","beginner"] },
-  { id:"f2", language:"French", youtubeId:"q9aFVmzRgLg", title:"French Greetings",             teacher:"Alexa", country:"FR", flag:"FR", topic:"Bonjour merci",              category:"conversation",  level:"A1",    durationSec:420, tags:["greetings","basics"] },
-  { id:"f3", language:"French", youtubeId:"-lfdDD9lpds", title:"French Gender: Le and La",     teacher:"Alexa", country:"FR", flag:"FR", topic:"Masculine and feminine",     category:"grammar",       level:"A1-A2", durationSec:480, tags:["gender","articles"] },
-  { id:"f4", language:"French", youtubeId:"ssHY3f7FOJM", title:"French Etre and Avoir",        teacher:"Alexa", country:"FR", flag:"FR", topic:"To be and to have",          category:"grammar",       level:"A1",    durationSec:540, tags:["verbs","etre","avoir"] },
-  { id:"f5", language:"French", youtubeId:"o-LbqRag28c", title:"French Numbers",               teacher:"Alexa", country:"FR", flag:"FR", topic:"Counting 1-100",             category:"vocabulary",    level:"A1",    durationSec:420, tags:["numbers","vocabulary"] },
-  { id:"f6", language:"French", youtubeId:"PkiyAulrfCo", title:"French at a Cafe",             teacher:"Alexa", country:"FR", flag:"FR", topic:"Ordering coffee and food",   category:"conversation",  level:"A2",    durationSec:480, tags:["cafe","food"] },
-
-  { id:"s1", language:"Spanish", youtubeId:"nIJK_lUYUS0", title:"Spanish Pronunciation",       teacher:"SpanishPod101", country:"ES", flag:"ES", topic:"Spanish sounds",        category:"pronunciation", level:"A1",    durationSec:480, tags:["pronunciation","beginner"] },
-  { id:"s2", language:"Spanish", youtubeId:"5sQlZNhP5OU", title:"Spanish Greetings",           teacher:"SpanishPod101", country:"ES", flag:"ES", topic:"Hola gracias",          category:"conversation",  level:"A1",    durationSec:420, tags:["greetings","basics"] },
-  { id:"s3", language:"Spanish", youtubeId:"XMf1OkdruEY", title:"Ser vs Estar",                teacher:"SpanishPod101", country:"ES", flag:"ES", topic:"Two ways to say to be", category:"grammar",       level:"A2",    durationSec:600, tags:["ser","estar","grammar"] },
-  { id:"s4", language:"Spanish", youtubeId:"BNSoDln1FQ8", title:"Spanish Numbers",             teacher:"SpanishPod101", country:"ES", flag:"ES", topic:"Counting in Spanish",   category:"vocabulary",    level:"A1",    durationSec:420, tags:["numbers","vocabulary"] },
-  { id:"s5", language:"Spanish", youtubeId:"odDSbWHUGYk", title:"Spanish Present Tense",       teacher:"SpanishPod101", country:"ES", flag:"ES", topic:"Regular verb conjugation",category:"grammar",     level:"A1-A2", durationSec:540, tags:["present tense","verbs"] },
-  { id:"s6", language:"Spanish", youtubeId:"QJC5dd1ODBQ", title:"Spanish at a Restaurant",     teacher:"SpanishPod101", country:"ES", flag:"ES", topic:"Ordering food",         category:"conversation",  level:"A2",    durationSec:480, tags:["food","restaurant"] },
-
-  { id:"g1", language:"German", youtubeId:"ud2wlMNmhVE", title:"German Pronunciation",         teacher:"GermanPod101", country:"DE", flag:"DE", topic:"Vowels umlauts",         category:"pronunciation", level:"A1",    durationSec:480, tags:["pronunciation","umlauts"] },
-  { id:"g2", language:"German", youtubeId:"EeNL95YOlmE", title:"German Greetings",             teacher:"GermanPod101", country:"DE", flag:"DE", topic:"Hallo danke bitte",      category:"conversation",  level:"A1",    durationSec:420, tags:["greetings","basics"] },
-  { id:"g3", language:"German", youtubeId:"6jexvI0-uTU", title:"German Articles: Der Die Das", teacher:"GermanPod101", country:"DE", flag:"DE", topic:"Grammatical gender",     category:"grammar",       level:"A1-A2", durationSec:600, tags:["articles","gender"] },
-  { id:"g4", language:"German", youtubeId:"I28MDrOMxNM", title:"German Numbers",               teacher:"GermanPod101", country:"DE", flag:"DE", topic:"Counting in German",     category:"vocabulary",    level:"A1",    durationSec:420, tags:["numbers","vocabulary"] },
-  { id:"g5", language:"German", youtubeId:"BK9vaLQ1Lgo", title:"German Verb Conjugation",      teacher:"GermanPod101", country:"DE", flag:"DE", topic:"Present tense verbs",    category:"grammar",       level:"A1-A2", durationSec:540, tags:["verbs","conjugation"] },
-  { id:"g6", language:"German", youtubeId:"SiVe_3dWZ48", title:"German at a Restaurant",       teacher:"GermanPod101", country:"DE", flag:"DE", topic:"Ordering food",          category:"conversation",  level:"A2",    durationSec:480, tags:["food","restaurant"] },
-];
-
-export const VIDEO_LESSONS: VideoLesson[] = [...EN, ...OTHER];
 
 export const CATEGORIES = [
-  { id:"all",           label:"All",          emoji:"🎬" },
-  { id:"grammar",       label:"Grammar",      emoji:"📐" },
-  { id:"conversation",  label:"Conversation", emoji:"💬" },
-  { id:"vocabulary",    label:"Vocabulary",   emoji:"📚" },
-  { id:"pronunciation", label:"Pronunciation",emoji:"🎤" },
-  { id:"listening",     label:"Listening",    emoji:"🎧" },
+  "Movie short clip","Daily English Conversation","Learning resources",
+  "Listening Time (Shadowing)","IELTS Listening","US UK songs","TOEIC Listening",
+  "Entertainment","BBC learning english","VOA Learning English","Toefl Listening",
+  "Science and Facts","Fairy Tales","IPA","News","Vietnam Today","TED",
+  "Travel vlog","Animals and wildlife","Business English",
 ];
