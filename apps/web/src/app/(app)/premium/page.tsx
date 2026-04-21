@@ -7,8 +7,8 @@ import { cn } from "@/lib/utils";
 import { FREE_LIMITS } from "@/lib/usageLimit";
 
 const PLANS = [
-  { id: "monthly", label: "1 tháng (99k)", price: "99.000d/thang", badge: null as string | null },
-  { id: "yearly", label: "1 năm (1tr)", price: "1.000.000d/nam", badge: "Tiết kiệm 16%" as string | null },
+  { id: "monthly", label: "1 tháng (99k)", price: "99.000đ/tháng", badge: null as string | null },
+  { id: "yearly", label: "1 năm (1tr)", price: "1.000.000đ/năm", badge: "Tiết kiệm 16%" as string | null },
 ];
 
 const ROWS = [
@@ -35,7 +35,7 @@ export default function PremiumPage() {
     if (!user) return;
     setLoading(true); setNotified(false);
     try {
-      const res = await fetch("/api/payment/vietqr", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ userId: user.id, plan, email: user.email }) });
+      const res = await fetch("/api/payment/vietqr", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ userId: user.id, plan, email: user.email, userName: user.name }) });
       setQrData(await res.json() as Record<string, unknown>);
     } catch { alert("Loi tao QR."); } finally { setLoading(false); }
   };
