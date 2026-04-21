@@ -30,7 +30,13 @@ Return JSON:
   "exercises": [
     { "question": "fill in the blank or translate", "answer": "" }
   ],
-  "tips": ["practical learning tip 1 in ${nativeLanguage}", "practical learning tip 2 in ${nativeLanguage}", "practical learning tip 3 in ${nativeLanguage}"]
+  "tips": ["practical learning tip 1 in ${nativeLanguage}", "practical learning tip 2 in ${nativeLanguage}", "practical learning tip 3 in ${nativeLanguage}"],
+  "reading": {
+    "passage": "a short reading passage in ${targetLanguage} related to the topic (8-12 sentences)",
+    "questions": [
+      { "question": "comprehension question in ${targetLanguage}", "options": ["option A", "option B", "option C", "option D"], "correct": 0, "explanation": "why correct, in ${nativeLanguage}" }
+    ]
+  }
 }`,
       }],
       response_format: { type: "json_object" },

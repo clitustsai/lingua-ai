@@ -12,6 +12,7 @@ import { canUseFeature, getRemainingUses, incrementUsage, FREE_LIMITS } from "@/
 interface Vocab { word: string; translation: string; example: string; pronunciation?: string; romanization?: string; }
 interface DialogueLine { speaker: string; text: string; translation: string; }
 interface Exercise { question: string; answer: string; type?: string; }
+interface ReadingQ { question: string; options: string[]; correct: number; explanation: string; }
 interface Lesson {
   title: string;
   objective: string;
@@ -20,6 +21,7 @@ interface Lesson {
   dialogue: DialogueLine[];
   exercises: Exercise[];
   tips?: string[];
+  reading?: { passage: string; questions: ReadingQ[] };
 }
 
 const LESSON_TOPICS = [
@@ -37,7 +39,7 @@ const LESSON_TOPICS = [
   { id: "news", label: "Thời sự", emoji: "📰", color: "#64748b" },
 ];
 
-type Tab = "vocab" | "grammar" | "dialogue" | "exercises";
+type Tab = "vocab" | "grammar" | "dialogue" | "exercises" | "reading";
 
 export default function LessonsPage() {
   const { settings, addFlashcard, incrementLessons, checkAchievements } = useAppStore();
@@ -50,6 +52,8 @@ export default function LessonsPage() {
   const [showAnswers, setShowAnswers] = useState<Record<number, boolean>>({});
   const [savedWords, setSavedWords] = useState<Set<string>>(new Set());
   const [completed, setCompleted] = useState(false);
+  const [readingAnswers, setReadingAnswers] = useState<Record<number, number>>({});
+  const [readingChecked, setReadingChecked] = useState(false);
 
   const generate = async () => {
     if (!isPremium && !canUseFeature("lesson", isPremium)) {
@@ -62,6 +66,8 @@ export default function LessonsPage() {
     setSavedWords(new Set());
     setCompleted(false);
     setTab("vocab");
+    setReadingAnswers({});
+    setReadingChecked(false);
     try {
       const res = await fetch("/api/lesson", {
         method: "POST",
@@ -97,6 +103,7 @@ export default function LessonsPage() {
     { id: "grammar", label: "Ngữ pháp", emoji: "📐" },
     { id: "dialogue", label: "Hội thoại", emoji: "💬" },
     { id: "exercises", label: "Bài tập", emoji: "✏️" },
+    { id: "reading", label: "Đọc hiểu", emoji: "📖" },
   ];
 
   return (
@@ -281,6 +288,81 @@ export default function LessonsPage() {
                   )}
                 </div>
               ))}
+            </div>
+          )}
+
+          {/* READING TAB */}
+          {tab === "reading" && (
+            <div className="flex flex-col gap-3">
+              {!lesson.reading ? (
+                <div className="rounded-2xl p-5 text-center text-gray-500 text-sm"
+                  style={{ background: "rgba(26,16,53,0.6)", border: "1px solid rgba(139,92,246,0.1)" }}>
+                  Bài học này chưa có phần đọc hiểu. Tạo bài học mới để thử!
+                </div>
+              ) : (
+                <>
+                  <div className="rounded-2xl p-4" style={{ background: "rgba(26,16,53,0.8)", border: "1px solid rgba(139,92,246,0.2)" }}>
+                    <p className="text-xs text-purple-400 font-semibold mb-2">📖 Đoạn văn</p>
+                    <p className="text-gray-200 text-sm leading-relaxed whitespace-pre-line">{lesson.reading.passage}</p>
+                  </div>
+                  {lesson.reading.questions?.map((q, i) => {
+                    const picked = readingAnswers[i];
+                    const isCorrect = picked === q.correct;
+                    return (
+                      <div key={i} className="rounded-2xl p-4"
+                        style={{ background: "rgba(26,16,53,0.8)", border: `1px solid ${readingChecked ? (isCorrect ? "rgba(34,197,94,0.3)" : "rgba(239,68,68,0.3)") : "rgba(139,92,246,0.15)"}` }}>
+                        <p className="text-sm text-white font-medium mb-3">
+                          <span className="text-gray-500 mr-1.5">Câu {i + 1}</span>{q.question}
+                        </p>
+                        <div className="flex flex-col gap-2">
+                          {q.options?.map((opt, oi) => {
+                            const isPicked = picked === oi;
+                            const isRight = oi === q.correct;
+                            return (
+                              <button key={oi} onClick={() => !readingChecked && setReadingAnswers(p => ({ ...p, [i]: oi }))}
+                                disabled={readingChecked}
+                                className={cn("flex items-center gap-3 px-3 py-2.5 rounded-xl border text-left text-sm transition-all",
+                                  readingChecked
+                                    ? isRight ? "border-green-500 bg-green-900/20 text-green-300"
+                                      : isPicked ? "border-red-500 bg-red-900/20 text-red-300"
+                                      : "border-white/5 text-gray-600 opacity-50"
+                                    : isPicked ? "border-primary-500 bg-primary-900/30 text-white"
+                                    : "border-gray-700 bg-gray-800/60 text-gray-300 hover:border-primary-400")}>
+                                <span className={cn("w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0",
+                                  readingChecked ? isRight ? "bg-green-600 text-white" : isPicked ? "bg-red-600 text-white" : "bg-gray-800 text-gray-500"
+                                  : isPicked ? "bg-primary-600 text-white" : "bg-gray-800 text-gray-400")}>
+                                  {["A","B","C","D"][oi]}
+                                </span>
+                                {opt}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        {readingChecked && q.explanation && (
+                          <p className={cn("mt-2 px-3 py-2 rounded-xl text-xs", isCorrect ? "bg-green-900/20 text-green-300" : "bg-yellow-900/20 text-yellow-300")}>
+                            💡 {q.explanation}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
+                  {!readingChecked && lesson.reading.questions?.length > 0 && (
+                    <button onClick={() => setReadingChecked(true)}
+                      disabled={Object.keys(readingAnswers).length < lesson.reading!.questions.length}
+                      className="w-full py-3 rounded-2xl font-bold text-white text-sm disabled:opacity-40 transition-all"
+                      style={{ background: "linear-gradient(135deg,#7c3aed,#6366f1)" }}>
+                      Kiểm tra đáp án ({Object.keys(readingAnswers).length}/{lesson.reading.questions.length} câu)
+                    </button>
+                  )}
+                  {readingChecked && (
+                    <div className="rounded-2xl p-4 text-center" style={{ background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.25)" }}>
+                      <p className="text-green-400 font-bold text-lg">
+                        {lesson.reading.questions.filter((q, i) => readingAnswers[i] === q.correct).length}/{lesson.reading.questions.length} đúng
+                      </p>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           )}
 

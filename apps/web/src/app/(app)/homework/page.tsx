@@ -334,13 +334,17 @@ export default function HomeworkPage() {
               </button>
 
               {ex.type === "multiple-choice" && ex.options ? (
-                <div className="grid grid-cols-2 gap-2">
+                <div className="flex flex-col gap-2">
                   {ex.options.map((opt, j) => (
                     <button key={j} onClick={() => setAnswers(p => ({ ...p, [ex.id]: opt }))}
-                      className={cn("px-3 py-2.5 rounded-xl border text-xs font-medium text-left transition-all",
+                      className={cn("flex items-center gap-3 px-3 py-2.5 rounded-xl border text-sm text-left transition-all",
                         answers[ex.id] === opt
                           ? "border-primary-500 bg-primary-900/30 text-white"
                           : "border-gray-700 bg-gray-800 text-gray-300 hover:border-gray-600")}>
+                      <span className={cn("w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0",
+                        answers[ex.id] === opt ? "bg-primary-600 text-white" : "bg-gray-700 text-gray-400")}>
+                        {["A","B","C","D"][j]}
+                      </span>
                       {opt}
                     </button>
                   ))}
