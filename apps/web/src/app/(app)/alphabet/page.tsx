@@ -1,25 +1,25 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { Volume2, X, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/useAppStore";
 
 const VOWELS = [
-  { symbol: "ɑ", example: "hot",   audio: "hot" },
-  { symbol: "æ", example: "cat",   audio: "cat" },
-  { symbol: "ʌ", example: "but",   audio: "but" },
-  { symbol: "ɛ", example: "bed",   audio: "bed" },
-  { symbol: "eɪ", example: "say",  audio: "say" },
-  { symbol: "ɜ", example: "bird",  audio: "bird" },
-  { symbol: "ɪ", example: "ship",  audio: "ship" },
-  { symbol: "i", example: "sheep", audio: "sheep" },
-  { symbol: "ə", example: "about", audio: "about" },
-  { symbol: "oʊ", example: "boat", audio: "boat" },
-  { symbol: "ʊ", example: "foot",  audio: "foot" },
-  { symbol: "u", example: "food",  audio: "food" },
-  { symbol: "aʊ", example: "cow",  audio: "cow" },
-  { symbol: "aɪ", example: "time", audio: "time" },
-  { symbol: "ɔɪ", example: "boy",  audio: "boy" },
+  { symbol: "ɑ",  example: "hot",   audio: "hot" },
+  { symbol: "æ",  example: "cat",   audio: "cat" },
+  { symbol: "ʌ",  example: "but",   audio: "but" },
+  { symbol: "ɛ",  example: "bed",   audio: "bed" },
+  { symbol: "eɪ", example: "say",   audio: "say" },
+  { symbol: "ɜ",  example: "bird",  audio: "bird" },
+  { symbol: "ɪ",  example: "ship",  audio: "ship" },
+  { symbol: "i",  example: "sheep", audio: "sheep" },
+  { symbol: "ə",  example: "about", audio: "about" },
+  { symbol: "oʊ", example: "boat",  audio: "boat" },
+  { symbol: "ʊ",  example: "foot",  audio: "foot" },
+  { symbol: "u",  example: "food",  audio: "food" },
+  { symbol: "aʊ", example: "cow",   audio: "cow" },
+  { symbol: "aɪ", example: "time",  audio: "time" },
+  { symbol: "ɔɪ", example: "boy",   audio: "boy" },
 ];
 
 const CONSONANTS = [
@@ -52,55 +52,44 @@ const CONSONANTS = [
 type Sound = { symbol: string; example: string; audio: string };
 
 function buildQuiz(sound: Sound, allSounds: Sound[]) {
-  // Pick 1 wrong answer from same group
   const others = allSounds.filter(s => s.symbol !== sound.symbol);
   const wrong = others[Math.floor(Math.random() * others.length)];
-  const options = Math.random() > 0.5
-    ? [sound, wrong]
-    : [wrong, sound];
-  return { sound, options };
+  return Math.random() > 0.5 ? [sound, wrong] : [wrong, sound];
 }
 
 export default function AlphabetPage() {
   const { incrementWords, checkAchievements } = useAppStore();
+  const allSounds = [...VOWELS, ...CONSONANTS];
+
   const [quiz, setQuiz] = useState<{ sound: Sound; options: Sound[] } | null>(null);
   const [answered, setAnswered] = useState<"correct" | "wrong" | null>(null);
   const [xp, setXp] = useState(0);
   const [progress, setProgress] = useState(0);
   const [quizQueue, setQuizQueue] = useState<Sound[]>([]);
   const [quizIdx, setQuizIdx] = useState(0);
-  const allSounds = [...VOWELS, ...CONSONANTS];
 
   const speak = (word: string) => {
     const u = new SpeechSynthesisUtterance(word);
     u.lang = "en-US";
     u.rate = 0.85;
+    window.speechSynthesis.cancel();
     window.speechSynthesis.speak(u);
   };
 
   const startSession = () => {
-    // Shuffle all sounds for a session
     const shuffled = [...allSounds].sort(() => Math.random() - 0.5).slice(0, 10);
     setQuizQueue(shuffled);
     setQuizIdx(0);
     setXp(0);
     setProgress(0);
-    const q = buildQuiz(shuffled[0], allSounds);
-    setQuiz(q);
     setAnswered(null);
+    setQuiz({ sound: shuffled[0], options: buildQuiz(shuffled[0], allSounds) });
     speak(shuffled[0].audio);
   };
 
-  const pickSound = (sound: Sound) => {
-    const q = buildQuiz(sound, allSounds);
-    setQuiz(q);
-    setAnswered(null);
-    speak(sound.audio);
-  };
-
   const answer = (opt: Sound) => {
-    if (answered) return;
-    const correct = opt.symbol === quiz!.sound.symbol;
+    if (answered || !quiz) return;
+    const correct = opt.symbol === quiz.sound.symbol;
     setAnswered(correct ? "correct" : "wrong");
     if (correct) {
       setXp(x => x + 10);
@@ -118,27 +107,15 @@ export default function AlphabetPage() {
       return;
     }
     setQuizIdx(nextIdx);
-    const q = buildQuiz(quizQueue[nextIdx], allSounds);
-    setQuiz(q);
+    const nextSound = quizQueue[nextIdx];
+    setQuiz({ sound: nextSound, options: buildQuiz(nextSound, allSounds) });
     setAnswered(null);
-    speak(quizQueue[nextIdx].audio);
+    speak(nextSound.audio);
   };
 
-  const SoundCard = ({ s }: { s: Sound }) => (
-    <button
-      onClick={() => pickSound(s)}
-      className="flex flex-col items-center gap-1 p-3 rounded-2xl border border-gray-700 bg-gray-800/80 hover:border-blue-500 hover:bg-gray-700/80 transition-all group"
-    >
-      <span className="text-white font-bold text-xl leading-none">{s.symbol}</span>
-      <span className="text-gray-500 text-xs">{s.example}</span>
-      <div className="w-8 h-1 rounded-full bg-gray-700 group-hover:bg-blue-500 transition-colors mt-0.5" />
-    </button>
-  );
-
-  // Quiz modal
+  // ── Quiz screen ──────────────────────────────────────────────────────────────
   if (quiz) return (
     <div className="fixed inset-0 z-50 flex flex-col" style={{ background: "#111827" }}>
-      {/* Top bar */}
       <div className="flex items-center gap-3 px-5 pt-5 pb-3">
         <button onClick={() => { setQuiz(null); setAnswered(null); }}
           className="p-2 rounded-full hover:bg-gray-800 text-gray-400 transition-colors">
@@ -150,20 +127,15 @@ export default function AlphabetPage() {
         <span className="text-yellow-400 text-sm font-bold">+{xp} KN</span>
       </div>
 
-      {/* Content */}
       <div className="flex-1 flex flex-col items-center justify-center px-6 gap-8">
         <h2 className="text-white text-2xl font-bold">Bạn nghe được gì?</h2>
 
-        {/* Big speaker button */}
-        <button
-          onClick={() => speak(quiz.sound.audio)}
+        <button onClick={() => speak(quiz.sound.audio)}
           className="w-24 h-24 rounded-3xl flex items-center justify-center shadow-2xl transition-transform active:scale-95"
-          style={{ background: "#38bdf8" }}
-        >
+          style={{ background: "#38bdf8" }}>
           <Volume2 className="w-12 h-12 text-gray-900" />
         </button>
 
-        {/* Options */}
         <div className="flex gap-4 w-full max-w-sm">
           {quiz.options.map((opt, i) => {
             const isCorrect = opt.symbol === quiz.sound.symbol;
@@ -176,7 +148,7 @@ export default function AlphabetPage() {
                     ? "border-gray-600 bg-gray-800 text-white hover:border-blue-400"
                     : isCorrect
                     ? "border-green-500 bg-green-900/30 text-green-300"
-                    : !isCorrect && answered === "wrong" && opt.symbol !== quiz.options.find(o => o.symbol === quiz.sound.symbol)?.symbol
+                    : picked && !isCorrect
                     ? "border-red-500 bg-red-900/30 text-red-300"
                     : "border-gray-700 bg-gray-800/50 text-gray-500 opacity-60"
                 )}>
@@ -187,7 +159,6 @@ export default function AlphabetPage() {
           })}
         </div>
 
-        {/* Feedback */}
         {answered && (
           <div className={cn("w-full max-w-sm rounded-2xl p-4 flex items-center justify-between",
             answered === "correct" ? "bg-green-900/30 border border-green-600/40" : "bg-red-900/30 border border-red-600/40")}>
@@ -200,7 +171,7 @@ export default function AlphabetPage() {
               </p>
             </div>
             <button onClick={next}
-              className={cn("px-4 py-2 rounded-xl font-bold text-sm flex items-center gap-1 transition-colors",
+              className={cn("px-4 py-2 rounded-xl font-bold text-sm flex items-center gap-1",
                 answered === "correct" ? "bg-green-600 hover:bg-green-500 text-white" : "bg-red-600 hover:bg-red-500 text-white")}>
               Tiếp <ChevronRight className="w-4 h-4" />
             </button>
@@ -208,6 +179,16 @@ export default function AlphabetPage() {
         )}
       </div>
     </div>
+  );
+
+  // ── Main grid ────────────────────────────────────────────────────────────────
+  const SoundCard = ({ s }: { s: Sound }) => (
+    <button onClick={() => speak(s.audio)}
+      className="flex flex-col items-center gap-1 p-3 rounded-2xl border border-gray-700 bg-gray-800/80 hover:border-blue-500 hover:bg-gray-700/80 active:scale-95 transition-all group">
+      <span className="text-white font-bold text-xl leading-none">{s.symbol}</span>
+      <span className="text-gray-500 text-xs">{s.example}</span>
+      <div className="w-8 h-1 rounded-full bg-gray-700 group-hover:bg-blue-500 transition-colors mt-0.5" />
+    </button>
   );
 
   return (
@@ -222,7 +203,6 @@ export default function AlphabetPage() {
         </button>
       </div>
 
-      {/* Vowels */}
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-3">
           <div className="flex-1 h-px bg-gray-700" />
@@ -234,7 +214,6 @@ export default function AlphabetPage() {
         </div>
       </div>
 
-      {/* Consonants */}
       <div>
         <div className="flex items-center gap-3 mb-3">
           <div className="flex-1 h-px bg-gray-700" />
