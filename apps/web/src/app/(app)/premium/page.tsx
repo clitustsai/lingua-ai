@@ -12,7 +12,7 @@ const PLANS = [
 ];
 
 const ROWS = [
-  { feature: "Chat AI", vip: "Không giới hạn", hi: true },
+  { feature: "Chat AI", free: FREE_LIMITS.chat + " tin/ngày", vip: "Không giới hạn", hi: true },
   { feature: "Dịch thuật", free: FREE_LIMITS.translate + " lần/ngày", vip: "Không giới hạn", hi: true },
   { feature: "AI Teacher", free: FREE_LIMITS.homework + " bài/ngày", vip: "Không giới hạn", hi: true },
   { feature: "Tạo bài học AI", free: FREE_LIMITS.generateLesson + " lần/ngày", vip: "Không giới hạn", hi: true },
