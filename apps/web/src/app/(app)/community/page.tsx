@@ -1,306 +1,271 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useAuthStore } from "@/store/useAuthStore";
 import { useAppStore } from "@/store/useAppStore";
-import { Heart, MessageCircle, CheckCircle2, Plus, Send, X, Volume2, Loader2 } from "lucide-react";
-import { speakText } from "@/components/VoiceButton";
+import { createClient } from "@/lib/supabase";
+import { Send, Users, MessageCircle, Globe, Smile } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// Seed posts for demo
-const SEED_POSTS = [
-  {
-    id: "seed1", authorName: "Minh Anh", authorFlag: "🇻🇳", language: "English", level: "B1",
-    text: "Yesterday I go to the market and buyed many vegetables.",
-    translation: "Hôm qua tôi đi chợ và mua nhiều rau.",
-    question: "Câu này có đúng ngữ pháp không? Mình không chắc về thì quá khứ.",
-    likes: 5, likedByMe: false,
-    comments: [{ id: "c1", authorName: "Emma", text: "Great effort! Keep practicing 💪", createdAt: "2024-01-15T10:00:00Z" }],
-    corrections: [{ id: "cr1", authorName: "Carlos", corrected: "Yesterday I went to the market and bought many vegetables.", explanation: "Dùng 'went' (quá khứ của go) và 'bought' (quá khứ của buy) — đây là động từ bất quy tắc.", createdAt: "2024-01-15T10:05:00Z" }],
-    createdAt: "2024-01-15T09:00:00Z",
-  },
-  {
-    id: "seed2", authorName: "Yuki", authorFlag: "🇯🇵", language: "English", level: "A2",
-    text: "I am very exciting about my trip to Vietnam next month!",
-    translation: "Tôi rất hào hứng về chuyến đi Việt Nam tháng tới!",
-    question: "Mình dùng 'exciting' hay 'excited'? Confused!",
-    likes: 8, likedByMe: false,
-    comments: [],
-    corrections: [{ id: "cr2", authorName: "Pierre", corrected: "I am very excited about my trip to Vietnam next month!", explanation: "'Excited' = cảm xúc của người (tôi cảm thấy hào hứng). 'Exciting' = tính chất của sự vật (chuyến đi thú vị). Quy tắc: -ed cho người, -ing cho sự vật.", createdAt: "2024-01-15T11:00:00Z" }],
-    createdAt: "2024-01-15T10:30:00Z",
-  },
-  {
-    id: "seed3", authorName: "Thanh", authorFlag: "🇻🇳", language: "Korean", level: "A1",
-    text: "저는 한국어를 공부해요. 매일 조금씩 배워요.",
-    translation: "Tôi học tiếng Hàn. Mỗi ngày học một chút.",
-    question: "Câu này có tự nhiên không? Mình mới học được 2 tuần.",
-    likes: 12, likedByMe: false,
-    comments: [{ id: "c2", authorName: "Hana", text: "정말 잘했어요! Very good for 2 weeks! 👏", createdAt: "2024-01-15T12:00:00Z" }],
-    corrections: [],
-    createdAt: "2024-01-15T11:00:00Z",
-  },
+type Msg = {
+  id: string;
+  userId: string;
+  userName: string;
+  avatar: string;
+  text: string;
+  lang: string;
+  ts: number;
+};
+
+type OnlineUser = {
+  userId: string;
+  userName: string;
+  avatar: string;
+  lang: string;
+};
+
+const EMOJIS = ["😊","👍","🔥","💪","🎉","❤️","😂","🤔"];
+const ROOMS = [
+  { id: "general", label: "Chung", emoji: "🌐" },
+  { id: "english", label: "English", emoji: "🇬🇧" },
+  { id: "japanese", label: "日本語", emoji: "��" },
+  { id: "korean", label: "한국어", emoji: "🇰🇷" },
 ];
 
+function avatar(name: string) {
+  return name ? name[0].toUpperCase() : "?";
+}
+
+function timeStr(ts: number) {
+  const d = new Date(ts);
+  return d.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
+}
+
 export default function CommunityPage() {
-  const { communityPosts, addCommunityPost, likePost, addComment, addCorrection, settings, username } = useAppStore();
-  const [showNewPost, setShowNewPost] = useState(false);
-  const [newText, setNewText] = useState("");
-  const [newQuestion, setNewQuestion] = useState("");
-  const [posting, setPosting] = useState(false);
-  const [expandedPost, setExpandedPost] = useState<string | null>(null);
-  const [commentText, setCommentText] = useState<Record<string, string>>({});
-  const [correctionText, setCorrectionText] = useState<Record<string, string>>({});
-  const [correctionExp, setCorrectionExp] = useState<Record<string, string>>({});
-  const [aiCorrecting, setAiCorrecting] = useState<string | null>(null);
+  const { user } = useAuthStore();
+  const { settings } = useAppStore();
+  const [tab, setTab] = useState<"chat" | "friends">("chat");
+  const [room, setRoom] = useState("general");
+  const [messages, setMessages] = useState<Msg[]>([]);
+  const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
+  const [input, setInput] = useState("");
+  const [showEmoji, setShowEmoji] = useState(false);
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const channelRef = useRef<any>(null);
+  const supabase = createClient();
 
-  const allPosts = [...communityPosts, ...SEED_POSTS.filter(s => !communityPosts.find(p => p.id === s.id))];
+  const myName = user?.name || user?.email?.split("@")[0] || "Ẩn danh";
+  const myLang = settings.targetLanguage.flag + " " + settings.targetLanguage.name;
 
-  const submitPost = () => {
-    if (!newText.trim()) return;
-    setPosting(true);
-    const post = {
-      id: Date.now().toString(),
-      authorName: username || "Bạn",
-      authorFlag: settings.targetLanguage.flag,
-      language: settings.targetLanguage.name,
-      level: settings.level,
-      text: newText.trim(),
-      question: newQuestion.trim() || "Câu này có đúng không?",
-      likes: 0, likedByMe: false,
-      comments: [], corrections: [],
-      createdAt: new Date().toISOString(),
-    };
-    addCommunityPost(post);
-    setNewText(""); setNewQuestion(""); setShowNewPost(false); setPosting(false);
-  };
+  useEffect(() => {
+    // Leave old channel
+    if (channelRef.current) {
+      supabase.removeChannel(channelRef.current);
+    }
 
-  const submitComment = (postId: string) => {
-    const text = commentText[postId]?.trim();
-    if (!text) return;
-    addComment(postId, { id: Date.now().toString(), authorName: username || "Bạn", text, createdAt: new Date().toISOString() });
-    setCommentText(p => ({ ...p, [postId]: "" }));
-  };
+    setMessages([]);
+    setOnlineUsers([]);
 
-  const submitCorrection = (postId: string) => {
-    const corrected = correctionText[postId]?.trim();
-    const explanation = correctionExp[postId]?.trim();
-    if (!corrected) return;
-    addCorrection(postId, { id: Date.now().toString(), authorName: username || "Bạn", corrected, explanation: explanation || "", createdAt: new Date().toISOString() });
-    setCorrectionText(p => ({ ...p, [postId]: "" }));
-    setCorrectionExp(p => ({ ...p, [postId]: "" }));
-  };
+    const channel = supabase.channel(`community:${room}`, {
+      config: { presence: { key: user?.id || "anon" } },
+    });
 
-  const aiCorrect = async (post: typeof allPosts[0]) => {
-    setAiCorrecting(post.id);
-    try {
-      const res = await fetch("/api/rewrite", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          text: post.text,
-          targetLanguage: post.language,
-          nativeLanguage: settings.nativeLanguage.name,
-          level: post.level,
-        }),
+    // Presence: track online users
+    channel.on("presence", { event: "sync" }, () => {
+      const state = channel.presenceState<OnlineUser>();
+      const users: OnlineUser[] = [];
+      Object.values(state).forEach((arr: any) => {
+        arr.forEach((u: OnlineUser) => users.push(u));
       });
-      const data = await res.json();
-      if (data.rewrites?.corrected) {
-        const explanation = data.issues?.map((i: any) => `${i.original} → ${i.fix}: ${i.explanation}`).join(". ") || data.overallFeedback || "AI correction";
-        addCorrection(post.id, {
-          id: Date.now().toString(),
-          authorName: "🤖 AI",
-          corrected: data.rewrites.corrected,
-          explanation,
-          createdAt: new Date().toISOString(),
+      setOnlineUsers(users);
+    });
+
+    // Broadcast: receive messages
+    channel.on("broadcast", { event: "msg" }, ({ payload }: any) => {
+      setMessages(prev => {
+        if (prev.find(m => m.id === payload.id)) return prev;
+        return [...prev.slice(-99), payload as Msg];
+      });
+    });
+
+    channel.subscribe(async (status) => {
+      if (status === "SUBSCRIBED") {
+        await channel.track({
+          userId: user?.id || "anon",
+          userName: myName,
+          avatar: avatar(myName),
+          lang: myLang,
         });
       }
-    } finally { setAiCorrecting(null); }
+    });
+
+    channelRef.current = channel;
+    return () => { supabase.removeChannel(channel); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [room, user?.id]);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  const send = async () => {
+    const text = input.trim();
+    if (!text || !channelRef.current) return;
+    const msg: Msg = {
+      id: Date.now() + Math.random().toString(36).slice(2),
+      userId: user?.id || "anon",
+      userName: myName,
+      avatar: avatar(myName),
+      text,
+      lang: myLang,
+      ts: Date.now(),
+    };
+    setInput("");
+    setShowEmoji(false);
+    // Optimistic
+    setMessages(prev => [...prev.slice(-99), msg]);
+    await channelRef.current.send({ type: "broadcast", event: "msg", payload: msg });
   };
 
-  const timeAgo = (iso: string) => {
-    const diff = Date.now() - new Date(iso).getTime();
-    const m = Math.floor(diff / 60000);
-    if (m < 1) return "vừa xong";
-    if (m < 60) return `${m} phút trước`;
-    const h = Math.floor(m / 60);
-    if (h < 24) return `${h} giờ trước`;
-    return `${Math.floor(h / 24)} ngày trước`;
-  };
+  const isMe = (msg: Msg) => msg.userId === (user?.id || "anon");
 
   return (
-    <div className="p-5 max-w-2xl">
-      <div className="pt-2 mb-5 flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-white flex items-center gap-2">
-            🌐 Community
-          </h1>
-          <p className="text-sm text-gray-500 mt-1">Đăng câu hỏi · Nhận sửa bài · Like & comment</p>
+    <div className="flex flex-col h-[calc(100vh-4rem)] max-w-2xl">
+      {/* Header */}
+      <div className="px-5 pt-4 pb-3 shrink-0">
+        <h1 className="text-xl font-bold text-white flex items-center gap-2 mb-3">
+          <Globe className="w-5 h-5 text-blue-400" /> Cộng đồng
+        </h1>
+        {/* Tabs */}
+        <div className="flex gap-1 p-1 rounded-2xl mb-3" style={{ background: "rgba(15,10,30,0.6)" }}>
+          <button onClick={() => setTab("chat")}
+            className={cn("flex-1 py-2 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-1.5",
+              tab === "chat" ? "bg-blue-600 text-white" : "text-gray-400 hover:text-gray-200")}>
+            <MessageCircle className="w-3.5 h-3.5" /> Chat cộng đồng
+          </button>
+          <button onClick={() => setTab("friends")}
+            className={cn("flex-1 py-2 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-1.5",
+              tab === "friends" ? "bg-blue-600 text-white" : "text-gray-400 hover:text-gray-200")}>
+            <Users className="w-3.5 h-3.5" /> Bạn bè ({onlineUsers.length})
+          </button>
         </div>
-        <button onClick={() => setShowNewPost(!showNewPost)}
-          className="flex items-center gap-1.5 px-3 py-2 bg-primary-600 hover:bg-primary-500 text-white rounded-xl text-sm font-medium transition-colors">
-          <Plus className="w-4 h-4" /> Đăng bài
-        </button>
+        {/* Room selector (chat tab only) */}
+        {tab === "chat" && (
+          <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
+            {ROOMS.map(r => (
+              <button key={r.id} onClick={() => setRoom(r.id)}
+                className={cn("flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-medium border shrink-0 transition-all",
+                  room === r.id ? "border-blue-500 bg-blue-900/30 text-white" : "border-gray-700 bg-gray-800/60 text-gray-400 hover:border-gray-600")}>
+                {r.emoji} {r.label}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* New post form */}
-      {showNewPost && (
-        <div className="rounded-2xl p-4 mb-5" style={{ background: "rgba(26,16,53,0.9)", border: "1px solid rgba(139,92,246,0.3)" }}>
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-sm font-semibold text-white">Đăng câu hỏi mới</p>
-            <button onClick={() => setShowNewPost(false)} className="text-gray-500 hover:text-gray-300"><X className="w-4 h-4" /></button>
-          </div>
-          <textarea value={newText} onChange={e => setNewText(e.target.value)}
-            placeholder={`Viết câu bằng ${settings.targetLanguage.name} muốn được sửa...`}
-            rows={3}
-            className="w-full rounded-xl px-3 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary-500 border border-gray-700 resize-none mb-2"
-            style={{ background: "rgba(15,10,30,0.8)" }}
-          />
-          <input value={newQuestion} onChange={e => setNewQuestion(e.target.value)}
-            placeholder="Câu hỏi của bạn (vd: Câu này có tự nhiên không?)"
-            className="w-full rounded-xl px-3 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary-500 border border-gray-700 mb-3"
-            style={{ background: "rgba(15,10,30,0.8)" }}
-          />
-          <div className="flex gap-2">
-            <button onClick={submitPost} disabled={!newText.trim() || posting}
-              className="flex-1 py-2.5 bg-primary-600 hover:bg-primary-500 disabled:opacity-50 text-white rounded-xl text-sm font-medium transition-colors">
-              Đăng bài
-            </button>
-            <button onClick={() => setShowNewPost(false)} className="px-4 py-2.5 bg-gray-800 text-gray-400 rounded-xl text-sm transition-colors hover:bg-gray-700">
-              Hủy
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Posts */}
-      <div className="flex flex-col gap-4">
-        {allPosts.map(post => {
-          const isExpanded = expandedPost === post.id;
-          return (
-            <div key={post.id} className="rounded-2xl overflow-hidden" style={{ background: "rgba(26,16,53,0.8)", border: "1px solid rgba(139,92,246,0.12)" }}>
-              {/* Post header */}
-              <div className="px-4 pt-4 pb-3">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-9 h-9 rounded-xl bg-primary-600/30 flex items-center justify-center text-lg">{post.authorFlag}</div>
-                  <div>
-                    <p className="text-white font-medium text-sm">{post.authorName}</p>
-                    <p className="text-xs text-gray-500">{post.language} · {post.level} · {timeAgo(post.createdAt)}</p>
-                  </div>
+      {/* CHAT TAB */}
+      {tab === "chat" && (
+        <>
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto px-5 py-2 flex flex-col gap-2">
+            {messages.length === 0 && (
+              <div className="flex flex-col items-center justify-center h-full gap-3 text-gray-600">
+                <MessageCircle className="w-10 h-10 opacity-30" />
+                <p className="text-sm">Chưa có tin nhắn. Hãy bắt đầu trò chuyện!</p>
+              </div>
+            )}
+            {messages.map(msg => (
+              <div key={msg.id} className={cn("flex gap-2 items-end", isMe(msg) && "flex-row-reverse")}>
+                {/* Avatar */}
+                <div className={cn("w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mb-0.5",
+                  isMe(msg) ? "bg-blue-600" : "bg-gray-700")}>
+                  {msg.avatar}
                 </div>
-
-                {/* Text */}
-                <div className="rounded-xl p-3 mb-2" style={{ background: "rgba(15,10,30,0.6)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                  <div className="flex items-start justify-between gap-2">
-                    <p className="text-white text-sm leading-relaxed">{post.text}</p>
-                    <button onClick={() => speakText(post.text, settings.targetLanguage.code)} className="p-1 text-gray-600 hover:text-primary-400 shrink-0">
-                      <Volume2 className="w-3.5 h-3.5" />
-                    </button>
+                <div className={cn("max-w-[72%]", isMe(msg) && "items-end flex flex-col")}>
+                  {!isMe(msg) && (
+                    <p className="text-xs text-gray-500 mb-0.5 px-1">{msg.userName} · {msg.lang}</p>
+                  )}
+                  <div className={cn("px-3 py-2 rounded-2xl text-sm break-words",
+                    isMe(msg)
+                      ? "bg-blue-600 text-white rounded-br-sm"
+                      : "text-white rounded-bl-sm"
+                  )} style={!isMe(msg) ? { background: "rgba(26,16,53,0.9)", border: "1px solid rgba(139,92,246,0.2)" } : {}}>
+                    {msg.text}
                   </div>
-                  {post.translation && <p className="text-gray-500 text-xs mt-1 italic">{post.translation}</p>}
-                </div>
-
-                {/* Question */}
-                <p className="text-xs text-primary-400 mb-3">❓ {post.question}</p>
-
-                {/* Actions */}
-                <div className="flex items-center gap-3">
-                  <button onClick={() => likePost(post.id)}
-                    className={cn("flex items-center gap-1.5 text-xs transition-colors", post.likedByMe ? "text-red-400" : "text-gray-500 hover:text-red-400")}>
-                    <Heart className={cn("w-4 h-4", post.likedByMe && "fill-current")} />
-                    {post.likes}
-                  </button>
-                  <button onClick={() => setExpandedPost(isExpanded ? null : post.id)}
-                    className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-primary-400 transition-colors">
-                    <MessageCircle className="w-4 h-4" />
-                    {post.comments.length} bình luận
-                  </button>
-                  <button onClick={() => setExpandedPost(isExpanded ? null : post.id)}
-                    className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-green-400 transition-colors">
-                    <CheckCircle2 className="w-4 h-4" />
-                    {post.corrections.length} sửa bài
-                  </button>
-                  <button onClick={() => aiCorrect(post)} disabled={aiCorrecting === post.id}
-                    className="ml-auto flex items-center gap-1 text-xs text-purple-400 hover:text-purple-300 transition-colors disabled:opacity-50">
-                    {aiCorrecting === post.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "🤖"}
-                    AI sửa
-                  </button>
+                  <p className="text-xs text-gray-600 mt-0.5 px-1">{timeStr(msg.ts)}</p>
                 </div>
               </div>
+            ))}
+            <div ref={bottomRef} />
+          </div>
 
-              {/* Expanded: corrections + comments */}
-              {isExpanded && (
-                <div className="border-t border-white/5 px-4 py-3 flex flex-col gap-4">
-                  {/* Corrections */}
-                  {post.corrections.length > 0 && (
-                    <div>
-                      <p className="text-xs text-green-400 font-semibold mb-2">✅ Sửa bài ({post.corrections.length})</p>
-                      {post.corrections.map(c => (
-                        <div key={c.id} className="rounded-xl p-3 mb-2" style={{ background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.2)" }}>
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="text-xs font-semibold text-green-300">{c.authorName}</span>
-                            <span className="text-xs text-gray-600">{timeAgo(c.createdAt)}</span>
-                          </div>
-                          <p className="text-sm text-white font-medium mb-1">"{c.corrected}"</p>
-                          {c.explanation && <p className="text-xs text-gray-400">{c.explanation}</p>}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Add correction */}
-                  <div>
-                    <p className="text-xs text-gray-500 mb-2">Sửa bài cho {post.authorName}:</p>
-                    <input value={correctionText[post.id] ?? ""} onChange={e => setCorrectionText(p => ({ ...p, [post.id]: e.target.value }))}
-                      placeholder="Câu đúng..."
-                      className="w-full rounded-xl px-3 py-2 text-sm text-white placeholder-gray-500 border border-gray-700 focus:outline-none focus:border-green-500 mb-1.5"
-                      style={{ background: "rgba(15,10,30,0.8)" }}
-                    />
-                    <input value={correctionExp[post.id] ?? ""} onChange={e => setCorrectionExp(p => ({ ...p, [post.id]: e.target.value }))}
-                      placeholder="Giải thích (tùy chọn)..."
-                      className="w-full rounded-xl px-3 py-2 text-sm text-white placeholder-gray-500 border border-gray-700 focus:outline-none focus:border-green-500 mb-2"
-                      style={{ background: "rgba(15,10,30,0.8)" }}
-                    />
-                    <button onClick={() => submitCorrection(post.id)} disabled={!correctionText[post.id]?.trim()}
-                      className="px-4 py-2 bg-green-700/40 hover:bg-green-700/60 disabled:opacity-50 text-green-300 rounded-xl text-xs font-medium transition-colors">
-                      Gửi sửa bài
-                    </button>
-                  </div>
-
-                  {/* Comments */}
-                  {post.comments.length > 0 && (
-                    <div>
-                      <p className="text-xs text-gray-500 font-semibold mb-2">Bình luận</p>
-                      {post.comments.map(c => (
-                        <div key={c.id} className="flex gap-2 mb-2">
-                          <div className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center text-xs shrink-0 mt-0.5">
-                            {c.authorName[0]}
-                          </div>
-                          <div className="flex-1 rounded-xl px-3 py-2" style={{ background: "rgba(15,10,30,0.6)" }}>
-                            <span className="text-xs font-semibold text-gray-300">{c.authorName} </span>
-                            <span className="text-xs text-gray-400">{c.text}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Add comment */}
-                  <div className="flex gap-2">
-                    <input value={commentText[post.id] ?? ""} onChange={e => setCommentText(p => ({ ...p, [post.id]: e.target.value }))}
-                      onKeyDown={e => e.key === "Enter" && submitComment(post.id)}
-                      placeholder="Bình luận..."
-                      className="flex-1 rounded-xl px-3 py-2 text-sm text-white placeholder-gray-500 border border-gray-700 focus:outline-none focus:border-primary-500"
-                      style={{ background: "rgba(15,10,30,0.8)" }}
-                    />
-                    <button onClick={() => submitComment(post.id)} disabled={!commentText[post.id]?.trim()}
-                      className="p-2 bg-primary-600/30 hover:bg-primary-600/50 disabled:opacity-50 text-primary-300 rounded-xl transition-colors">
-                      <Send className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              )}
+          {/* Input */}
+          <div className="px-5 pb-4 pt-2 shrink-0 relative">
+            {showEmoji && (
+              <div className="absolute bottom-16 left-5 flex gap-1.5 p-2 rounded-2xl z-10"
+                style={{ background: "rgba(20,12,40,0.98)", border: "1px solid rgba(139,92,246,0.3)" }}>
+                {EMOJIS.map(e => (
+                  <button key={e} onClick={() => { setInput(p => p + e); setShowEmoji(false); }}
+                    className="text-xl hover:scale-125 transition-transform">{e}</button>
+                ))}
+              </div>
+            )}
+            <div className="flex gap-2 items-center p-1 rounded-2xl" style={{ background: "rgba(26,16,53,0.9)", border: "1px solid rgba(139,92,246,0.2)" }}>
+              <button onClick={() => setShowEmoji(p => !p)}
+                className="p-2 text-gray-500 hover:text-yellow-400 transition-colors shrink-0">
+                <Smile className="w-5 h-5" />
+              </button>
+              <input
+                value={input}
+                onChange={e => setInput(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && !e.shiftKey && send()}
+                placeholder="Nhắn tin..."
+                className="flex-1 bg-transparent text-white text-sm placeholder-gray-500 focus:outline-none"
+              />
+              <button onClick={send} disabled={!input.trim()}
+                className="p-2 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white transition-colors shrink-0">
+                <Send className="w-4 h-4" />
+              </button>
             </div>
-          );
-        })}
-      </div>
+          </div>
+        </>
+      )}
+
+      {/* FRIENDS TAB */}
+      {tab === "friends" && (
+        <div className="flex-1 overflow-y-auto px-5 py-2">
+          {onlineUsers.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full gap-3 text-gray-600">
+              <Users className="w-10 h-10 opacity-30" />
+              <p className="text-sm">Chưa có ai online trong phòng này</p>
+              <p className="text-xs text-gray-700">Mời bạn bè vào học cùng!</p>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-2">
+                {onlineUsers.length} người đang online
+              </p>
+              {onlineUsers.map((u, i) => (
+                <div key={i} className="flex items-center gap-3 p-3 rounded-2xl"
+                  style={{ background: "rgba(26,16,53,0.8)", border: "1px solid rgba(139,92,246,0.12)" }}>
+                  <div className="relative">
+                    <div className="w-10 h-10 rounded-full bg-blue-600/40 flex items-center justify-center text-sm font-bold text-white">
+                      {u.avatar}
+                    </div>
+                    <div className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-green-500 border-2 border-gray-900" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-white text-sm font-medium">{u.userName}</p>
+                    <p className="text-gray-500 text-xs">{u.lang}</p>
+                  </div>
+                  {u.userId === (user?.id || "anon") && (
+                    <span className="text-xs text-blue-400 font-medium">Bạn</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
