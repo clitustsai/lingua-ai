@@ -20,17 +20,17 @@ export const VIDEO_LESSONS: VideoLesson[] = [
 
   // Daily English Conversation
   v("dc1","56UR3e3LHKY","Love mom","Youtube","US","Daily English Conversation","A2",144,56074,["family","conversation"]),
-  v("dc2","nfWlot6h_JM","Valentine's Day Story | Culture and History | Stories for Kids","Youtube","US","Daily English Conversation","A2",179,12672,["holiday","story"]),
+  v("dc2","nfWlot6h_JM","Valentine's Day Story | Culture and History","Youtube","US","Daily English Conversation","A2",179,12672,["holiday","story"]),
   v("dc3","_OBlgSz8sSM","A Dolphin Show Debate","Youtube","US","Daily English Conversation","B1",72,15959,["debate","animals"],true),
   v("dc4","9bZkp7q19f0","A Sweet Welcome","Youtube","US","Daily English Conversation","A1",34,52992,["greeting","beginner"]),
   v("dc5","kJQP7kiw5Fk","English Conversation Practice - At the Airport","Youtube","US","Daily English Conversation","A2",180,34000,["airport","travel"]),
   v("dc6","YQHsXMglC9A","Daily English Conversation - Shopping","Youtube","US","Daily English Conversation","A1",240,28000,["shopping","beginner"]),
 
   // Learning resources
-  v("lr1","dQw4w9WgXcQ","Day By Day - one minute phrase lesson (series #46) | Learn English - Mark Kulek","Youtube","US","Learning resources","A2",112,20435,["phrases","daily"]),
+  v("lr1","dQw4w9WgXcQ","Day By Day - one minute phrase lesson","Youtube","US","Learning resources","A2",112,20435,["phrases","daily"]),
   v("lr2","9bZkp7q19f0","9 Ways to Ask for Help in English","Youtube","US","Learning resources","B1",169,17219,["phrases","help"],true),
   v("lr3","kJQP7kiw5Fk","How to Improve Spelling","Youtube","US","Learning resources","B1",296,20229,["spelling","writing"]),
-  v("lr4","YQHsXMglC9A","How to Pronounce RESUME & RESUME - American English Heteronym","Youtube","US","Learning resources","B1",115,9718,["pronunciation","vocabulary"]),
+  v("lr4","YQHsXMglC9A","How to Pronounce RESUME - American English","Youtube","US","Learning resources","B1",115,9718,["pronunciation","vocabulary"]),
   v("lr5","LIfIFAMnJA0","5 Common English Mistakes","Youtube","US","Learning resources","A2",180,45000,["mistakes","grammar"]),
   v("lr6","Yt5pBMFBMkA","English Idioms in Daily Life","Youtube","US","Learning resources","B2",240,32000,["idioms","advanced"]),
 

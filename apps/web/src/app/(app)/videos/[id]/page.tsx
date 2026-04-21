@@ -111,17 +111,8 @@ export default function VideoDetailPage() {
 
   useEffect(() => {
     if (!video) return;
-    if (isEnglish) {
-      setRealVideoId(video.youtubeId);
-    } else {
-      setVideoLoading(true);
-      const query = `${video.title} ${video.language} lesson`;
-      fetch(`/api/youtube-search?q=${encodeURIComponent(query)}`)
-        .then(r => r.json())
-        .then(d => { if (d.videoId) setRealVideoId(d.videoId); })
-        .catch(() => {})
-        .finally(() => setVideoLoading(false));
-    }
+    // Always try to use the stored ID first, fallback to YouTube search link
+    setRealVideoId(video.youtubeId);
 
     // Generate lesson inline to avoid stale closure
     setLoading(true);
@@ -194,15 +185,16 @@ export default function VideoDetailPage() {
           <div className="relative aspect-video rounded-2xl overflow-hidden bg-black">
             <iframe
               className="w-full h-full"
-              src={`https://www.youtube-nocookie.com/embed/${realVideoId}?rel=0&modestbranding=1`}
+              src={`https://www.youtube.com/embed/${realVideoId}?rel=0&modestbranding=1`}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowFullScreen
             />
-            <a href={`https://www.youtube.com/watch?v=${realVideoId}`}
+            {/* Fallback button if video unavailable */}
+            <a href={`https://www.youtube.com/results?search_query=${encodeURIComponent(video.title)}`}
               target="_blank" rel="noopener noreferrer"
               className="absolute bottom-3 right-3 flex items-center gap-1.5 bg-red-600 hover:bg-red-500 text-white text-xs px-2.5 py-1.5 rounded-lg font-medium transition-colors shadow-lg z-10">
               <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-              YouTube
+              Tìm trên YouTube
             </a>
           </div>
         ) : (
