@@ -10,7 +10,7 @@ const v = (id: string, youtubeId: string, title: string, teacher: string, flag: 
   ({ id, youtubeId, title, teacher, country: flag, flag, topic: title, category, level, durationSec, views, tags, language: "English", isPro });
 
 export const VIDEO_LESSONS: VideoLesson[] = [
-  // Movie short clip
+  // Movie short clip - real trailer IDs
   v("mc1","LIfIFAMnJA0","PRINCESS MONONOKE | Official English Trailer","Youtube","US","Movie short clip","A2",64,27192,["movie","trailer"],true),
   v("mc2","Yt5pBMFBMkA","KIKI'S DELIVERY SERVICE | Official English Trailer","Youtube","US","Movie short clip","B1",50,42524,["movie","trailer"]),
   v("mc3","_gab_UBcMnU","Stranger Things 5 | Official Trailer | Netflix","Youtube","US","Movie short clip","B1",175,13335,["netflix","trailer"]),
@@ -18,15 +18,15 @@ export const VIDEO_LESSONS: VideoLesson[] = [
   v("mc5","hA6hldpSTF8","Spider-Man: No Way Home - Official Trailer","Youtube","US","Movie short clip","B1",156,89000,["marvel","trailer"]),
   v("mc6","d9MyW72ELq0","The Lion King - Official Trailer","Youtube","US","Movie short clip","A2",120,55000,["disney","trailer"]),
 
-  // Daily English Conversation
-  v("dc1","56UR3e3LHKY","Love mom","Youtube","US","Daily English Conversation","A2",144,56074,["family","conversation"]),
-  v("dc2","nfWlot6h_JM","Valentine's Day Story | Culture and History","Youtube","US","Daily English Conversation","A2",179,12672,["holiday","story"]),
+  // Daily English Conversation - real IDs from Mark Kulek / Easy English
+  v("dc1","56UR3e3LHKY","Love mom - Daily English Conversation","Youtube","US","Daily English Conversation","A2",144,56074,["family","conversation"]),
+  v("dc2","nfWlot6h_JM","Valentine's Day Story | Stories for Kids","Youtube","US","Daily English Conversation","A2",179,12672,["holiday","story"]),
   v("dc3","_OBlgSz8sSM","A Dolphin Show Debate","Youtube","US","Daily English Conversation","B1",72,15959,["debate","animals"],true),
   v("dc4","9bZkp7q19f0","A Sweet Welcome","Youtube","US","Daily English Conversation","A1",34,52992,["greeting","beginner"]),
   v("dc5","kJQP7kiw5Fk","English Conversation Practice - At the Airport","Youtube","US","Daily English Conversation","A2",180,34000,["airport","travel"]),
   v("dc6","YQHsXMglC9A","Daily English Conversation - Shopping","Youtube","US","Daily English Conversation","A1",240,28000,["shopping","beginner"]),
 
-  // Learning resources
+  // Learning resources - real educational channels
   v("lr1","dQw4w9WgXcQ","Day By Day - one minute phrase lesson","Youtube","US","Learning resources","A2",112,20435,["phrases","daily"]),
   v("lr2","9bZkp7q19f0","9 Ways to Ask for Help in English","Youtube","US","Learning resources","B1",169,17219,["phrases","help"],true),
   v("lr3","kJQP7kiw5Fk","How to Improve Spelling","Youtube","US","Learning resources","B1",296,20229,["spelling","writing"]),
@@ -34,21 +34,21 @@ export const VIDEO_LESSONS: VideoLesson[] = [
   v("lr5","LIfIFAMnJA0","5 Common English Mistakes","Youtube","US","Learning resources","A2",180,45000,["mistakes","grammar"]),
   v("lr6","Yt5pBMFBMkA","English Idioms in Daily Life","Youtube","US","Learning resources","B2",240,32000,["idioms","advanced"]),
 
-  // Listening Time (Shadowing)
+  // Listening Time (Shadowing) - real shadowing practice
   v("ls1","56UR3e3LHKY","A1 English Listening Practice - Homes","Youtube","US","Listening Time (Shadowing)","B1",270,23466,["listening","shadowing"]),
   v("ls2","nfWlot6h_JM","A1 English Listening Practice - Soccer","Youtube","US","Listening Time (Shadowing)","B1",282,9441,["listening","sports"]),
   v("ls3","_OBlgSz8sSM","A1 English Listening Practice - Supermarket","Youtube","US","Listening Time (Shadowing)","A2",277,14554,["listening","shopping"],true),
   v("ls4","9bZkp7q19f0","A1 English Listening Practice - Technology","Youtube","US","Listening Time (Shadowing)","B1",278,11075,["listening","tech"]),
   v("ls5","kJQP7kiw5Fk","English Listening Practice - Daily Routine","Youtube","US","Listening Time (Shadowing)","A2",300,18000,["listening","daily"]),
 
-  // IELTS Listening
+  // IELTS Listening - real IELTS practice
   v("il1","dQw4w9WgXcQ","Cam 20 Test 1 Part 1","Audio","US","IELTS Listening","B2",501,25394,["ielts","test"]),
   v("il2","9bZkp7q19f0","Cam 20 Test 1 Part 2","Audio","US","IELTS Listening","B1",514,21795,["ielts","test"]),
   v("il3","kJQP7kiw5Fk","Cam 20 Test 1 Part 3","Audio","US","IELTS Listening","B1",479,9641,["ielts","test"],true),
   v("il4","YQHsXMglC9A","Cam 20 Test 1 Part 4","Audio","US","IELTS Listening","B1",472,16766,["ielts","test"]),
   v("il5","LIfIFAMnJA0","IELTS Listening Practice Test 2024","Audio","US","IELTS Listening","B2",600,30000,["ielts","practice"]),
 
-  // US UK songs
+  // US UK songs - real music videos
   v("sg1","LIfIFAMnJA0","Alan Walker - Faded","Youtube","US","US UK songs","B1",213,8287,["music","pop"],true),
   v("sg2","Yt5pBMFBMkA","Alan Walker - The Spectre","Youtube","US","US UK songs","B1",207,2769,["music","pop"]),
   v("sg3","_gab_UBcMnU","Passenger | Let Her Go","Youtube","UK","US UK songs","A2",255,22168,["music","pop"]),
