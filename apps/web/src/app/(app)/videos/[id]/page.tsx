@@ -246,7 +246,7 @@ export default function VideoDetailPage() {
               <iframe
                 key={realVideoId}
                 className="w-full h-full"
-                src={`https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(video.title)}&rel=0&modestbranding=1`}
+                src={`https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(video.title)}&rel=0&modestbranding=1&origin=https://lingua-ai-web-umber.vercel.app`}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
                 onLoad={handleVideoPlay}
