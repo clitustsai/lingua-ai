@@ -36,7 +36,7 @@ const nextConfig = {
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.youtube.com https://www.youtube-nocookie.com https://pagead2.googlesyndication.com https://adservice.google.com https://www.googletagmanager.com",
               "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' data: blob: https://img.youtube.com https://i.ytimg.com https://*.ytimg.com https://i9.ytimg.com https://lh3.googleusercontent.com https://img.vietqr.io https://pagead2.googlesyndication.com https://*.googleusercontent.com",
+              "img-src 'self' data: blob: https://img.youtube.com https://i.ytimg.com https://*.ytimg.com https://i9.ytimg.com https://lh3.googleusercontent.com https://img.vietqr.io https://pagead2.googlesyndication.com https://*.googleusercontent.com https://*.youtube.com",
               "media-src 'self' blob: https://www.youtube.com https://www.youtube-nocookie.com",
               "connect-src 'self' https://*.supabase.co https://api.groq.com https://api.resend.com https://pagead2.googlesyndication.com https://adservice.google.com https://www.googleapis.com",
               "frame-src https://www.youtube.com https://www.youtube-nocookie.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://*.youtube.com",

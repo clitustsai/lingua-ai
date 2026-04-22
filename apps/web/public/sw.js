@@ -1,4 +1,4 @@
-const CACHE = "lingua-ai-v1";
+const CACHE = "lingua-ai-v3";
 const OFFLINE_URLS = [
   "/",
   "/flashcards",
@@ -35,6 +35,17 @@ self.addEventListener("fetch", (e) => {
       )
     );
     return;
+  }
+  // Skip external resources (YouTube, Supabase, etc.) - pass through directly
+  if (
+    e.request.url.includes("youtube.com") ||
+    e.request.url.includes("ytimg.com") ||
+    e.request.url.includes("supabase.co") ||
+    e.request.url.includes("googleapis.com") ||
+    e.request.url.includes("vietqr.io") ||
+    e.request.url.includes("googleusercontent.com")
+  ) {
+    return; // Let browser handle normally, no SW interception
   }
   // Cache-first for static assets
   e.respondWith(
