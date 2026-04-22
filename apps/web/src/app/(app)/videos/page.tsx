@@ -27,7 +27,7 @@ function VideoCard({ v, locked, onClick }: {
   v: VideoLesson; locked: boolean; onClick: () => void;
 }) {
   const isAudio = v.teacher === "Audio";
-  const thumb = `https://i.ytimg.com/vi/${v.youtubeId}/mqdefault.jpg`;
+  const thumb = `https://i.ytimg.com/vi/${v.youtubeId}/hqdefault.jpg`;
   const [imgError, setImgError] = useState(false);
 
   return (
