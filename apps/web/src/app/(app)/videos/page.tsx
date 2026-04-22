@@ -27,8 +27,8 @@ function VideoCard({ v, locked, onClick }: {
   v: VideoLesson; locked: boolean; onClick: () => void;
 }) {
   const isAudio = v.teacher === "Audio";
-  // Use hqdefault for better quality thumbnails
   const thumb = `https://i.ytimg.com/vi/${v.youtubeId}/mqdefault.jpg`;
+  const [imgError, setImgError] = useState(false);
 
   return (
     <div className={cn("rounded-xl overflow-hidden border transition-all hover:border-gray-500 cursor-pointer group",
@@ -36,12 +36,12 @@ function VideoCard({ v, locked, onClick }: {
       style={{ background: "rgba(18,12,36,0.9)" }}>
       {/* Thumbnail */}
       <div className="relative w-full aspect-video overflow-hidden bg-gray-900" onClick={onClick}>
-        {isAudio ? (
+        {isAudio || imgError ? (
           <div className="absolute inset-0 flex items-center justify-center"
             style={{ background: "linear-gradient(135deg,#1e3a5f,#0f2040)" }}>
             <div className="text-center px-2">
-              <div className="text-2xl font-black text-white opacity-80 leading-tight">{v.category.split(" ")[0]}</div>
-              <div className="text-blue-300 text-xs mt-1">🎧 Audio</div>
+              <div className="text-3xl mb-1">{isAudio ? "🎧" : "🎬"}</div>
+              <div className="text-white text-xs font-medium opacity-70 line-clamp-2">{v.title}</div>
             </div>
           </div>
         ) : (
@@ -50,8 +50,12 @@ function VideoCard({ v, locked, onClick }: {
             src={thumb}
             alt={v.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            onError={() => setImgError(true)}
           />
         )}
+
+        {/* Gradient overlay at bottom for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
 
         {/* Lock overlay */}
         {locked && (
@@ -60,48 +64,48 @@ function VideoCard({ v, locked, onClick }: {
           </div>
         )}
 
-        {/* PRO badge */}
+        {/* PRO badge - top left */}
         {v.isPro && (
           <div className="absolute top-1.5 left-1.5 bg-yellow-500 text-black text-xs font-black px-1.5 py-0.5 rounded z-10">
             PRO
           </div>
         )}
 
-        {/* View count */}
+        {/* View count - top left (after PRO) */}
         <div className="absolute top-1.5 flex items-center gap-0.5 text-white text-xs bg-black/50 px-1.5 py-0.5 rounded"
           style={{ left: v.isPro ? "44px" : "6px" }}>
           <Users className="w-2.5 h-2.5 opacity-70" />
           <span>{fmtViews(v.views)}</span>
         </div>
 
-        {/* Level badge */}
+        {/* Level badge - top right */}
         <div className="absolute top-1.5 right-1.5 text-xs font-bold text-white px-1.5 py-0.5 rounded"
           style={{ background: LEVEL_COLOR[v.level] ?? "#6b7280" }}>
           {v.level}
         </div>
 
-        {/* Source */}
+        {/* Source - bottom left */}
         <div className="absolute bottom-1.5 left-1.5 text-white text-xs px-1.5 py-0.5 rounded flex items-center gap-1"
           style={{ background: isAudio ? "#1d4ed8" : "#dc2626" }}>
           {isAudio ? "🎧 Audio" : "▶ Youtube"}
         </div>
 
-        {/* Duration */}
+        {/* Duration - bottom right */}
         <div className="absolute bottom-1.5 right-1.5 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded flex items-center gap-1">
           <Clock className="w-2.5 h-2.5" />{fmt(v.durationSec)}
         </div>
       </div>
 
-      {/* Title */}
+      {/* Title - fixed 2 lines with min-height for uniform layout */}
       <div className="px-2.5 pt-2 pb-1" onClick={onClick}>
-        <p className="text-xs font-medium leading-tight line-clamp-2 min-h-[2.5rem]"
-          style={{ color: v.isPro ? "#fbbf24" : "white" }}>
+        <p className="text-xs font-medium leading-tight line-clamp-2"
+          style={{ color: v.isPro ? "#fbbf24" : "white", minHeight: "2.5rem", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
           {v.title}
         </p>
       </div>
 
-      {/* Dictation / Shadowing */}
-      <div className="flex items-center justify-between px-2.5 pb-2.5 pt-0.5">
+      {/* Dictation / Shadowing - always at same position */}
+      <div className="flex items-center justify-between px-2.5 pb-2.5 pt-0.5 border-t border-white/5 mt-1">
         <button onClick={onClick}
           className="flex items-center gap-1 text-xs text-gray-400 hover:text-white transition-colors">
           <Clock className="w-3 h-3" /> Dictation
