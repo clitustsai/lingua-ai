@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/store/useAppStore";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -27,8 +27,16 @@ function VideoCard({ v, locked, onClick }: {
   v: VideoLesson; locked: boolean; onClick: () => void;
 }) {
   const isAudio = v.teacher === "Audio";
-  const thumb = `https://i.ytimg.com/vi/${v.youtubeId}/hqdefault.jpg`;
-  const [imgError, setImgError] = useState(false);
+  // Fallback chain: hqdefault → mqdefault → sddefault → placeholder
+  const THUMBS = [
+    `https://i.ytimg.com/vi/${v.youtubeId}/hqdefault.jpg`,
+    `https://i.ytimg.com/vi/${v.youtubeId}/mqdefault.jpg`,
+    `https://img.youtube.com/vi/${v.youtubeId}/sddefault.jpg`,
+  ];
+  const [thumbIdx, setThumbIdx] = useState(0);
+  const thumbFailed = thumbIdx >= THUMBS.length;
+
+  const handleThumbError = () => setThumbIdx(i => i + 1);
 
   return (
     <div className={cn("rounded-xl overflow-hidden border transition-all hover:border-gray-500 cursor-pointer group",
@@ -36,7 +44,7 @@ function VideoCard({ v, locked, onClick }: {
       style={{ background: "rgba(18,12,36,0.9)" }}>
       {/* Thumbnail */}
       <div className="relative w-full aspect-video overflow-hidden bg-gray-900" onClick={onClick}>
-        {isAudio || imgError ? (
+        {isAudio || thumbFailed ? (
           <div className="absolute inset-0 flex items-center justify-center"
             style={{ background: "linear-gradient(135deg,#1e3a5f,#0f2040)" }}>
             <div className="text-center px-2">
@@ -47,10 +55,10 @@ function VideoCard({ v, locked, onClick }: {
         ) : (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={thumb}
+            src={THUMBS[thumbIdx]}
             alt={v.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            onError={() => setImgError(true)}
+            onError={handleThumbError}
           />
         )}
 
@@ -121,17 +129,16 @@ function VideoCard({ v, locked, onClick }: {
 
 export default function VideosPage() {
   const router = useRouter();
-  const { completedVideos } = useAppStore();
   const { user } = useAuthStore();
   const isPremium = user?.isPremium ?? false;
   const [activeTag, setActiveTag] = useState<string | null>(null);
 
   // Clear stale YouTube ID cache on mount
-  useState(() => {
+  useEffect(() => {
     if (typeof window !== "undefined") {
       Object.keys(localStorage).filter(k => k.startsWith("yt_ok_")).forEach(k => localStorage.removeItem(k));
     }
-  });
+  }, []);
 
   const grouped = CATEGORIES.map(cat => ({
     cat,
