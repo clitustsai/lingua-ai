@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useAppStore } from "@/store/useAppStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { VIDEO_LESSONS, CATEGORIES, VideoLesson } from "@/lib/videoLessons";
-import { Clock, Users, ChevronRight, Crown } from "lucide-react";
+import { Clock, Users, ChevronRight, Crown, Play, Headphones, Music, BookOpen, Globe, Tv, Mic } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 function fmt(sec: number) {
@@ -21,6 +21,30 @@ const LEVEL_COLOR: Record<string, string> = {
   B1:"#3b82f6", "A2-B1":"#3b82f6", "B1-B2":"#3b82f6",
   B2:"#a855f7", "B2-C1":"#a855f7",
   C1:"#f97316", C2:"#ef4444",
+};
+
+const CAT_ICON: Record<string, any> = {
+  "Movie short clip": Play,
+  "Daily English Conversation": Mic,
+  "Learning resources": BookOpen,
+  "Listening Time (Shadowing)": Headphones,
+  "US UK songs": Music,
+  "Science and Facts": Globe,
+  "TED": Tv,
+  "Travel vlog": Globe,
+  "BBC learning english": BookOpen,
+};
+
+const CAT_GRADIENT: Record<string, string> = {
+  "Movie short clip": "from-purple-900/60 to-purple-700/30",
+  "Daily English Conversation": "from-blue-900/60 to-blue-700/30",
+  "Learning resources": "from-green-900/60 to-green-700/30",
+  "Listening Time (Shadowing)": "from-pink-900/60 to-pink-700/30",
+  "US UK songs": "from-red-900/60 to-red-700/30",
+  "Science and Facts": "from-yellow-900/60 to-yellow-700/30",
+  "TED": "from-orange-900/60 to-orange-700/30",
+  "Travel vlog": "from-cyan-900/60 to-cyan-700/30",
+  "BBC learning english": "from-indigo-900/60 to-indigo-700/30",
 };
 
 function VideoCard({ v, locked, onClick }: {
@@ -45,12 +69,12 @@ function VideoCard({ v, locked, onClick }: {
       {/* Thumbnail */}
       <div className="relative w-full aspect-video overflow-hidden bg-gray-900" onClick={onClick}>
         {isAudio || thumbFailed ? (
-          <div className="absolute inset-0 flex items-center justify-center"
-            style={{ background: "linear-gradient(135deg,#1e3a5f,#0f2040)" }}>
-            <div className="text-center px-2">
-              <div className="text-3xl mb-1">{isAudio ? "🎧" : "🎬"}</div>
-              <div className="text-white text-xs font-medium opacity-70 line-clamp-2">{v.title}</div>
-            </div>
+          <div className={cn("absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gradient-to-br", CAT_GRADIENT[v.category] ?? "from-gray-900/60 to-gray-700/30")}>
+            {(() => {
+              const Icon = isAudio ? Headphones : (CAT_ICON[v.category] ?? Play);
+              return <Icon className="w-10 h-10 text-white/60" />;
+            })()}
+            <p className="text-white/50 text-xs font-medium text-center px-3 line-clamp-2">{v.title}</p>
           </div>
         ) : (
           // eslint-disable-next-line @next/next/no-img-element
