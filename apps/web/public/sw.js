@@ -1,4 +1,4 @@
-const CACHE = "lingua-ai-v3";
+const CACHE = "lingua-ai-v4";
 const OFFLINE_URLS = [
   "/",
   "/flashcards",

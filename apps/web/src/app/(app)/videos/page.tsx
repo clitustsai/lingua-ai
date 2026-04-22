@@ -126,6 +126,13 @@ export default function VideosPage() {
   const isPremium = user?.isPremium ?? false;
   const [activeTag, setActiveTag] = useState<string | null>(null);
 
+  // Clear stale YouTube ID cache on mount
+  useState(() => {
+    if (typeof window !== "undefined") {
+      Object.keys(localStorage).filter(k => k.startsWith("yt_ok_")).forEach(k => localStorage.removeItem(k));
+    }
+  });
+
   const grouped = CATEGORIES.map(cat => ({
     cat,
     videos: VIDEO_LESSONS.filter(v => v.category === cat && v.language === "English"),
