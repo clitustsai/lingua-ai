@@ -105,14 +105,61 @@ export default function VideoDetailPage() {
   const [realVideoId, setRealVideoId] = useState<string | null>(null);
   const [videoLoading, setVideoLoading] = useState(false);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
+  const [videoError, setVideoError] = useState(false);
 
   // For English use stored ID; for others fetch real ID via YouTube API
   const isEnglish = video?.language === "English";
 
+  // Load smart video: check cache → stored ID → smart search fallback
+  const loadSmartVideo = async (vid: typeof video, forceSearch = false) => {
+    if (!vid) return;
+    const cacheKey = `yt_ok_${vid.id}`;
+    const cached = typeof window !== "undefined" ? localStorage.getItem(cacheKey) : null;
+    if (cached && !forceSearch) {
+      setRealVideoId(cached);
+      return;
+    }
+    // Try stored ID first
+    if (!forceSearch) {
+      setRealVideoId(vid.youtubeId);
+      return;
+    }
+    // Smart search via YouTube API
+    setVideoLoading(true);
+    try {
+      const res = await fetch("/api/youtube-smart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: vid.title + " english lesson", minDuration: 30, maxDuration: 900 }),
+      });
+      const data = await res.json();
+      if (data.videoId) {
+        setRealVideoId(data.videoId);
+        setVideoError(false);
+        // Cache this good ID
+        if (typeof window !== "undefined") localStorage.setItem(`yt_ok_${vid.id}`, data.videoId);
+      }
+    } catch {}
+    finally { setVideoLoading(false); }
+  };
+
+  // Called when iframe reports video unavailable
+  const handleVideoError = () => {
+    setVideoError(true);
+    loadSmartVideo(video, true); // force smart search
+  };
+
+  // Mark video ID as good when it plays successfully
+  const handleVideoPlay = () => {
+    if (video && realVideoId && typeof window !== "undefined") {
+      localStorage.setItem(`yt_ok_${video.id}`, realVideoId);
+    }
+  };
+
   useEffect(() => {
     if (!video) return;
-    // Always try to use the stored ID first, fallback to YouTube search link
-    setRealVideoId(video.youtubeId);
+    setVideoError(false);
+    loadSmartVideo(video, false);
 
     // Generate lesson content
     setLoading(true);
@@ -183,13 +230,28 @@ export default function VideoDetailPage() {
           </div>
         ) : realVideoId ? (
           <div className="relative aspect-video rounded-2xl overflow-hidden bg-black">
-            {/* Use YouTube search embed - always works */}
-            <iframe
-              className="w-full h-full"
-              src={`https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(video.title)}&rel=0&modestbranding=1`}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowFullScreen
-            />
+            {videoError ? (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-gray-900">
+                {videoLoading ? (
+                  <><Loader2 className="w-8 h-8 text-purple-400 animate-spin" /><p className="text-gray-400 text-sm">Đang tìm video khác...</p></>
+                ) : (
+                  <><p className="text-gray-400 text-sm">Video không khả dụng</p>
+                  <button onClick={() => loadSmartVideo(video, true)}
+                    className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-sm rounded-xl transition-colors">
+                    Tìm video khác
+                  </button></>
+                )}
+              </div>
+            ) : (
+              <iframe
+                key={realVideoId}
+                className="w-full h-full"
+                src={`https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(video.title)}&rel=0&modestbranding=1`}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                onLoad={handleVideoPlay}
+              />
+            )}
             <a href={`https://www.youtube.com/results?search_query=${encodeURIComponent(video.title)}`}
               target="_blank" rel="noopener noreferrer"
               className="absolute bottom-3 right-3 flex items-center gap-1.5 bg-red-600 hover:bg-red-500 text-white text-xs px-2.5 py-1.5 rounded-lg font-medium transition-colors shadow-lg z-10">
