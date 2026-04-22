@@ -110,7 +110,7 @@ export default function VideoDetailPage() {
   // For English use stored ID; for others fetch real ID via YouTube API
   const isEnglish = video?.language === "English";
 
-  // Load smart video: check cache → stored ID → smart search fallback
+  // Load smart video: check cache → YouTube API search → fallback to stored ID
   const loadSmartVideo = async (vid: typeof video, forceSearch = false) => {
     if (!vid) return;
     const cacheKey = `yt_ok_${vid.id}`;
@@ -119,28 +119,29 @@ export default function VideoDetailPage() {
       setRealVideoId(cached);
       return;
     }
-    // Try stored ID first
-    if (!forceSearch) {
-      setRealVideoId(vid.youtubeId);
-      return;
-    }
-    // Smart search via YouTube API
+    // Always search via YouTube API for real video
     setVideoLoading(true);
     try {
       const res = await fetch("/api/youtube-smart", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: vid.title + " english lesson", minDuration: 30, maxDuration: 900 }),
+        body: JSON.stringify({
+          query: vid.title,
+          minDuration: 30,
+          maxDuration: 900,
+        }),
       });
       const data = await res.json();
       if (data.videoId) {
         setRealVideoId(data.videoId);
         setVideoError(false);
-        // Cache this good ID
-        if (typeof window !== "undefined") localStorage.setItem(`yt_ok_${vid.id}`, data.videoId);
+        if (typeof window !== "undefined") localStorage.setItem(cacheKey, data.videoId);
+        return;
       }
     } catch {}
     finally { setVideoLoading(false); }
+    // Fallback to stored ID if API fails
+    setRealVideoId(vid.youtubeId);
   };
 
   // Called when iframe reports video unavailable
