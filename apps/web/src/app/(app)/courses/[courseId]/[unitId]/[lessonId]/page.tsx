@@ -8,11 +8,16 @@ import { speakText } from "@/components/VoiceButton";
 import { cn } from "@/lib/utils";
 
 // ── Vocabulary Lesson ────────────────────────────────────────────────────────
-function VocabLesson({ data, lang }: { data: any; lang: string }) {
+function VocabLesson({ data, lang, onComplete }: { data: any; lang: string; onComplete?: () => void }) {
   const [step, setStep] = useState<"learn" | "practice">("learn");
   const [idx, setIdx] = useState(0);
   const [flipped, setFlipped] = useState(false);
+  const [practiceCompleted, setPracticeCompleted] = useState(false);
   const items = data.items ?? [];
+
+  useEffect(() => {
+    if (step === "practice" && practiceCompleted) onComplete?.();
+  }, [step, practiceCompleted, onComplete]);
 
   if (step === "learn") {
     const item = items[idx];
@@ -53,14 +58,20 @@ function VocabLesson({ data, lang }: { data: any; lang: string }) {
   }
 
   // Practice: simple match quiz from vocab
-  return <MatchQuiz items={items.map((i: any) => ({ question: i.word, answer: i.translation }))} lang={lang} />;
+  return <MatchQuiz items={items.map((i: any) => ({ question: i.word, answer: i.translation }))} lang={lang} onComplete={() => setPracticeCompleted(true)} />;
 }
 
 // ── Grammar Lesson ───────────────────────────────────────────────────────────
-function GrammarLesson({ data, lang }: { data: any; lang: string }) {
+function GrammarLesson({ data, lang, onComplete }: { data: any; lang: string; onComplete?: () => void }) {
   const [showEx, setShowEx] = useState<Record<number, boolean>>({});
   const examples = data.examples ?? [];
   const exercises = data.exercises ?? [];
+  useEffect(() => { if (exercises.length === 0) onComplete?.(); }, []);
+  const [allShown, setAllShown] = useState(false);
+  useEffect(() => {
+    const total = exercises.length;
+    if (total > 0 && Object.keys(showEx).length >= total) { onComplete?.(); setAllShown(true); }
+  }, [showEx, exercises.length, onComplete]);
   return (
     <div className="flex flex-col gap-5">
       <div className="rounded-2xl p-4" style={{ background: "rgba(234,179,8,0.1)", border: "1px solid rgba(234,179,8,0.2)" }}>
@@ -98,9 +109,16 @@ function GrammarLesson({ data, lang }: { data: any; lang: string }) {
 }
 
 // ── Listening Lesson ─────────────────────────────────────────────────────────
-function ListeningLesson({ data, lang }: { data: any; lang: string }) {
+function ListeningLesson({ data, lang, onComplete }: { data: any; lang: string; onComplete?: () => void }) {
   const [showScript, setShowScript] = useState(false);
   const [showAnswers, setShowAnswers] = useState<Record<number, boolean>>({});
+  const questions = data.questions ?? [];
+  useEffect(() => {
+    if (questions.length === 0) onComplete?.();
+  }, []);
+  useEffect(() => {
+    if (questions.length > 0 && Object.keys(showAnswers).length >= questions.length) onComplete?.();
+  }, [showAnswers, questions.length, onComplete]);
   return (
     <div className="flex flex-col gap-5">
       <p className="text-sm text-gray-400">{data.intro}</p>
@@ -129,9 +147,16 @@ function ListeningLesson({ data, lang }: { data: any; lang: string }) {
 }
 
 // ── Reading Lesson ───────────────────────────────────────────────────────────
-function ReadingLesson({ data, lang }: { data: any; lang: string }) {
+function ReadingLesson({ data, lang, onComplete }: { data: any; lang: string; onComplete?: () => void }) {
   const [showTrans, setShowTrans] = useState(false);
   const [showAnswers, setShowAnswers] = useState<Record<number, boolean>>({});
+  const questions = data.questions ?? [];
+  useEffect(() => {
+    if (questions.length === 0) onComplete?.();
+  }, []);
+  useEffect(() => {
+    if (questions.length > 0 && Object.keys(showAnswers).length >= questions.length) onComplete?.();
+  }, [showAnswers, questions.length, onComplete]);
   return (
     <div className="flex flex-col gap-5">
       <div className="rounded-2xl p-4" style={{ background: "rgba(26,16,53,0.8)", border: "1px solid rgba(139,92,246,0.2)" }}>
@@ -162,7 +187,8 @@ function ReadingLesson({ data, lang }: { data: any; lang: string }) {
 }
 
 // ── Speaking Lesson ──────────────────────────────────────────────────────────
-function SpeakingLesson({ data, lang }: { data: any; lang: string }) {
+function SpeakingLesson({ data, lang, onComplete }: { data: any; lang: string; onComplete?: () => void }) {
+  useEffect(() => { onComplete?.(); }, []);
   return (
     <div className="flex flex-col gap-5">
       <div className="rounded-2xl p-4" style={{ background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.2)" }}>
@@ -203,7 +229,7 @@ function SpeakingLesson({ data, lang }: { data: any; lang: string }) {
 }
 
 // ── Quiz Lesson ──────────────────────────────────────────────────────────────
-function QuizLesson({ data }: { data: any }) {
+function QuizLesson({ data, onComplete }: { data: any; onComplete?: () => void }) {
   const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [score, setScore] = useState(0);
@@ -215,7 +241,7 @@ function QuizLesson({ data }: { data: any }) {
     setSelected(idx);
     if (idx === questions[current].correct) setScore(s => s + 1);
     setTimeout(() => {
-      if (current + 1 >= questions.length) setDone(true);
+      if (current + 1 >= questions.length) { setDone(true); onComplete?.(); }
       else { setCurrent(c => c + 1); setSelected(null); }
     }, 900);
   };
@@ -267,7 +293,7 @@ function QuizLesson({ data }: { data: any }) {
 }
 
 // ── Match Quiz (used by vocab) ───────────────────────────────────────────────
-function MatchQuiz({ items, lang }: { items: { question: string; answer: string }[]; lang: string }) {
+function MatchQuiz({ items, lang, onComplete }: { items: { question: string; answer: string }[]; lang: string; onComplete?: () => void }) {
   const shuffled = [...items].sort(() => Math.random() - 0.5).slice(0, 6);
   const [selected, setSelected] = useState<string | null>(null);
   const [matched, setMatched] = useState<string[]>([]);
@@ -278,7 +304,12 @@ function MatchQuiz({ items, lang }: { items: { question: string; answer: string 
   const pickAns = (ans: string) => {
     if (!selected) return;
     const correct = shuffled.find(i => i.question === selected)?.answer;
-    if (ans === correct) { setMatched(m => [...m, selected]); setSelected(null); }
+    if (ans === correct) {
+      const newMatched = [...matched, selected];
+      setMatched(newMatched);
+      setSelected(null);
+      if (newMatched.length === shuffled.length) onComplete?.();
+    }
     else { setWrong(ans); setTimeout(() => setWrong(null), 600); }
   };
 
@@ -338,6 +369,7 @@ export default function LessonPlayerPage() {
   const [loading, setLoading] = useState(true);
   const [completed, setCompleted] = useState(false);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
+  const [canComplete, setCanComplete] = useState(false);
 
   const prog = courseProgress.find(p => p.courseId === courseId);
   const alreadyDone = prog?.completedLessons.includes(lessonId) ?? false;
@@ -412,12 +444,12 @@ export default function LessonPlayerPage() {
           </div>
         ) : (
           <>
-            {lesson.type === "vocabulary" && <VocabLesson data={lessonData} lang={settings.targetLanguage.code} />}
-            {lesson.type === "grammar" && <GrammarLesson data={lessonData} lang={settings.targetLanguage.code} />}
-            {lesson.type === "listening" && <ListeningLesson data={lessonData} lang={settings.targetLanguage.code} />}
-            {lesson.type === "reading" && <ReadingLesson data={lessonData} lang={settings.targetLanguage.code} />}
-            {lesson.type === "speaking" && <SpeakingLesson data={lessonData} lang={settings.targetLanguage.code} />}
-            {lesson.type === "quiz" && <QuizLesson data={lessonData} />}
+            {lesson.type === "vocabulary" && <VocabLesson data={lessonData} lang={settings.targetLanguage.code} onComplete={() => setCanComplete(true)} />}
+            {lesson.type === "grammar" && <GrammarLesson data={lessonData} lang={settings.targetLanguage.code} onComplete={() => setCanComplete(true)} />}
+            {lesson.type === "listening" && <ListeningLesson data={lessonData} lang={settings.targetLanguage.code} onComplete={() => setCanComplete(true)} />}
+            {lesson.type === "reading" && <ReadingLesson data={lessonData} lang={settings.targetLanguage.code} onComplete={() => setCanComplete(true)} />}
+            {lesson.type === "speaking" && <SpeakingLesson data={lessonData} lang={settings.targetLanguage.code} onComplete={() => setCanComplete(true)} />}
+            {lesson.type === "quiz" && <QuizLesson data={lessonData} onComplete={() => setCanComplete(true)} />}
 
             <div className="mt-8">
               {completed || alreadyDone ? (
@@ -438,9 +470,9 @@ export default function LessonPlayerPage() {
                   )}
                 </div>
               ) : (
-                <button onClick={markDone}
-                  className="w-full py-3.5 rounded-2xl bg-primary-600 hover:bg-primary-500 text-white font-bold flex items-center justify-center gap-2 transition-colors">
-                  Hoàn thành bài học <ChevronRight className="w-5 h-5" />
+                <button onClick={markDone} disabled={!canComplete}
+                  className="w-full py-3.5 rounded-2xl bg-primary-600 hover:bg-primary-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold flex items-center justify-center gap-2 transition-colors">
+                  {canComplete ? "Hoàn thành bài học" : "Hoàn thành tất cả bài tập trước"} <ChevronRight className="w-5 h-5" />
                 </button>
               )}
             </div>
