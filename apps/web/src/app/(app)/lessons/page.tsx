@@ -119,9 +119,6 @@ export default function LessonsPage() {
         </p>
       </div>
 
-      {/* TOEIC 200 banner */}
-      <Toeic200Banner className="mb-5" />
-
       {/* TOEIC 200 Practice */}
       <Toeic200Practice />
 
