@@ -66,6 +66,7 @@ const QUESTIONS: Record<Part, Q[]> = {
 };
 
 export default function ToeicPractice() {
+  const [open, setOpen] = useState(false);
   const [activePart, setActivePart] = useState<Part>("P1");
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [flagged, setFlagged] = useState<Set<string>>(new Set());
@@ -87,11 +88,17 @@ export default function ToeicPractice() {
 
   return (
     <div className="rounded-2xl overflow-hidden" style={{ background: "rgba(10,6,24,0.95)", border: "1px solid rgba(59,130,246,0.2)" }}>
-      {/* Header */}
-      <div className="px-4 pt-3 pb-2 border-b border-white/5 flex items-center justify-between">
-        <p className="text-white font-bold text-sm">📝 Luyện tập TOEIC — 200 câu</p>
-        <p className="text-gray-500 text-xs">Toàn bộ 7 parts · 120 phút</p>
-      </div>
+      {/* Header - always visible */}
+      <button onClick={() => setOpen(o => !o)}
+        className="w-full px-4 py-3 flex items-center justify-between hover:bg-white/5 transition-colors">
+        <div className="flex items-center gap-2">
+          <span className="text-white font-bold text-sm">📝 Luyện tập TOEIC — 200 câu</span>
+          <span className="text-gray-500 text-xs">· 7 parts · 120 phút</span>
+        </div>
+        <span className="text-blue-400 text-xs font-semibold">{open ? "Thu gọn ▲" : "Bắt đầu ▼"}</span>
+      </button>
+
+      {!open ? null : (<>
 
       {/* Part tabs */}
       <div className="flex items-center gap-1 px-3 py-2 border-b border-white/5 overflow-x-auto scrollbar-hide">
@@ -297,6 +304,7 @@ export default function ToeicPractice() {
           </div>
         )}
       </div>
+      </>)}
     </div>
   );
 }
