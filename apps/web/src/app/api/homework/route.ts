@@ -72,7 +72,7 @@ Return JSON exactly like this (no extra text):
       id: ex.id ?? String(i + 1),
       type: ex.type ?? "multiple-choice",
       instruction: ex.instruction ?? "Answer the question",
-      question: ex.question ?? "",
+      question: (ex.question ?? "").split("---")[0].replace(/^(plan|note|explanation)[:\s]*/gi, "").trim(),
       answer: ex.answer ?? "",
       hint: ex.hint ?? null,
       points: Number(ex.points) || 5,
