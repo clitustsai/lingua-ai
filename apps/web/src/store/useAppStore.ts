@@ -160,8 +160,6 @@ type AppStore = {
   claimStreakReward: (day: number) => void;
   setUsername: (name: string) => void;
   checkDailyStreak: () => void;
-  completedVideos: string[];
-  addCompletedVideo: (videoId: string) => void;
   translateHistory: { id: string; original: string; translation: string; fromLang: string; toLang: string; savedAt: string; starred: boolean }[];
   addTranslateHistory: (item: { original: string; translation: string; fromLang: string; toLang: string }) => void;
   toggleStarTranslation: (id: string) => void;
