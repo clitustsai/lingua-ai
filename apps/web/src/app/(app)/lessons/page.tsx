@@ -9,7 +9,6 @@ import { cn } from "@/lib/utils";
 import { speakText } from "@/components/VoiceButton";
 import PremiumGate from "@/components/PremiumGate";
 import { canUseFeature, getRemainingUses, incrementUsage, FREE_LIMITS } from "@/lib/usageLimit";
-import ToeicPractice from "@/components/ToeicPractice";
 
 interface Vocab { word: string; translation: string; example: string; pronunciation?: string; romanization?: string; }
 interface DialogueLine { speaker: string; text: string; translation: string; }
@@ -120,7 +119,6 @@ export default function LessonsPage() {
       </div>
 
       {/* Topic grid */}
-      <ToeicPractice />
       <div className="grid grid-cols-4 gap-2 mb-5">
         {LESSON_TOPICS.map(t => (
           <button key={t.id} onClick={() => setSelectedTopic(t)}

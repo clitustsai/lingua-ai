@@ -4,7 +4,6 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { COURSES } from "@ai-lang/shared";
 import { useRouter } from "next/navigation";
 import { BookOpen, ChevronRight, Star, Flame, Trophy, Crown, Lock } from "lucide-react";
-import ToeicPractice from "@/components/ToeicPractice";
 
 // Courses under development (language courses)
 const COMING_SOON_CATEGORIES = ["Ngôn ngữ"];
@@ -54,7 +53,6 @@ export default function CoursesPage() {
       </div>
 
       <div className="px-5 space-y-8 pb-6">
-        <ToeicPractice />
         {/* Free notice */}
         {!isPremium && (
           <div className="flex items-center justify-between px-3 py-2.5 rounded-xl"
