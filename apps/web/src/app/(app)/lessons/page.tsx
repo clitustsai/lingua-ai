@@ -9,7 +9,6 @@ import { cn } from "@/lib/utils";
 import { speakText } from "@/components/VoiceButton";
 import PremiumGate from "@/components/PremiumGate";
 import { canUseFeature, getRemainingUses, incrementUsage, FREE_LIMITS } from "@/lib/usageLimit";
-import Toeic200Practice from "@/components/Toeic200Practice";
 
 interface Vocab { word: string; translation: string; example: string; pronunciation?: string; romanization?: string; }
 interface DialogueLine { speaker: string; text: string; translation: string; }
@@ -118,9 +117,6 @@ export default function LessonsPage() {
           {settings.targetLanguage.flag} {settings.targetLanguage.name} · Cấp độ {settings.level}
         </p>
       </div>
-
-      {/* TOEIC 200 Practice */}
-      <Toeic200Practice />
 
       {/* Topic grid */}
       <div className="grid grid-cols-4 gap-2 mb-5">

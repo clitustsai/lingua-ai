@@ -8,7 +8,6 @@ import { speakText } from "@/components/VoiceButton";
 import { cn } from "@/lib/utils";
 import { LEVELS } from "@ai-lang/shared";
 import { canUseFeature, getRemainingUses, incrementUsage, FREE_LIMITS } from "@/lib/usageLimit";
-import Toeic200Practice from "@/components/Toeic200Practice";
 
 const GOALS = [
   { id: "travel", label: "Du lịch", emoji: "✈️", desc: "Giao tiếp khi đi du lịch" },
@@ -176,7 +175,6 @@ export default function LearningPathPage() {
           <Sparkles className="w-6 h-6 text-yellow-400" /> Lộ trình học cá nhân
         </h1>
         <p className="text-sm text-gray-400 mt-1">AI tạo kế hoạch học riêng cho bạn</p>
-        <div className="mt-4"><Toeic200Practice /></div>
       </div>
 
       <div className="flex flex-col gap-5">
