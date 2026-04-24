@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import AIErrorToast from "@/components/AIErrorToast";
 import { speakText } from "@/components/VoiceButton";
 import { canUseFeature, getRemainingUses, incrementUsage, FREE_LIMITS } from "@/lib/usageLimit";
-import Toeic200Banner from "@/components/Toeic200Banner";
+import Toeic200Practice from "@/components/Toeic200Practice";
 
 type Exercise = {
   id: string; type: string; instruction: string; question: string;
@@ -171,7 +171,7 @@ export default function HomeworkPage() {
             <GraduationCap className="w-5 h-5 text-yellow-400" /> AI Teacher
           </h1>
           <p className="text-sm text-gray-500 mt-1">Bài tập cá nhân hóa · AI chấm điểm · Theo dõi tiến độ</p>
-          <Toeic200Banner className="mt-4" />
+          <div className="mt-4"><Toeic200Practice /></div>
         </div>
         <div className="flex items-center gap-2">
           {streak > 0 && (
