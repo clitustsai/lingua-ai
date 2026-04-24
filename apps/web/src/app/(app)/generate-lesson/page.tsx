@@ -7,6 +7,7 @@ import { Sparkles, Loader2, Volume2, Copy, Check, BookOpen, Mic, ChevronDown, Ch
 import { speakText } from "@/components/VoiceButton";
 import { cn } from "@/lib/utils";
 import { canUseFeature, getRemainingUses, incrementUsage, FREE_LIMITS } from "@/lib/usageLimit";
+import Toeic200Banner from "@/components/Toeic200Banner";
 
 const QUICK_TOPICS = [
   { label: "IELTS Speaking Part 1", emoji: "🎤" },
@@ -83,6 +84,7 @@ export default function GenerateLessonPage() {
           <Sparkles className="w-5 h-5 text-yellow-400" /> Tạo bài học tự động
         </h1>
         <p className="text-sm text-gray-400 mt-1">Nhập chủ đề → AI tạo câu hỏi, sample answer, vocab ngay</p>
+        <Toeic200Banner className="mt-4" />
       </div>
 
       {/* Input */}
