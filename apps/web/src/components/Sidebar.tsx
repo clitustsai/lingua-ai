@@ -44,7 +44,6 @@ const NAV_GROUPS = (tr: any) => [
   {
     label: "Nội dung",
     items: [
-      { href: "/videos",        icon: Youtube,         label: tr.videoLessons },
       { href: "/video",         icon: Headphones,      label: tr.videoSub },
       { href: "/courses",       icon: Compass,         label: tr.courses },
       { href: "/lessons",       icon: GraduationCap,   label: tr.lessons },

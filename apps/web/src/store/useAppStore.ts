@@ -438,14 +438,6 @@ export const useAppStore = create<AppStore>()(
         };
       }),
 
-      completedVideos: [],
-
-      addCompletedVideo: (videoId) => set((state) => ({
-        completedVideos: state.completedVideos.includes(videoId)
-          ? state.completedVideos
-          : [...state.completedVideos, videoId],
-      })),
-
       translateHistory: [],
 
       addTranslateHistory: (item) => set((state) => ({
