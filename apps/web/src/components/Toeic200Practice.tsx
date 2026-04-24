@@ -185,21 +185,28 @@ export default function Toeic200Practice() {
                       <Flag className="w-3.5 h-3.5" />
                     </button>
                   </div>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-col gap-2">
                     {q.options.map((opt, j) => {
+                      // Strip leading "A. ", "B. " etc if AI added them
+                      const cleanOpt = opt.replace(/^[A-D]\.\s*/i, "");
                       const isRight = j === q.correct;
                       const isPicked = picked === j;
                       return (
                         <button key={j} onClick={() => !checked && setAnswers(prev => ({ ...prev, [i]: j }))}
                           disabled={checked}
-                          className={cn("px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all",
+                          className={cn("px-3 py-2 rounded-xl border text-sm text-left transition-all flex items-center gap-2",
                             checked
                               ? isRight ? "border-green-500 bg-green-900/30 text-green-300"
                                 : isPicked ? "border-red-500 bg-red-900/30 text-red-300"
                                 : "border-gray-700 text-gray-600 opacity-40"
                               : isPicked ? "border-blue-500 bg-blue-900/30 text-white"
                               : "border-gray-700 bg-gray-800 text-gray-300 hover:border-blue-500")}>
-                          {["A","B","C","D"][j]}. {opt}
+                          <span className={cn("w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0",
+                            checked ? isRight ? "bg-green-600 text-white" : isPicked ? "bg-red-600 text-white" : "bg-gray-800 text-gray-500"
+                            : isPicked ? "bg-blue-600 text-white" : "bg-gray-700 text-gray-400")}>
+                            {["A","B","C","D"][j]}
+                          </span>
+                          {cleanOpt}
                         </button>
                       );
                     })}
