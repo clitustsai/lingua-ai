@@ -17,8 +17,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Chua cau hinh tai khoan ACB" }, { status: 503 });
   }
 
-  const amount = plan === "yearly" ? 1000000 : 99000;
-  const planLabel = plan === "yearly" ? "VIP 1 nam" : "VIP 1 thang";
+  const AMOUNTS: Record<string, number> = {
+    monthly:   99000,
+    quarterly: 249000,
+    biannual:  449000,
+    yearly:    799000,
+  };
+  const LABELS: Record<string, string> = {
+    monthly:   "VIP 1 thang",
+    quarterly: "VIP 3 thang",
+    biannual:  "VIP 6 thang",
+    yearly:    "VIP 12 thang",
+  };
+  const amount = AMOUNTS[plan] ?? 99000;
+  const planLabel = LABELS[plan] ?? "VIP 1 thang";
 
   // Dùng tên user (bỏ dấu) hoặc shortId để nhận diện
   const nameClean = (userName || "")
