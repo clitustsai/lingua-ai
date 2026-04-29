@@ -9,7 +9,7 @@ import type { AuthUser } from "@/store/useAuthStore";
 
 const AVATARS = ["🦊","🐼","🦁","🐯","🦋","🐸","🦄","🐙","🦅","🐬","🌟","🎭"];
 type Mode = "login" | "register";
-type Step = "form" | "otp";
+type Step = "form" | "otp" | "2fa";
 
 const MARQUEE_ROW1 = [
   { icon: "🤖", text: "AI Chat thông minh" },
@@ -165,6 +165,8 @@ export default function AuthPage() {
 
   const [mode, setMode] = useState<Mode>("login");
   const [step, setStep] = useState<Step>("form");
+  const [twoFaCode, setTwoFaCode] = useState("");
+  const [twoFaFactorId, setTwoFaFactorId] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone] = useState("");
@@ -243,6 +245,24 @@ export default function AuthPage() {
     }
   };
 
+  const verify2FA = async () => {
+    if (twoFaCode.length !== 6) { setError("Nhập đủ 6 số"); return; }
+    setLoading(true); setError("");
+    try {
+      const { data: challenge } = await supabase.auth.mfa.challenge({ factorId: twoFaFactorId });
+      if (!challenge) throw new Error("Không thể tạo challenge");
+      const { error } = await supabase.auth.mfa.verify({ factorId: twoFaFactorId, challengeId: challenge.id, code: twoFaCode });
+      if (error) throw error;
+      const { data: { user: u } } = await supabase.auth.getUser();
+      if (u) {
+        const user: AuthUser = { id: u.id, name: u.user_metadata?.full_name || u.email?.split("@")[0] || "User", email: u.email || "", avatar: u.user_metadata?.avatar_url || AVATARS[Math.floor(Math.random() * AVATARS.length)], createdAt: u.created_at };
+        login(user); router.push("/dashboard");
+      }
+    } catch (err: any) {
+      setError("Mã 2FA không đúng. Thử lại.");
+    } finally { setLoading(false); }
+  };
+
   const submitForgot = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!forgotEmail.trim()) { setError("Vui lòng nhập email"); return; }
@@ -288,6 +308,19 @@ export default function AuthPage() {
       } else {
         const { data, error } = await supabase.auth.signInWithPassword({ email: email.trim().toLowerCase(), password });
         if (error) throw error;
+        // Check if user has 2FA enabled
+        const { data: assuranceData } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+        if (assuranceData?.nextLevel === "aal2" && assuranceData?.currentLevel === "aal1") {
+          // User has 2FA - need to verify
+          const { data: factors } = await supabase.auth.mfa.listFactors();
+          const totpFactor = factors?.totp?.[0];
+          if (totpFactor) {
+            setTwoFaFactorId(totpFactor.id);
+            setStep("2fa");
+            setLoading(false);
+            return;
+          }
+        }
         const u = data.user!;
         const user: AuthUser = { id: u.id, name: u.user_metadata?.full_name || u.email?.split("@")[0] || "User", email: u.email || "", avatar: u.user_metadata?.avatar_url || AVATARS[Math.floor(Math.random() * AVATARS.length)], createdAt: u.created_at };
         login(user); router.push("/dashboard");
@@ -400,7 +433,26 @@ export default function AuthPage() {
           </div>
 
           <div className="p-4">
-            {step === "otp" ? (
+            {step === "2fa" ? (
+              <div className="flex flex-col gap-5">
+                <button onClick={() => { setStep("form"); setTwoFaCode(""); setError(""); }}
+                  className="flex items-center gap-2 text-white/40 hover:text-white text-xs transition-colors w-fit">
+                  <ArrowLeft className="w-3.5 h-3.5" /> Quay lại
+                </button>
+                <div className="text-center">
+                  <p className="text-white font-bold">Xác thực 2 lớp</p>
+                  <p className="text-white/40 text-xs mt-1">Nhập mã 6 số từ Google Authenticator</p>
+                </div>
+                <OtpInput value={twoFaCode} onChange={setTwoFaCode} />
+                {error && <p className="text-red-400 text-xs text-center">{error}</p>}
+                <button onClick={verify2FA} disabled={loading || twoFaCode.length < 6}
+                  className="w-full py-3.5 rounded-2xl font-bold text-white flex items-center justify-center gap-2 transition-all disabled:opacity-40"
+                  style={{ background: "linear-gradient(135deg,#6d28d9,#4f46e5)", boxShadow: "0 4px 20px rgba(109,40,217,0.4)" }}>
+                  {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+                  {loading ? "Đang xác thực..." : "Xác nhận"}
+                </button>
+              </div>
+            ) : step === "otp" ? (
               <div className="flex flex-col gap-5">
                 <button onClick={() => { setStep("form"); setOtp(""); setError(""); }}
                   className="flex items-center gap-2 text-white/40 hover:text-white text-xs transition-colors w-fit">
