@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState } from "react";
 import { useAppStore } from "@/store/useAppStore";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -9,18 +9,18 @@ import { cn } from "@/lib/utils";
 import { canUseFeature, getRemainingUses, incrementUsage, FREE_LIMITS } from "@/lib/usageLimit";
 
 const QUICK_TOPICS = [
-  { label: "IELTS Speaking Part 1", emoji: "??" },
-  { label: "IELTS Speaking Part 2", emoji: "???" },
-  { label: "IELTS Writing Task 2", emoji: "??" },
-  { label: "TOEIC Listening", emoji: "??" },
-  { label: "Business Email", emoji: "??" },
-  { label: "Job Interview", emoji: "??" },
-  { label: "Travel English", emoji: "??" },
-  { label: "Daily Conversation", emoji: "??" },
-  { label: "Grammar: Present Perfect", emoji: "??" },
-  { label: "Vocabulary: Technology", emoji: "??" },
-  { label: "Pronunciation: TH sound", emoji: "??" },
-  { label: "Phrasal Verbs", emoji: "??" },
+  { label: "IELTS Speaking Part 1", emoji: "🎤" },
+  { label: "IELTS Speaking Part 2", emoji: "🗣️" },
+  { label: "IELTS Writing Task 2", emoji: "✍️" },
+  { label: "TOEIC Listening", emoji: "🎧" },
+  { label: "Business Email", emoji: "📧" },
+  { label: "Job Interview", emoji: "💼" },
+  { label: "Travel English", emoji: "✈️" },
+  { label: "Daily Conversation", emoji: "💬" },
+  { label: "Grammar: Present Perfect", emoji: "📐" },
+  { label: "Vocabulary: Technology", emoji: "💻" },
+  { label: "Pronunciation: TH sound", emoji: "🔊" },
+  { label: "Phrasal Verbs", emoji: "📚" },
 ];
 
 export default function GenerateLessonPage() {
@@ -75,13 +75,13 @@ export default function GenerateLessonPage() {
       });
       const data = await res.json();
       if (data.error || (!data.questions && !data.vocabulary)) {
-        setError("AI kh�ng t?o du?c b�i h?c. Th? l?i nh�!");
+        setError("AI không tạo được bài học. Thử lại nhé!");
         return;
       }
       if (!isPremium) incrementUsage("generateLesson");
       setLesson(data);
     } catch {
-      setError("L?i k?t n?i. Vui l�ng th? l?i!");
+      setError("Lỗi kết nối. Vui lòng thử lại!");
     } finally { setLoading(false); }
   };
 
@@ -97,9 +97,9 @@ export default function GenerateLessonPage() {
     <div className="p-5 max-w-2xl">
       <div className="pt-2 mb-5">
         <h1 className="text-xl font-bold text-white flex items-center gap-2">
-          <Sparkles className="w-5 h-5 text-yellow-400" /> T?o b�i h?c t? d?ng
+          <Sparkles className="w-5 h-5 text-yellow-400" /> Tạo bài học tự động
         </h1>
-        <p className="text-sm text-gray-400 mt-1">Nh?p ch? d? ? AI t?o c�u h?i, sample answer, vocab ngay</p>
+        <p className="text-sm text-gray-400 mt-1">Nhập chủ đề → AI tạo câu hỏi, sample answer, vocab ngay</p>
       </div>
 
       {/* Input */}
@@ -108,19 +108,19 @@ export default function GenerateLessonPage() {
           value={topic}
           onChange={e => setTopic(e.target.value)}
           onKeyDown={e => e.key === "Enter" && generate()}
-          placeholder='V� d?: "IELTS Speaking Part 1", "Grammar: Past Perfect"...'
+          placeholder='Ví dụ: "IELTS Speaking Part 1", "Grammar: Past Perfect"...'
           className="w-full bg-transparent text-white placeholder-gray-500 text-sm focus:outline-none mb-3"
         />
         <button onClick={() => generate()} disabled={loading || !topic.trim()}
           className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold text-white transition-all disabled:opacity-50"
           style={{ background: "linear-gradient(135deg,#7c3aed,#6366f1)" }}>
-          {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> �ang t?o b�i h?c...</> : <><Sparkles className="w-4 h-4" /> T?o b�i h?c</>}
+          {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Đang tạo bài học...</> : <><Sparkles className="w-4 h-4" /> Tạo bài học</>}
         </button>
         {!isPremium && (
           <p className="text-center text-xs text-gray-600 mt-2">
-            C�n {getRemainingUses("generateLesson", isPremium)}/{FREE_LIMITS.generateLesson} l?n h�m nay
+            Còn {getRemainingUses("generateLesson", isPremium)}/{FREE_LIMITS.generateLesson} lần hôm nay
             {getRemainingUses("generateLesson", isPremium) === 0 && (
-              <button onClick={() => router.push("/premium")} className="ml-1 text-yellow-500 underline">N�ng c?p VIP</button>
+              <button onClick={() => router.push("/premium")} className="ml-1 text-yellow-500 underline">Nâng cấp VIP</button>
             )}
           </p>
         )}
@@ -129,7 +129,7 @@ export default function GenerateLessonPage() {
       {/* Quick topics */}
       {!lesson && !loading && (
         <div>
-          <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-3">Ch? d? ph? bi?n</p>
+          <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-3">Chủ đề phổ biến</p>
           <div className="grid grid-cols-2 gap-2">
             {QUICK_TOPICS.map(t => (
               <button key={t.label} onClick={() => generate(t.label)}
@@ -150,17 +150,17 @@ export default function GenerateLessonPage() {
             <div className="ai-typing-dot" />
             <div className="ai-typing-dot" />
           </div>
-          <p className="text-gray-500 text-sm">AI dang t?o b�i h?c cho "{topic}"...</p>
+          <p className="text-gray-500 text-sm">AI đang tạo bài học cho "{topic}"...</p>
         </div>
       )}
 
       {/* Error */}
       {error && !loading && (
         <div className="rounded-2xl p-5 text-center" style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)" }}>
-          <p className="text-red-400 text-sm mb-3">?? {error}</p>
+          <p className="text-red-400 text-sm mb-3">⚠️ {error}</p>
           <button onClick={() => { setError(null); generate(); }}
             className="px-5 py-2 rounded-xl bg-primary-600 hover:bg-primary-500 text-white text-sm font-semibold transition-colors">
-            Th? l?i
+            Thử lại
           </button>
         </div>
       )}
@@ -184,7 +184,7 @@ export default function GenerateLessonPage() {
             <div className="rounded-2xl overflow-hidden" style={{ background: "rgba(26,16,53,0.8)", border: "1px solid rgba(139,92,246,0.15)" }}>
               <button onClick={() => toggle("questions")}
                 className="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-white">
-                <span className="flex items-center gap-2"><Mic className="w-4 h-4 text-pink-400" /> C�u h?i luy?n t?p ({lesson.questions.length})</span>
+                <span className="flex items-center gap-2"><Mic className="w-4 h-4 text-pink-400" /> Câu hỏi luyện tập ({lesson.questions.length})</span>
                 {showSection.questions ? <ChevronUp className="w-4 h-4 text-gray-500" /> : <ChevronDown className="w-4 h-4 text-gray-500" />}
               </button>
               {showSection.questions && (
@@ -192,7 +192,7 @@ export default function GenerateLessonPage() {
                   {lesson.questions.map((q: any, i: number) => (
                     <div key={i} className="rounded-xl p-3" style={{ background: "rgba(15,10,30,0.6)" }}>
                       <p className="text-white text-sm font-medium">{i + 1}. {q.question}</p>
-                      {q.tip && <p className="text-gray-500 text-xs mt-1">?? {q.tip}</p>}
+                      {q.tip && <p className="text-gray-500 text-xs mt-1">💡 {q.tip}</p>}
                     </div>
                   ))}
                 </div>
@@ -245,7 +245,7 @@ export default function GenerateLessonPage() {
             <div className="rounded-2xl overflow-hidden" style={{ background: "rgba(26,16,53,0.8)", border: "1px solid rgba(139,92,246,0.15)" }}>
               <button onClick={() => toggle("vocab")}
                 className="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-white">
-                <span className="flex items-center gap-2"><BookOpen className="w-4 h-4 text-blue-400" /> T? v?ng quan tr?ng ({lesson.vocabulary.length})</span>
+                <span className="flex items-center gap-2"><BookOpen className="w-4 h-4 text-blue-400" /> Từ vựng quan trọng ({lesson.vocabulary.length})</span>
                 {showSection.vocab ? <ChevronUp className="w-4 h-4 text-gray-500" /> : <ChevronDown className="w-4 h-4 text-gray-500" />}
               </button>
               {showSection.vocab && (
@@ -276,9 +276,9 @@ export default function GenerateLessonPage() {
           {/* Grammar tips */}
           {lesson.grammarTips?.length > 0 && (
             <div className="rounded-2xl p-4" style={{ background: "rgba(234,179,8,0.08)", border: "1px solid rgba(234,179,8,0.2)" }}>
-              <p className="text-xs text-yellow-400 font-semibold uppercase tracking-wide mb-3">?? Ng? ph�p c?n nh?</p>
+              <p className="text-xs text-yellow-400 font-semibold uppercase tracking-wide mb-3">📐 Ngữ pháp cần nhớ</p>
               {lesson.grammarTips.map((tip: string, i: number) => (
-                <p key={i} className="text-gray-300 text-sm mb-1.5">� {tip}</p>
+                <p key={i} className="text-gray-300 text-sm mb-1.5">• {tip}</p>
               ))}
             </div>
           )}
@@ -286,8 +286,8 @@ export default function GenerateLessonPage() {
           {/* TOEIC Practice */}
           <div className="rounded-2xl overflow-hidden" style={{ background: "rgba(10,6,24,0.95)", border: "1px solid rgba(59,130,246,0.2)" }}>
             <div className="px-4 pt-3 pb-2 border-b border-white/5 flex items-center justify-between">
-              <p className="text-white font-bold text-sm">?? Luy?n t?p TOEIC</p>
-              <p className="text-gray-500 text-xs">7 parts � 200 c�u</p>
+              <p className="text-white font-bold text-sm">📝 Luyện tập TOEIC</p>
+              <p className="text-gray-500 text-xs">7 parts · 200 câu</p>
             </div>
             <div className="flex items-center gap-1 px-3 py-2 border-b border-white/5 overflow-x-auto scrollbar-hide">
               {(["P1","P2","P3","P4","P5","P6","P7"]).map(p => (
@@ -303,7 +303,7 @@ export default function GenerateLessonPage() {
                     {q.image && <img src={q.image} alt="" className="w-full max-w-xs rounded-lg mb-2 object-cover" style={{ maxHeight: 120 }} />}
                     {q.passage && <div className="mb-2 px-3 py-2 rounded-lg text-xs text-gray-400 italic whitespace-pre-line" style={{ background: "rgba(255,255,255,0.04)" }}>{q.passage}</div>}
                     <div className="flex items-start justify-between gap-2 mb-2">
-                      <p className="text-white text-sm">C�u {i+1}{q.question ? `. ${q.question}` : ""}</p>
+                      <p className="text-white text-sm">Câu {i+1}{q.question ? `. ${q.question}` : ""}</p>
                       <button onClick={() => setToeicFlagged(prev => { const n = new Set(prev); n.has(qk) ? n.delete(qk) : n.add(qk); return n; })} className={cn("shrink-0 transition-colors", isFlagged ? "text-yellow-400" : "text-gray-600 hover:text-yellow-400")}><Flag className="w-3.5 h-3.5" /></button>
                     </div>
                     <div className="flex flex-col gap-1.5">
@@ -323,12 +323,12 @@ export default function GenerateLessonPage() {
               {!toeicChecked ? (
                 <button onClick={() => setToeicChecked(true)} disabled={Object.keys(toeicAnswers).filter(k => k.startsWith(toeicPart)).length < toeicQs.length}
                   className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white text-sm font-bold transition-colors">
-                  Ki?m tra ({Object.keys(toeicAnswers).filter(k => k.startsWith(toeicPart)).length}/{toeicQs.length} c�u)
+                  Kiểm tra ({Object.keys(toeicAnswers).filter(k => k.startsWith(toeicPart)).length}/{toeicQs.length} câu)
                 </button>
               ) : (
                 <div className="flex items-center justify-between px-4 py-3 rounded-xl" style={{ background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.2)" }}>
-                  <span className="text-white text-sm font-bold">{toeicScore}/{toeicQs.length} d�ng</span>
-                  <button onClick={() => { setToeicAnswers({}); setToeicChecked(false); }} className="text-xs text-gray-400 hover:text-white">L�m l?i</button>
+                  <span className="text-white text-sm font-bold">{toeicScore}/{toeicQs.length} đúng</span>
+                  <button onClick={() => { setToeicAnswers({}); setToeicChecked(false); }} className="text-xs text-gray-400 hover:text-white">Làm lại</button>
                 </div>
               )}
             </div>
@@ -336,7 +336,7 @@ export default function GenerateLessonPage() {
 
           <button onClick={() => { setLesson(null); setTopic(""); }}
             className="w-full py-2.5 rounded-xl border border-gray-700 text-gray-400 text-sm transition-colors hover:border-gray-600">
-            T?o b�i h?c kh�c
+            Tạo bài học khác
           </button>
         </div>
       )}

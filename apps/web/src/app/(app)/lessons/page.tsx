@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState } from "react";
 import { useAppStore } from "@/store/useAppStore";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -26,18 +26,18 @@ interface Lesson {
 }
 
 const LESSON_TOPICS = [
-  { id: "travel", label: "Du lịch", emoji: "✈️", color: "#3b82f6" },
-  { id: "food", label: "Ẩm thực", emoji: "🍜", color: "#f59e0b" },
-  { id: "business", label: "Kinh doanh", emoji: "💼", color: "#8b5cf6" },
-  { id: "shopping", label: "Mua sắm", emoji: "🛍️", color: "#ec4899" },
-  { id: "health", label: "Sức khỏe", emoji: "🏥", color: "#10b981" },
-  { id: "hobbies", label: "Sở thích", emoji: "🎨", color: "#f97316" },
-  { id: "technology", label: "Công nghệ", emoji: "💻", color: "#06b6d4" },
-  { id: "environment", label: "Môi trường", emoji: "🌿", color: "#22c55e" },
-  { id: "education", label: "Giáo dục", emoji: "📚", color: "#a855f7" },
-  { id: "sports", label: "Thể thao", emoji: "⚽", color: "#ef4444" },
-  { id: "family", label: "Gia đình", emoji: "👨‍👩‍👧", color: "#f59e0b" },
-  { id: "news", label: "Thời sự", emoji: "📰", color: "#64748b" },
+  { id: "travel", label: "Du lß╗ïch", emoji: "Γ£ê∩╕Å", color: "#3b82f6" },
+  { id: "food", label: "ß║¿m thß╗▒c", emoji: "≡ƒì£", color: "#f59e0b" },
+  { id: "business", label: "Kinh doanh", emoji: "≡ƒÆ╝", color: "#8b5cf6" },
+  { id: "shopping", label: "Mua sß║»m", emoji: "≡ƒ¢ì∩╕Å", color: "#ec4899" },
+  { id: "health", label: "Sß╗⌐c khß╗Åe", emoji: "≡ƒÅÑ", color: "#10b981" },
+  { id: "hobbies", label: "Sß╗ƒ th├¡ch", emoji: "≡ƒÄ¿", color: "#f97316" },
+  { id: "technology", label: "C├┤ng nghß╗ç", emoji: "≡ƒÆ╗", color: "#06b6d4" },
+  { id: "environment", label: "M├┤i tr╞░ß╗¥ng", emoji: "≡ƒî┐", color: "#22c55e" },
+  { id: "education", label: "Gi├ío dß╗Ñc", emoji: "≡ƒôÜ", color: "#a855f7" },
+  { id: "sports", label: "Thß╗â thao", emoji: "ΓÜ╜", color: "#ef4444" },
+  { id: "family", label: "Gia ─æ├¼nh", emoji: "≡ƒæ¿ΓÇì≡ƒæ⌐ΓÇì≡ƒæº", color: "#f59e0b" },
+  { id: "news", label: "Thß╗¥i sß╗▒", emoji: "≡ƒô░", color: "#64748b" },
 ];
 
 type Tab = "vocab" | "grammar" | "dialogue" | "exercises" | "reading";
@@ -117,21 +117,21 @@ export default function LessonsPage() {
   };
 
   const TABS: { id: Tab; label: string; emoji: string }[] = [
-    { id: "vocab", label: "Từ vựng", emoji: "📚" },
-    { id: "grammar", label: "Ngữ pháp", emoji: "📐" },
-    { id: "dialogue", label: "Hội thoại", emoji: "💬" },
-    { id: "exercises", label: "Bài tập", emoji: "✏️" },
-    { id: "reading", label: "Đọc hiểu", emoji: "📖" },
+    { id: "vocab", label: "Tß╗½ vß╗▒ng", emoji: "≡ƒôÜ" },
+    { id: "grammar", label: "Ngß╗» ph├íp", emoji: "≡ƒôÉ" },
+    { id: "dialogue", label: "Hß╗Öi thoß║íi", emoji: "≡ƒÆ¼" },
+    { id: "exercises", label: "B├ái tß║¡p", emoji: "Γ£Å∩╕Å" },
+    { id: "reading", label: "─Éß╗ìc hiß╗âu", emoji: "≡ƒôû" },
   ];
 
   return (
     <div className="p-5 max-w-2xl">
       <div className="pt-2 mb-5">
         <h1 className="text-xl font-bold text-white flex items-center gap-2">
-          <BookOpen className="w-5 h-5 text-primary-400" /> Bài học AI
+          <BookOpen className="w-5 h-5 text-primary-400" /> B├ái hß╗ìc AI
         </h1>
         <p className="text-sm text-gray-500 mt-1">
-          {settings.targetLanguage.flag} {settings.targetLanguage.name} · Cấp độ {settings.level}
+          {settings.targetLanguage.flag} {settings.targetLanguage.name} ┬╖ Cß║Ñp ─æß╗Ö {settings.level}
         </p>
       </div>
 
@@ -152,15 +152,15 @@ export default function LessonsPage() {
         className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold text-white transition-all disabled:opacity-50 mb-2"
         style={{ background: `linear-gradient(135deg, ${selectedTopic.color}, ${selectedTopic.color}cc)` }}>
         {loading
-          ? <><Loader2 className="w-4 h-4 animate-spin" /> AI đang tạo bài học...</>
-          : <><Zap className="w-4 h-4" /> Tạo bài học: {selectedTopic.emoji} {selectedTopic.label}</>
+          ? <><Loader2 className="w-4 h-4 animate-spin" /> AI ─æang tß║ío b├ái hß╗ìc...</>
+          : <><Zap className="w-4 h-4" /> Tß║ío b├ái hß╗ìc: {selectedTopic.emoji} {selectedTopic.label}</>
         }
       </button>
       {!isPremium && (
         <p className="text-center text-xs text-gray-600 mb-4">
-          Còn {getRemainingUses("lesson", isPremium)}/{FREE_LIMITS.lesson} lần hôm nay
+          C├▓n {getRemainingUses("lesson", isPremium)}/{FREE_LIMITS.lesson} lß║ºn h├┤m nay
           {getRemainingUses("lesson", isPremium) === 0 && (
-            <button onClick={() => router.push("/premium")} className="ml-1 text-yellow-500 underline">Nâng cấp VIP</button>
+            <button onClick={() => router.push("/premium")} className="ml-1 text-yellow-500 underline">N├óng cß║Ñp VIP</button>
           )}
         </p>
       )}
@@ -173,7 +173,7 @@ export default function LessonsPage() {
             <div className="ai-typing-dot" />
             <div className="ai-typing-dot" />
           </div>
-          <p className="text-gray-500 text-sm">AI đang soạn bài học cho bạn...</p>
+          <p className="text-gray-500 text-sm">AI ─æang soß║ín b├ái hß╗ìc cho bß║ín...</p>
         </div>
       )}
 
@@ -228,7 +228,7 @@ export default function LessonsPage() {
                     <button onClick={() => saveVocab(v)} disabled={savedWords.has(v.word)}
                       className={cn("p-2 rounded-xl transition-colors shrink-0",
                         savedWords.has(v.word) ? "bg-green-900/30 text-green-400" : "bg-accent-600/20 hover:bg-accent-600/40 text-accent-400")}>
-                      {savedWords.has(v.word) ? "✓" : <Plus className="w-4 h-4" />}
+                      {savedWords.has(v.word) ? "Γ£ô" : <Plus className="w-4 h-4" />}
                     </button>
                   </div>
                 </div>
@@ -240,7 +240,7 @@ export default function LessonsPage() {
           {tab === "grammar" && lesson.grammar && (
             <div className="flex flex-col gap-3">
               <div className="rounded-2xl p-4" style={{ background: "rgba(234,179,8,0.08)", border: "1px solid rgba(234,179,8,0.25)" }}>
-                <p className="text-yellow-400 font-bold mb-2">📐 {lesson.grammar.rule}</p>
+                <p className="text-yellow-400 font-bold mb-2">≡ƒôÉ {lesson.grammar.rule}</p>
                 <p className="text-gray-300 text-sm leading-relaxed">{lesson.grammar.explanation}</p>
               </div>
               <div className="flex flex-col gap-2">
@@ -256,7 +256,7 @@ export default function LessonsPage() {
               </div>
               {lesson.tips && lesson.tips.length > 0 && (
                 <div className="rounded-2xl p-4" style={{ background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.2)" }}>
-                  <p className="text-primary-400 font-semibold text-sm mb-2">💡 Mẹo học</p>
+                  <p className="text-primary-400 font-semibold text-sm mb-2">≡ƒÆí Mß║╣o hß╗ìc</p>
                   {lesson.tips.map((tip, i) => <p key={i} className="text-gray-300 text-sm">{tip}</p>)}
                 </div>
               )}
@@ -266,7 +266,7 @@ export default function LessonsPage() {
           {/* DIALOGUE TAB */}
           {tab === "dialogue" && lesson.dialogue?.length > 0 && (
             <div className="flex flex-col gap-3">
-              <p className="text-xs text-gray-500 text-center">Nhấn vào bong bóng để nghe phát âm</p>
+              <p className="text-xs text-gray-500 text-center">Nhß║Ñn v├áo bong b├│ng ─æß╗â nghe ph├ít ├óm</p>
               {lesson.dialogue.map((line, i) => (
                 <div key={i} className={cn("flex gap-3", line.speaker === "B" && "flex-row-reverse")}>
                   <div className={cn("w-8 h-8 rounded-2xl flex items-center justify-center text-xs font-bold shrink-0 mt-0.5",
@@ -294,13 +294,13 @@ export default function LessonsPage() {
                   <p className="text-white text-sm font-medium mb-3">{i + 1}. {ex.question}</p>
                   {/* Input to fill in answer */}
                   <input
-                    placeholder="Nhập câu trả lời của bạn..."
+                    placeholder="Nhß║¡p c├óu trß║ú lß╗¥i cß╗ºa bß║ín..."
                     className="w-full rounded-xl px-3 py-2.5 text-sm text-white placeholder-white/25 border border-white/10 focus:outline-none focus:border-purple-500/60 mb-3 transition-all"
                     style={{ background: "rgba(255,255,255,0.05)" }}
                   />
                   <button onClick={() => setShowAnswers(prev => ({ ...prev, [i]: !prev[i] }))}
                     className="flex items-center gap-1.5 text-xs text-primary-400 hover:text-primary-300 transition-colors">
-                    {showAnswers[i] ? <><ChevronUp className="w-3.5 h-3.5" /> Ẩn đáp án</> : <><ChevronDown className="w-3.5 h-3.5" /> Xem đáp án</>}
+                    {showAnswers[i] ? <><ChevronUp className="w-3.5 h-3.5" /> ß║¿n ─æ├íp ├ín</> : <><ChevronDown className="w-3.5 h-3.5" /> Xem ─æ├íp ├ín</>}
                   </button>
                   {showAnswers[i] && (
                     <div className="mt-2 pl-3 border-l-2 border-green-500">
@@ -318,12 +318,12 @@ export default function LessonsPage() {
               {!lesson.reading ? (
                 <div className="rounded-2xl p-5 text-center text-gray-500 text-sm"
                   style={{ background: "rgba(26,16,53,0.6)", border: "1px solid rgba(139,92,246,0.1)" }}>
-                  Bài học này chưa có phần đọc hiểu. Tạo bài học mới để thử!
+                  B├ái hß╗ìc n├áy ch╞░a c├│ phß║ºn ─æß╗ìc hiß╗âu. Tß║ío b├ái hß╗ìc mß╗¢i ─æß╗â thß╗¡!
                 </div>
               ) : (
                 <>
                   <div className="rounded-2xl p-4" style={{ background: "rgba(26,16,53,0.8)", border: "1px solid rgba(139,92,246,0.2)" }}>
-                    <p className="text-xs text-purple-400 font-semibold mb-2">📖 Đoạn văn</p>
+                    <p className="text-xs text-purple-400 font-semibold mb-2">≡ƒôû ─Éoß║ín v─ân</p>
                     <p className="text-gray-200 text-sm leading-relaxed whitespace-pre-line">{lesson.reading.passage}</p>
                   </div>
                   {lesson.reading.questions?.map((q, i) => {
@@ -333,7 +333,7 @@ export default function LessonsPage() {
                       <div key={i} className="rounded-2xl p-4"
                         style={{ background: "rgba(26,16,53,0.8)", border: `1px solid ${readingChecked ? (isCorrect ? "rgba(34,197,94,0.3)" : "rgba(239,68,68,0.3)") : "rgba(139,92,246,0.15)"}` }}>
                         <p className="text-sm text-white font-medium mb-3">
-                          <span className="text-gray-500 mr-1.5">Câu {i + 1}</span>{q.question}
+                          <span className="text-gray-500 mr-1.5">C├óu {i + 1}</span>{q.question}
                         </p>
                         <div className="flex flex-col gap-2">
                           {q.options?.map((opt, oi) => {
@@ -361,7 +361,7 @@ export default function LessonsPage() {
                         </div>
                         {readingChecked && q.explanation && (
                           <p className={cn("mt-2 px-3 py-2 rounded-xl text-xs", isCorrect ? "bg-green-900/20 text-green-300" : "bg-yellow-900/20 text-yellow-300")}>
-                            💡 {q.explanation}
+                            ≡ƒÆí {q.explanation}
                           </p>
                         )}
                       </div>
@@ -372,13 +372,13 @@ export default function LessonsPage() {
                       disabled={Object.keys(readingAnswers).length < lesson.reading!.questions.length}
                       className="w-full py-3 rounded-2xl font-bold text-white text-sm disabled:opacity-40 transition-all"
                       style={{ background: "linear-gradient(135deg,#7c3aed,#6366f1)" }}>
-                      Kiểm tra đáp án ({Object.keys(readingAnswers).length}/{lesson.reading.questions.length} câu)
+                      Kiß╗âm tra ─æ├íp ├ín ({Object.keys(readingAnswers).length}/{lesson.reading.questions.length} c├óu)
                     </button>
                   )}
                   {readingChecked && (
                     <div className="rounded-2xl p-4 text-center" style={{ background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.25)" }}>
                       <p className="text-green-400 font-bold text-lg">
-                        {lesson.reading.questions.filter((q, i) => readingAnswers[i] === q.correct).length}/{lesson.reading.questions.length} đúng
+                        {lesson.reading.questions.filter((q, i) => readingAnswers[i] === q.correct).length}/{lesson.reading.questions.length} ─æ├║ng
                       </p>
                     </div>
                   )}
@@ -394,8 +394,8 @@ export default function LessonsPage() {
               {/* TOEIC Practice */}
               <div className="mb-4 rounded-2xl overflow-hidden" style={{ background: "rgba(10,6,24,0.95)", border: "1px solid rgba(59,130,246,0.2)" }}>
                 <div className="px-4 pt-3 pb-2 border-b border-white/5 flex items-center justify-between">
-                  <p className="text-white font-bold text-sm">📝 Luyện tập TOEIC</p>
-                  <p className="text-gray-500 text-xs">7 parts · 200 câu</p>
+                  <p className="text-white font-bold text-sm">≡ƒô¥ Luyß╗çn tß║¡p TOEIC</p>
+                  <p className="text-gray-500 text-xs">7 parts ┬╖ 200 c├óu</p>
                 </div>
                 <div className="flex items-center gap-1 px-3 py-2 border-b border-white/5 overflow-x-auto scrollbar-hide">
                   {(["P1","P2","P3","P4","P5","P6","P7"]).map(p => (
@@ -411,7 +411,7 @@ export default function LessonsPage() {
                         {q.image && <img src={q.image} alt="" className="w-full max-w-xs rounded-lg mb-2 object-cover" style={{ maxHeight: 120 }} />}
                         {q.passage && <div className="mb-2 px-3 py-2 rounded-lg text-xs text-gray-400 italic whitespace-pre-line" style={{ background: "rgba(255,255,255,0.04)" }}>{q.passage}</div>}
                         <div className="flex items-start justify-between gap-2 mb-2">
-                          <p className="text-white text-sm">Câu {i+1}{q.question ? `. ${q.question}` : ""}</p>
+                          <p className="text-white text-sm">C├óu {i+1}{q.question ? `. ${q.question}` : ""}</p>
                           <button onClick={() => setToeicFlagged(prev => { const n = new Set(prev); n.has(qk) ? n.delete(qk) : n.add(qk); return n; })} className={cn("shrink-0 transition-colors", isFlagged ? "text-yellow-400" : "text-gray-600 hover:text-yellow-400")}><Flag className="w-3.5 h-3.5" /></button>
                         </div>
                         <div className="flex flex-col gap-1.5">
@@ -431,12 +431,12 @@ export default function LessonsPage() {
                   {!toeicChecked ? (
                     <button onClick={() => setToeicChecked(true)} disabled={Object.keys(toeicAnswers).filter(k => k.startsWith(toeicPart)).length < toeicQs.length}
                       className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white text-sm font-bold transition-colors">
-                      Kiểm tra ({Object.keys(toeicAnswers).filter(k => k.startsWith(toeicPart)).length}/{toeicQs.length} câu)
+                      Kiß╗âm tra ({Object.keys(toeicAnswers).filter(k => k.startsWith(toeicPart)).length}/{toeicQs.length} c├óu)
                     </button>
                   ) : (
                     <div className="flex items-center justify-between px-4 py-3 rounded-xl" style={{ background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.2)" }}>
-                      <span className="text-white text-sm font-bold">{toeicScore}/{toeicQs.length} đúng</span>
-                      <button onClick={() => { setToeicAnswers({}); setToeicChecked(false); }} className="text-xs text-gray-400 hover:text-white">Làm lại</button>
+                      <span className="text-white text-sm font-bold">{toeicScore}/{toeicQs.length} ─æ├║ng</span>
+                      <button onClick={() => { setToeicAnswers({}); setToeicChecked(false); }} className="text-xs text-gray-400 hover:text-white">L├ám lß║íi</button>
                     </div>
                   )}
                 </div>
@@ -444,13 +444,13 @@ export default function LessonsPage() {
               <button onClick={markComplete}
                 className="w-full py-3.5 rounded-2xl font-bold text-white flex items-center justify-center gap-2 transition-all"
                 style={{ background: "linear-gradient(135deg,#7c3aed,#6366f1)" }}>
-                <Star className="w-5 h-5" /> Hoàn thành bài học (+XP)
+                <Star className="w-5 h-5" /> Ho├án th├ánh b├ái hß╗ìc (+XP)
               </button>
               </>
             ) : (
               <div className="w-full py-3 rounded-2xl text-center font-semibold"
                 style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.3)", color: "#4ade80" }}>
-                ✅ Đã hoàn thành! Tuyệt vời!
+                Γ£à ─É├ú ho├án th├ánh! Tuyß╗çt vß╗¥i!
               </div>
             )}
           </div>

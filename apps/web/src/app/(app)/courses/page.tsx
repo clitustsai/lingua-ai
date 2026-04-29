@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState } from "react";
 import { useAppStore } from "@/store/useAppStore";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -8,9 +8,9 @@ import { BookOpen, ChevronRight, Star, Flame, Trophy, Crown, Lock, Flag } from "
 import { cn } from "@/lib/utils";
 
 // Courses under development (language courses)
-const COMING_SOON_CATEGORIES = ["Ngôn ngữ"];
+const COMING_SOON_CATEGORIES = ["Ng├┤n ngß╗»"];
 
-const CATEGORIES = ["Tất cả", "Chứng chỉ", "Kỹ năng", "Giao tiếp", "Ngôn ngữ"];
+const CATEGORIES = ["Tß║Ñt cß║ú", "Chß╗⌐ng chß╗ë", "Kß╗╣ n─âng", "Giao tiß║┐p", "Ng├┤n ngß╗»"];
 
 export default function CoursesPage() {
   const { courseProgress, totalXp, streak, enrollCourse } = useAppStore();
@@ -52,7 +52,7 @@ export default function CoursesPage() {
       {/* Header */}
       <div className="px-5 pt-12 pb-4">
         <div className="flex items-center justify-between mb-1">
-          <h1 className="text-2xl font-bold text-white">Khám phá</h1>
+          <h1 className="text-2xl font-bold text-white">Kh├ím ph├í</h1>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1 bg-orange-500/20 px-2.5 py-1 rounded-full">
               <Flame className="w-3.5 h-3.5 text-orange-400" />
@@ -75,7 +75,7 @@ export default function CoursesPage() {
         {!isPremium && (
           <div className="flex items-center justify-between px-3 py-2.5 rounded-xl"
             style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)" }}>
-            <p className="text-xs text-yellow-300">1 khóa học miễn phí · Nâng cấp để mở tất cả</p>
+            <p className="text-xs text-yellow-300">1 kh├│a hß╗ìc miß╗àn ph├¡ ┬╖ N├óng cß║Ñp ─æß╗â mß╗ƒ tß║Ñt cß║ú</p>
             <button onClick={() => router.push("/premium")}
               className="flex items-center gap-1 text-xs bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-300 px-2.5 py-1 rounded-lg transition-colors shrink-0">
               <Crown className="w-3 h-3" /> Premium
@@ -86,7 +86,7 @@ export default function CoursesPage() {
         {enrolledCourses.length > 0 && (
           <section>
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest">KHÓA HỌC CỦA TÔI</h2>
+              <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest">KH├ôA Hß╗îC Cß╗ªA T├öI</h2>
               <ChevronRight className="w-4 h-4 text-gray-600" />
             </div>
             <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
@@ -102,7 +102,7 @@ export default function CoursesPage() {
                       <p className="text-white/60 text-xs mt-0.5">{course.totalUnits} units</p>
                       <div className="mt-3">
                         <div className="flex justify-between text-xs text-white/60 mb-1">
-                          <span>Tiến độ</span><span>{pct}%</span>
+                          <span>Tiß║┐n ─æß╗Ö</span><span>{pct}%</span>
                         </div>
                         <div className="w-full bg-white/20 rounded-full h-1.5">
                           <div className="bg-white h-1.5 rounded-full transition-all" style={{ width: `${pct}%` }} />
@@ -120,8 +120,8 @@ export default function CoursesPage() {
         {enrolledCourses.length > 0 && (
           <div className="rounded-2xl overflow-hidden" style={{ background: "rgba(10,6,24,0.95)", border: "1px solid rgba(59,130,246,0.2)" }}>
             <div className="px-4 pt-3 pb-2 border-b border-white/5 flex items-center justify-between">
-              <p className="text-white font-bold text-sm">📝 Luyện tập TOEIC</p>
-              <p className="text-gray-500 text-xs">7 parts · 200 câu</p>
+              <p className="text-white font-bold text-sm">≡ƒô¥ Luyß╗çn tß║¡p TOEIC</p>
+              <p className="text-gray-500 text-xs">7 parts ┬╖ 200 c├óu</p>
             </div>
             <div className="flex items-center gap-1 px-3 py-2 border-b border-white/5 overflow-x-auto scrollbar-hide">
               {(["P1","P2","P3","P4","P5","P6","P7"]).map(p => (
@@ -137,7 +137,7 @@ export default function CoursesPage() {
                     {q.image && <img src={q.image} alt="" className="w-full max-w-xs rounded-lg mb-2 object-cover" style={{ maxHeight: 120 }} />}
                     {q.passage && <div className="mb-2 px-3 py-2 rounded-lg text-xs text-gray-400 italic whitespace-pre-line" style={{ background: "rgba(255,255,255,0.04)" }}>{q.passage}</div>}
                     <div className="flex items-start justify-between gap-2 mb-2">
-                      <p className="text-white text-sm">Câu {i+1}{q.question ? `. ${q.question}` : ""}</p>
+                      <p className="text-white text-sm">C├óu {i+1}{q.question ? `. ${q.question}` : ""}</p>
                       <button onClick={() => setToeicFlagged(prev => { const n = new Set(prev); n.has(qk) ? n.delete(qk) : n.add(qk); return n; })} className={cn("shrink-0 transition-colors", isFlagged ? "text-yellow-400" : "text-gray-600 hover:text-yellow-400")}><Flag className="w-3.5 h-3.5" /></button>
                     </div>
                     <div className="flex flex-col gap-1.5">
@@ -157,12 +157,12 @@ export default function CoursesPage() {
               {!toeicChecked ? (
                 <button onClick={() => setToeicChecked(true)} disabled={Object.keys(toeicAnswers).filter(k => k.startsWith(toeicPart)).length < toeicQs.length}
                   className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white text-sm font-bold transition-colors">
-                  Kiểm tra ({Object.keys(toeicAnswers).filter(k => k.startsWith(toeicPart)).length}/{toeicQs.length} câu)
+                  Kiß╗âm tra ({Object.keys(toeicAnswers).filter(k => k.startsWith(toeicPart)).length}/{toeicQs.length} c├óu)
                 </button>
               ) : (
                 <div className="flex items-center justify-between px-4 py-3 rounded-xl" style={{ background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.2)" }}>
-                  <span className="text-white text-sm font-bold">{toeicScore}/{toeicQs.length} đúng</span>
-                  <button onClick={() => { setToeicAnswers({}); setToeicChecked(false); }} className="text-xs text-gray-400 hover:text-white">Làm lại</button>
+                  <span className="text-white text-sm font-bold">{toeicScore}/{toeicQs.length} ─æ├║ng</span>
+                  <button onClick={() => { setToeicAnswers({}); setToeicChecked(false); }} className="text-xs text-gray-400 hover:text-white">L├ám lß║íi</button>
                 </div>
               )}
             </div>
@@ -172,7 +172,7 @@ export default function CoursesPage() {
         {/* Recommended courses */}
         <section>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest">CÁC KHÓA HỌC DÀNH CHO BẠN</h2>
+            <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest">C├üC KH├ôA Hß╗îC D├ÇNH CHO Bß║áN</h2>
             <ChevronRight className="w-4 h-4 text-gray-600" />
           </div>
           <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
@@ -191,7 +191,7 @@ export default function CoursesPage() {
                   {isComingSoon && (
                     <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center z-10 rounded-2xl gap-1">
                       <Lock className="w-6 h-6 text-gray-400" />
-                      <span className="text-xs text-gray-300 font-semibold">Đang phát triển</span>
+                      <span className="text-xs text-gray-300 font-semibold">─Éang ph├ít triß╗ân</span>
                     </div>
                   )}
                   {!isComingSoon && isLocked && (
@@ -249,7 +249,7 @@ export default function CoursesPage() {
                       {isComingSoon && (
                         <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center z-10 gap-1">
                           <Lock className="w-5 h-5 text-gray-400" />
-                          <span className="text-xs text-gray-300 font-semibold">Đang phát triển</span>
+                          <span className="text-xs text-gray-300 font-semibold">─Éang ph├ít triß╗ân</span>
                         </div>
                       )}
                       {!isComingSoon && isLocked && (
@@ -262,7 +262,7 @@ export default function CoursesPage() {
                         <p className="text-white font-bold text-sm">{course.title}</p>
                         <p className="text-white/60 text-xs mt-0.5">{course.subtitle}</p>
                         <div className="flex items-center gap-2 mt-1.5">
-                          <span className="text-xs text-white/50">{course.totalUnits} units · {course.totalLessons} bài</span>
+                          <span className="text-xs text-white/50">{course.totalUnits} units ┬╖ {course.totalLessons} b├ái</span>
                           <span className="text-xs bg-white/20 text-white px-1.5 py-0.5 rounded-full">{course.level}</span>
                         </div>
                         {enrolled && (
