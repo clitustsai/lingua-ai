@@ -3,7 +3,7 @@ import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/store/useAppStore";
 import { useAuthStore } from "@/store/useAuthStore";
-import { Loader2, Sparkles, ChevronRight, CheckCircle2, RotateCcw, BookOpen, Mic, MicOff, Headphones, Star, Flame, Crown, Lock, Flag } from "lucide-react";
+import { Loader2, Sparkles, ChevronRight, CheckCircle2, RotateCcw, BookOpen, Mic, MicOff, Headphones, Star, Flame, Crown, Lock } from "lucide-react";
 import { speakText } from "@/components/VoiceButton";
 import { cn } from "@/lib/utils";
 import { LEVELS } from "@ai-lang/shared";
@@ -43,23 +43,6 @@ export default function LearningPathPage() {
 
   // Speaking / mic state
   const [isRecording, setIsRecording] = useState(false);
-
-  // TOEIC state
-  const [toeicPart, setToeicPart] = useState("P1");
-  const [toeicAnswers, setToeicAnswers] = useState<Record<string,number>>({});
-  const [toeicChecked, setToeicChecked] = useState(false);
-  const [toeicFlagged, setToeicFlagged] = useState<Set<string>>(new Set());
-  const TOEIC_DATA: Record<string,{options:string[];correct:number;question?:string;image?:string;passage?:string}[]> = {
-    P1:[{options:["A woman is walking down a street.","A man is riding a bicycle.","Two people are sitting on a bench.","A car is parked on the road."],correct:0,image:"https://fastly.picsum.photos/id/1/400/250"},{options:["Workers are repairing a building.","A train is arriving at the station.","People are waiting on the platform.","A bus is parked near the entrance."],correct:2,image:"https://fastly.picsum.photos/id/10/400/250"}],
-    P2:[{question:"Where is the nearest post office?",options:["It's on Main Street.","I went there yesterday.","The mail arrived late."],correct:0},{question:"When does the meeting start?",options:["In the conference room.","At 3 o'clock.","With the manager."],correct:1}],
-    P3:[{question:"What are the speakers mainly discussing?",options:["A new product launch","A business trip schedule","An office renovation","A client complaint"],correct:1,passage:"M: Have you booked the flights for the Tokyo conference?\nW: Not yet. I'm waiting for the manager's approval.\nM: We should do it soon."}],
-    P4:[{question:"What is the announcement about?",options:["A store sale","A flight delay","A new service","A schedule change"],correct:1,passage:"Attention passengers: Flight KA205 to Singapore has been delayed by approximately two hours due to technical maintenance."}],
-    P5:[{question:"The manager asked all employees to _____ the new safety guidelines.",options:["follow","following","followed","follows"],correct:0},{question:"The conference will be held _____ the Grand Hotel.",options:["in","at","on","by"],correct:1}],
-    P6:[{question:"'We are writing to inform you that your order _____ been shipped.'",options:["have","has","had","having"],correct:1,passage:"Dear Mr. Johnson,\nWe are writing to inform you that your order _____ been shipped and is expected to arrive within 3-5 business days."}],
-    P7:[{question:"What is the main purpose of this notice?",options:["To announce a new product","To inform about office closure","To invite staff to a party","To request budget approval"],correct:1,passage:"NOTICE: Our office will be closed on December 25th and 26th for the Christmas holiday. Normal business hours will resume on December 27th."}],
-  };
-  const toeicQs = TOEIC_DATA[toeicPart] ?? [];
-  const toeicScore = toeicQs.filter((q,i) => toeicAnswers[`${toeicPart}-${i}`] === q.correct).length;
   const [speakingDone, setSpeakingDone] = useState(false);
   const [speakingScore, setSpeakingScore] = useState<{ score: number; transcript: string; feedback: string } | null>(null);
   const [scoringLoading, setScoringLoading] = useState(false);
@@ -555,57 +538,6 @@ export default function LearningPathPage() {
           </button>
         </div>
         <p className="text-sm text-gray-400 mt-1">{learningPath.description}</p>
-      </div>
-
-      {/* TOEIC Practice */}
-      <div className="mb-5 rounded-2xl overflow-hidden" style={{ background: "rgba(10,6,24,0.95)", border: "1px solid rgba(59,130,246,0.2)" }}>
-        <div className="px-4 pt-3 pb-2 border-b border-white/5 flex items-center justify-between">
-          <p className="text-white font-bold text-sm">📝 Luyện tập TOEIC</p>
-          <p className="text-gray-500 text-xs">7 parts · 200 câu</p>
-        </div>
-        <div className="flex items-center gap-1 px-3 py-2 border-b border-white/5 overflow-x-auto scrollbar-hide">
-          {(["P1","P2","P3","P4","P5","P6","P7"]).map(p => (
-            <button key={p} onClick={() => { setToeicPart(p); setToeicAnswers({}); setToeicChecked(false); setToeicFlagged(new Set()); }}
-              className={cn("px-2.5 py-1 rounded-lg text-xs font-bold shrink-0 transition-all", toeicPart === p ? "bg-blue-600 text-white" : "bg-gray-800 text-gray-400 hover:bg-gray-700")}>{p}</button>
-          ))}
-        </div>
-        <div className="px-4 py-3 flex flex-col gap-3">
-          {toeicQs.map((q, i) => {
-            const qk = `${toeicPart}-${i}`; const picked = toeicAnswers[qk]; const isFlagged = toeicFlagged.has(qk);
-            return (
-              <div key={i} className="rounded-xl border border-white/5 p-3" style={{ background: "rgba(18,12,36,0.8)" }}>
-                {q.image && <img src={q.image} alt="" className="w-full max-w-xs rounded-lg mb-2 object-cover" style={{ maxHeight: 120 }} />}
-                {q.passage && <div className="mb-2 px-3 py-2 rounded-lg text-xs text-gray-400 italic whitespace-pre-line" style={{ background: "rgba(255,255,255,0.04)" }}>{q.passage}</div>}
-                <div className="flex items-start justify-between gap-2 mb-2">
-                  <p className="text-white text-sm">Câu {i+1}{q.question ? `. ${q.question}` : ""}</p>
-                  <button onClick={() => setToeicFlagged(prev => { const n = new Set(prev); n.has(qk) ? n.delete(qk) : n.add(qk); return n; })} className={cn("shrink-0 transition-colors", isFlagged ? "text-yellow-400" : "text-gray-600 hover:text-yellow-400")}><Flag className="w-3.5 h-3.5" /></button>
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  {q.options.map((opt, j) => { const isOptRight = j === q.correct; const isPicked = picked === j; return (
-                    <button key={j} onClick={() => !toeicChecked && setToeicAnswers(p => ({ ...p, [qk]: j }))} disabled={toeicChecked}
-                      className={cn("px-3 py-2 rounded-xl border text-sm text-left flex items-center gap-2 transition-all",
-                        toeicChecked ? isOptRight ? "border-green-500 bg-green-900/30 text-green-300" : isPicked ? "border-red-500 bg-red-900/30 text-red-300" : "border-gray-700 text-gray-600 opacity-40"
-                        : isPicked ? "border-blue-500 bg-blue-900/30 text-white" : "border-gray-700 bg-gray-800 text-gray-300 hover:border-blue-500")}>
-                      <span className={cn("w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0", toeicChecked ? isOptRight ? "bg-green-600 text-white" : isPicked ? "bg-red-600 text-white" : "bg-gray-800 text-gray-500" : isPicked ? "bg-blue-600 text-white" : "bg-gray-700 text-gray-400")}>{["A","B","C","D"][j]}</span>
-                      {opt}
-                    </button>
-                  );})}
-                </div>
-              </div>
-            );
-          })}
-          {!toeicChecked ? (
-            <button onClick={() => setToeicChecked(true)} disabled={Object.keys(toeicAnswers).filter(k => k.startsWith(toeicPart)).length < toeicQs.length}
-              className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white text-sm font-bold transition-colors">
-              Kiểm tra ({Object.keys(toeicAnswers).filter(k => k.startsWith(toeicPart)).length}/{toeicQs.length} câu)
-            </button>
-          ) : (
-            <div className="flex items-center justify-between px-4 py-3 rounded-xl" style={{ background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.2)" }}>
-              <span className="text-white text-sm font-bold">{toeicScore}/{toeicQs.length} đúng</span>
-              <button onClick={() => { setToeicAnswers({}); setToeicChecked(false); }} className="text-xs text-gray-400 hover:text-white">Làm lại</button>
-            </div>
-          )}
-        </div>
       </div>
 
       {/* Progress */}
