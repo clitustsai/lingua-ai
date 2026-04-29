@@ -13,33 +13,48 @@ export async function POST(req: NextRequest) {
       model: "llama-3.3-70b-versatile",
       messages: [{
         role: "user",
-        content: `Create a short ${targetLanguage} lesson about "${topic}" for a ${level} level student whose native language is ${nativeLanguage}.
+        content: `Create a comprehensive ${targetLanguage} lesson about "${topic}" for a ${level} level student whose native language is ${nativeLanguage}.
+
+IMPORTANT: Generate EXACTLY 10 exercises (mix of fill-in-blank and translate) and 4 reading comprehension questions. All content must be about "${topic}".
 
 Return JSON:
 {
   "title": "lesson title",
   "objective": "what student will learn (in ${nativeLanguage})",
   "vocabulary": [
-    { "word": "native script of the word (e.g. 你好 for Chinese, こんにちは for Japanese, 안녕하세요 for Korean, or the word itself for Latin-script languages)", "romanization": "pronunciation/romanization for non-Latin scripts only (e.g. nǐ hǎo), null for Latin languages", "translation": "", "example": "", "pronunciation": "IPA or romanization for Latin languages" }
+    { "word": "word in ${targetLanguage}", "romanization": "romanization for non-Latin scripts only, null for Latin", "translation": "in ${nativeLanguage}", "example": "example sentence", "pronunciation": "IPA" }
   ],
-  "grammar": { "rule": "grammar rule name", "explanation": "explanation in ${nativeLanguage}", "examples": ["example1", "example2"] },
+  "grammar": { "rule": "grammar rule name", "explanation": "explanation in ${nativeLanguage}", "examples": ["example1", "example2", "example3", "example4"] },
   "dialogue": [
-    { "speaker": "A", "text": "", "translation": "" },
-    { "speaker": "B", "text": "", "translation": "" }
+    { "speaker": "A", "text": "sentence about ${topic}", "translation": "in ${nativeLanguage}" },
+    { "speaker": "B", "text": "response", "translation": "in ${nativeLanguage}" }
   ],
   "exercises": [
-    { "question": "fill in the blank or translate", "answer": "" }
+    { "question": "Fill in the blank with a real sentence about ${topic}: I _____ ...", "answer": "real answer" },
+    { "question": "Translate to ${targetLanguage}: [real ${nativeLanguage} sentence about ${topic}]", "answer": "real translation" },
+    { "question": "Fill in the blank: She _____ ...", "answer": "real answer" },
+    { "question": "Translate to ${nativeLanguage}: [real ${targetLanguage} sentence about ${topic}]", "answer": "real translation" },
+    { "question": "Fill in the blank: They _____ ...", "answer": "real answer" },
+    { "question": "Translate to ${targetLanguage}: [real ${nativeLanguage} sentence]", "answer": "real translation" },
+    { "question": "Fill in the blank: We _____ ...", "answer": "real answer" },
+    { "question": "Translate to ${nativeLanguage}: [real ${targetLanguage} sentence]", "answer": "real translation" },
+    { "question": "Fill in the blank: He _____ ...", "answer": "real answer" },
+    { "question": "Translate to ${targetLanguage}: [real ${nativeLanguage} sentence]", "answer": "real translation" }
   ],
-  "tips": ["practical learning tip 1 in ${nativeLanguage}", "practical learning tip 2 in ${nativeLanguage}", "practical learning tip 3 in ${nativeLanguage}"],
+  "tips": ["tip 1 in ${nativeLanguage}", "tip 2 in ${nativeLanguage}", "tip 3 in ${nativeLanguage}"],
   "reading": {
-    "passage": "a short reading passage in ${targetLanguage} related to the topic (8-12 sentences)",
+    "passage": "a reading passage in ${targetLanguage} about ${topic} (8-12 sentences)",
     "questions": [
-      { "question": "comprehension question in ${targetLanguage}", "options": ["option A", "option B", "option C", "option D"], "correct": 0, "explanation": "why correct, in ${nativeLanguage}" }
+      { "question": "comprehension question 1 in ${targetLanguage}", "options": ["A", "B", "C", "D"], "correct": 0, "explanation": "in ${nativeLanguage}" },
+      { "question": "comprehension question 2 in ${targetLanguage}", "options": ["A", "B", "C", "D"], "correct": 1, "explanation": "in ${nativeLanguage}" },
+      { "question": "comprehension question 3 in ${targetLanguage}", "options": ["A", "B", "C", "D"], "correct": 2, "explanation": "in ${nativeLanguage}" },
+      { "question": "comprehension question 4 in ${targetLanguage}", "options": ["A", "B", "C", "D"], "correct": 0, "explanation": "in ${nativeLanguage}" }
     ]
   }
 }`,
       }],
       response_format: { type: "json_object" },
+      max_tokens: 4000,
     });
 
     const result = JSON.parse(completion.choices[0].message.content || "{}");
