@@ -9,6 +9,7 @@ const nextConfig = {
       { protocol: "https", hostname: "img.vietqr.io" },
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "picsum.photos" },
+      { protocol: "https", hostname: "fastly.picsum.photos" },
     ],
     // Enable Next.js image optimization (WebP/AVIF auto-conversion)
     unoptimized: false,
@@ -39,7 +40,7 @@ const nextConfig = {
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.youtube.com https://www.youtube-nocookie.com https://pagead2.googlesyndication.com https://adservice.google.com https://www.googletagmanager.com https://*.google.com",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com",
               "font-src 'self' data: https://fonts.gstatic.com https://fonts.googleapis.com",
-              "img-src 'self' data: blob: https://img.youtube.com https://i.ytimg.com https://*.ytimg.com https://lh3.googleusercontent.com https://img.vietqr.io https://pagead2.googlesyndication.com https://*.googleusercontent.com https://*.youtube.com https://images.unsplash.com https://picsum.photos",
+              "img-src 'self' data: blob: https://img.youtube.com https://i.ytimg.com https://*.ytimg.com https://lh3.googleusercontent.com https://img.vietqr.io https://pagead2.googlesyndication.com https://*.googleusercontent.com https://*.youtube.com https://images.unsplash.com https://picsum.photos https://fastly.picsum.photos",
               "media-src 'self' blob: https://www.youtube.com https://www.youtube-nocookie.com https://*.googlevideo.com",
               "connect-src 'self' https://*.supabase.co https://api.groq.com https://api.resend.com https://pagead2.googlesyndication.com https://adservice.google.com https://www.googleapis.com https://*.google.com https://ep1.adtrafficquality.google https://*.googlevideo.com",
               "frame-src https://www.youtube.com https://www.youtube-nocookie.com https://*.youtube.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com",

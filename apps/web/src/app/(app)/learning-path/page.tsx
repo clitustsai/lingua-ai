@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/store/useAppStore";
@@ -10,12 +10,12 @@ import { LEVELS } from "@ai-lang/shared";
 import { canUseFeature, getRemainingUses, incrementUsage, FREE_LIMITS } from "@/lib/usageLimit";
 
 const GOALS = [
-  { id: "travel", label: "Du lịch", emoji: "✈️", desc: "Giao tiếp khi đi du lịch" },
-  { id: "ielts", label: "IELTS / TOEIC", emoji: "🎓", desc: "Thi chứng chỉ quốc tế" },
-  { id: "business", label: "Công việc", emoji: "💼", desc: "Tiếng Anh văn phòng" },
-  { id: "daily", label: "Giao tiếp hàng ngày", emoji: "💬", desc: "Nói chuyện tự nhiên" },
-  { id: "culture", label: "Văn hóa & Giải trí", emoji: "🎬", desc: "Xem phim, nghe nhạc" },
-  { id: "academic", label: "Học thuật", emoji: "📚", desc: "Đọc tài liệu, nghiên cứu" },
+  { id: "travel", label: "Du l?ch", emoji: "??", desc: "Giao ti?p khi di du l?ch" },
+  { id: "ielts", label: "IELTS / TOEIC", emoji: "??", desc: "Thi ch?ng ch? qu?c t?" },
+  { id: "business", label: "C�ng vi?c", emoji: "??", desc: "Ti?ng Anh van ph�ng" },
+  { id: "daily", label: "Giao ti?p h�ng ng�y", emoji: "??", desc: "N�i chuy?n t? nhi�n" },
+  { id: "culture", label: "Van h�a & Gi?i tr�", emoji: "??", desc: "Xem phim, nghe nh?c" },
+  { id: "academic", label: "H?c thu?t", emoji: "??", desc: "�?c t�i li?u, nghi�n c?u" },
 ];
 
 const DAYS_OPTIONS = [3, 5, 7];
@@ -50,7 +50,7 @@ export default function LearningPathPage() {
   const [toeicChecked, setToeicChecked] = useState(false);
   const [toeicFlagged, setToeicFlagged] = useState<Set<string>>(new Set());
   const TOEIC_DATA: Record<string,{options:string[];correct:number;question?:string;image?:string;passage?:string}[]> = {
-    P1:[{options:["A woman is walking down a street.","A man is riding a bicycle.","Two people are sitting on a bench.","A car is parked on the road."],correct:0,image:"https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=300&q=70"},{options:["Workers are repairing a building.","A train is arriving at the station.","People are waiting on the platform.","A bus is parked near the entrance."],correct:2,image:"https://images.unsplash.com/photo-1474487548417-781cb71495f3?w=300&q=70"}],
+    P1:[{options:["A woman is walking down a street.","A man is riding a bicycle.","Two people are sitting on a bench.","A car is parked on the road."],correct:0,image:"https://picsum.photos/seed/street/400/250"},{options:["Workers are repairing a building.","A train is arriving at the station.","People are waiting on the platform.","A bus is parked near the entrance."],correct:2,image:"https://picsum.photos/seed/station/400/250"}],
     P2:[{question:"Where is the nearest post office?",options:["It's on Main Street.","I went there yesterday.","The mail arrived late."],correct:0},{question:"When does the meeting start?",options:["In the conference room.","At 3 o'clock.","With the manager."],correct:1}],
     P3:[{question:"What are the speakers mainly discussing?",options:["A new product launch","A business trip schedule","An office renovation","A client complaint"],correct:1,passage:"M: Have you booked the flights for the Tokyo conference?\nW: Not yet. I'm waiting for the manager's approval.\nM: We should do it soon."}],
     P4:[{question:"What is the announcement about?",options:["A store sale","A flight delay","A new service","A schedule change"],correct:1,passage:"Attention passengers: Flight KA205 to Singapore has been delayed by approximately two hours due to technical maintenance."}],
@@ -67,7 +67,7 @@ export default function LearningPathPage() {
 
   const startRecording = () => {
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SR) { alert("Dùng Chrome để nhận diện giọng nói."); return; }
+    if (!SR) { alert("D�ng Chrome d? nh?n di?n gi?ng n�i."); return; }
     const rec = new SR();
     rec.lang = settings.targetLanguage.code === "en" ? "en-US"
       : settings.targetLanguage.code === "ja" ? "ja-JP"
@@ -86,9 +86,9 @@ export default function LearningPathPage() {
       setScoringLoading(true);
       // Score based on confidence + length
       const score = Math.min(100, Math.round(confidence * 80 + Math.min(transcript.split(" ").length * 2, 20)));
-      const feedback = score >= 80 ? "Phát âm tốt lắm! 🎉"
-        : score >= 60 ? "Khá tốt, tiếp tục luyện tập! 👍"
-        : "Thử lại, nói rõ hơn nhé! 🎤";
+      const feedback = score >= 80 ? "Ph�t �m t?t l?m! ??"
+        : score >= 60 ? "Kh� t?t, ti?p t?c luy?n t?p! ??"
+        : "Th? l?i, n�i r� hon nh�! ??";
       setSpeakingScore({ score, transcript, feedback });
       setSpeakingDone(true);
       setScoringLoading(false);
@@ -129,7 +129,7 @@ export default function LearningPathPage() {
       setStep("path");
     } catch {
       setStep("onboard");
-      alert("Không thể tạo lộ trình. Thử lại nhé!");
+      alert("Kh�ng th? t?o l? tr�nh. Th? l?i nh�!");
     }
   };
 
@@ -160,12 +160,12 @@ export default function LearningPathPage() {
       });
       const data = await res.json();
       if (data.error || (!data.vocabulary && !data.grammarPoint && !data.quiz)) {
-        setDayLesson({ _error: data.error || "Không thể tải bài học. Thử lại nhé!" });
+        setDayLesson({ _error: data.error || "Kh�ng th? t?i b�i h?c. Th? l?i nh�!" });
       } else {
         setDayLesson(data);
       }
     } catch {
-      setDayLesson({ _error: "Lỗi kết nối. Vui lòng thử lại!" });
+      setDayLesson({ _error: "L?i k?t n?i. Vui l�ng th? l?i!" });
     } finally {
       setLoadingDay(false);
     }
@@ -184,19 +184,19 @@ export default function LearningPathPage() {
     }
   };
 
-  // ── Onboarding ──────────────────────────────────────────────────────────────
+  // -- Onboarding --------------------------------------------------------------
   if (step === "onboard" || (!learningPath && step !== "generating")) return (
     <div className="p-5 max-w-lg">
       <div className="mb-6 pt-4">
         <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-          <Sparkles className="w-6 h-6 text-yellow-400" /> Lộ trình học cá nhân
+          <Sparkles className="w-6 h-6 text-yellow-400" /> L? tr�nh h?c c� nh�n
         </h1>
-        <p className="text-sm text-gray-400 mt-1">AI tạo kế hoạch học riêng cho bạn</p>
+        <p className="text-sm text-gray-400 mt-1">AI t?o k? ho?ch h?c ri�ng cho b?n</p>
       </div>
 
       <div className="flex flex-col gap-5">
         <div>
-          <p className="text-sm font-semibold text-gray-300 mb-3">🎯 Mục tiêu của bạn</p>
+          <p className="text-sm font-semibold text-gray-300 mb-3">?? M?c ti�u c?a b?n</p>
           <div className="grid grid-cols-2 gap-2">
             {GOALS.map(g => (
               <button key={g.id} onClick={() => setSelectedGoal(g.id)}
@@ -211,36 +211,36 @@ export default function LearningPathPage() {
         </div>
 
         <div>
-          <p className="text-sm font-semibold text-gray-300 mb-3">📊 Trình độ hiện tại</p>
+          <p className="text-sm font-semibold text-gray-300 mb-3">?? Tr�nh d? hi?n t?i</p>
           <div className="flex gap-2 flex-wrap">
             {LEVELS.map(l => {
               const locked = !canAccessLevel(l);
               return (
                 <button key={l}
                   onClick={() => !locked && setSelectedLevel(l)}
-                  title={locked ? `Thi đạt ${LEVELS[LEVELS.indexOf(l) - 1]} trước` : ""}
+                  title={locked ? `Thi d?t ${LEVELS[LEVELS.indexOf(l) - 1]} tru?c` : ""}
                   className={cn("px-4 py-2 rounded-xl border text-sm font-medium transition-colors relative",
                     locked ? "border-gray-700 bg-gray-800/40 text-gray-600 cursor-not-allowed opacity-50" :
                     selectedLevel === l ? "border-primary-500 bg-primary-600/20 text-primary-300" :
                     "border-gray-700 bg-gray-800 text-gray-400 hover:border-gray-600")}>
-                  {locked ? "🔒 " : ""}{l}
+                  {locked ? "?? " : ""}{l}
                 </button>
               );
             })}
           </div>
           {LEVELS.some(l => !canAccessLevel(l)) && (
-            <p className="text-xs text-yellow-400/70 mt-2">🔒 Thi đạt trình độ hiện tại để mở khóa trình độ tiếp theo</p>
+            <p className="text-xs text-yellow-400/70 mt-2">?? Thi d?t tr�nh d? hi?n t?i d? m? kh�a tr�nh d? ti?p theo</p>
           )}
         </div>
 
         <div>
-          <p className="text-sm font-semibold text-gray-300 mb-3">📅 Học mấy ngày/tuần?</p>
+          <p className="text-sm font-semibold text-gray-300 mb-3">?? H?c m?y ng�y/tu?n?</p>
           <div className="flex gap-3">
             {DAYS_OPTIONS.map(d => (
               <button key={d} onClick={() => setDaysPerWeek(d)}
                 className={cn("flex-1 py-3 rounded-xl border text-sm font-bold transition-colors",
                   daysPerWeek === d ? "border-primary-500 bg-primary-600/20 text-primary-300" : "border-gray-700 bg-gray-800 text-gray-400 hover:border-gray-600")}>
-                {d} ngày
+                {d} ng�y
               </button>
             ))}
           </div>
@@ -249,34 +249,34 @@ export default function LearningPathPage() {
         <div className="rounded-xl p-4 flex items-center gap-3" style={{ background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.2)" }}>
           <span className="text-2xl">{settings.targetLanguage.flag}</span>
           <div>
-            <p className="text-sm text-white font-medium">Học {settings.targetLanguage.name}</p>
-            <p className="text-xs text-gray-400">Mục tiêu: {GOALS.find(g => g.id === selectedGoal)?.label} · {selectedLevel} · {daysPerWeek} ngày/tuần</p>
+            <p className="text-sm text-white font-medium">H?c {settings.targetLanguage.name}</p>
+            <p className="text-xs text-gray-400">M?c ti�u: {GOALS.find(g => g.id === selectedGoal)?.label} � {selectedLevel} � {daysPerWeek} ng�y/tu?n</p>
           </div>
         </div>
 
         <button onClick={generate}
           className="w-full py-4 rounded-2xl bg-primary-600 hover:bg-primary-500 text-white font-bold text-base flex items-center justify-center gap-2 transition-colors">
-          <Sparkles className="w-5 h-5" /> Tạo lộ trình của tôi
+          <Sparkles className="w-5 h-5" /> T?o l? tr�nh c?a t�i
         </button>
         {!isPremium && (
           <p className="text-center text-xs text-gray-600">
-            Còn {getRemainingUses("lesson", isPremium)}/{FREE_LIMITS.lesson} lần hôm nay
+            C�n {getRemainingUses("lesson", isPremium)}/{FREE_LIMITS.lesson} l?n h�m nay
           </p>
         )}
       </div>
     </div>
   );
 
-  // ── Generating ──────────────────────────────────────────────────────────────
+  // -- Generating --------------------------------------------------------------
   if (step === "generating") return (
     <div className="flex flex-col items-center justify-center h-screen gap-4">
       <Loader2 className="w-10 h-10 text-purple-400 animate-spin" />
-      <p className="text-white font-semibold">AI đang tạo lộ trình cho bạn...</p>
-      <p className="text-gray-400 text-sm">Chỉ mất vài giây</p>
+      <p className="text-white font-semibold">AI dang t?o l? tr�nh cho b?n...</p>
+      <p className="text-gray-400 text-sm">Ch? m?t v�i gi�y</p>
     </div>
   );
 
-  // ── Day Lesson ──────────────────────────────────────────────────────────────
+  // -- Day Lesson --------------------------------------------------------------
   if (step === "day" && learningPath) {
     const day = learningPath.days[activeDayIdx];
     const isDone = pathDaysDone.includes(activeDayIdx + 1);
@@ -284,10 +284,10 @@ export default function LearningPathPage() {
       <div className="p-5 max-w-lg">
         <div className="flex items-center gap-3 mb-5 pt-4">
           <button onClick={() => setShowExitConfirm(true)} className="p-2 rounded-full bg-gray-800 hover:bg-gray-700 text-gray-300 transition-colors">
-            ←
+            ?
           </button>
           <div>
-            <p className="text-xs text-gray-500">Ngày {activeDayIdx + 1} · {day?.focus}</p>
+            <p className="text-xs text-gray-500">Ng�y {activeDayIdx + 1} � {day?.focus}</p>
             <p className="text-white font-bold">{day?.theme}</p>
           </div>
         </div>
@@ -295,14 +295,14 @@ export default function LearningPathPage() {
         {loadingDay ? (
           <div className="flex flex-col items-center justify-center h-64 gap-3">
             <Loader2 className="w-8 h-8 text-purple-400 animate-spin" />
-            <p className="text-gray-400 text-sm">Đang tạo bài học hôm nay...</p>
+            <p className="text-gray-400 text-sm">�ang t?o b�i h?c h�m nay...</p>
           </div>
         ) : dayLesson?._error ? (
           <div className="flex flex-col items-center justify-center h-64 gap-4">
-            <p className="text-red-400 text-sm text-center">⚠️ {dayLesson._error}</p>
+            <p className="text-red-400 text-sm text-center">?? {dayLesson._error}</p>
             <button onClick={() => openDay(activeDayIdx)}
               className="px-5 py-2.5 rounded-xl bg-primary-600 hover:bg-primary-500 text-white text-sm font-semibold transition-colors">
-              Thử lại
+              Th? l?i
             </button>
           </div>
         ) : dayLesson && (
@@ -310,7 +310,7 @@ export default function LearningPathPage() {
             {/* Warmup */}
             {dayLesson.warmup && (
               <div className="rounded-2xl p-4" style={{ background: "linear-gradient(135deg,rgba(139,92,246,0.2),rgba(99,102,241,0.1))", border: "1px solid rgba(139,92,246,0.3)" }}>
-                <p className="text-xs text-purple-400 font-semibold mb-1">✨ Khởi động</p>
+                <p className="text-xs text-purple-400 font-semibold mb-1">? Kh?i d?ng</p>
                 <p className="text-gray-200 text-sm">{dayLesson.warmup}</p>
               </div>
             )}
@@ -320,7 +320,7 @@ export default function LearningPathPage() {
               <div className="rounded-2xl overflow-hidden" style={{ background: "rgba(26,16,53,0.8)", border: "1px solid rgba(139,92,246,0.15)" }}>
                 <div className="px-4 py-3 border-b border-white/5 flex items-center gap-2">
                   <BookOpen className="w-4 h-4 text-blue-400" />
-                  <p className="text-sm font-semibold text-white">Từ vựng hôm nay</p>
+                  <p className="text-sm font-semibold text-white">T? v?ng h�m nay</p>
                 </div>
                 <div className="divide-y divide-white/5">
                   {dayLesson.vocabulary.map((v: any, i: number) => (
@@ -334,10 +334,10 @@ export default function LearningPathPage() {
                           {v.romanization && (
                             <span className="text-gray-400 text-sm font-mono">{v.romanization}</span>
                           )}
-                          <span className="text-gray-400 text-sm">— {v.translation}</span>
+                          <span className="text-gray-400 text-sm">� {v.translation}</span>
                         </div>
                         {v.example && <p className="text-xs text-gray-500 mt-0.5 italic">{v.example}</p>}
-                        {v.tip && <p className="text-xs text-yellow-400/70 mt-0.5">💡 {v.tip}</p>}
+                        {v.tip && <p className="text-xs text-yellow-400/70 mt-0.5">?? {v.tip}</p>}
                       </div>
                     </div>
                   ))}
@@ -348,11 +348,11 @@ export default function LearningPathPage() {
             {/* Grammar */}
             {dayLesson.grammarPoint && (
               <div className="rounded-2xl p-4" style={{ background: "rgba(26,16,53,0.8)", border: "1px solid rgba(234,179,8,0.2)" }}>
-                <p className="text-yellow-400 font-semibold text-sm mb-2">📐 {dayLesson.grammarPoint.rule}</p>
+                <p className="text-yellow-400 font-semibold text-sm mb-2">?? {dayLesson.grammarPoint.rule}</p>
                 <p className="text-gray-300 text-sm mb-3">{dayLesson.grammarPoint.explanation}</p>
                 {dayLesson.grammarPoint.examples?.map((ex: string, i: number) => (
                   <button key={i} onClick={() => speakText(ex, settings.targetLanguage.code)} className="flex items-center gap-2 text-sm text-gray-200 hover:text-yellow-300 transition-colors mb-1">
-                    <span className="text-yellow-500">▸</span>{ex}
+                    <span className="text-yellow-500">?</span>{ex}
                   </button>
                 ))}
               </div>
@@ -362,9 +362,9 @@ export default function LearningPathPage() {
             {dayLesson.listeningText && (
               <div className="rounded-2xl p-4" style={{ background: "rgba(26,16,53,0.8)", border: "1px solid rgba(34,197,94,0.2)" }}>
                 <div className="flex items-center justify-between mb-3">
-                  <p className="text-green-400 font-semibold text-sm flex items-center gap-2"><Headphones className="w-4 h-4" /> Luyện nghe</p>
+                  <p className="text-green-400 font-semibold text-sm flex items-center gap-2"><Headphones className="w-4 h-4" /> Luy?n nghe</p>
                   <button onClick={() => speakText(dayLesson.listeningText, settings.targetLanguage.code)} className="px-3 py-1.5 bg-green-700/30 hover:bg-green-700/50 text-green-300 rounded-lg text-xs transition-colors">
-                    ▶ Nghe
+                    ? Nghe
                   </button>
                 </div>
                 <p className="text-gray-200 text-sm">{dayLesson.listeningText}</p>
@@ -376,7 +376,7 @@ export default function LearningPathPage() {
             {dayLesson.speakingPrompt && (
               <div className="rounded-2xl p-4" style={{ background: "rgba(26,16,53,0.8)", border: "1px solid rgba(236,72,153,0.2)" }}>
                 <p className="text-pink-400 font-semibold text-sm flex items-center gap-2 mb-2">
-                  <Mic className="w-4 h-4" /> Luyện nói
+                  <Mic className="w-4 h-4" /> Luy?n n�i
                 </p>
                 <p className="text-gray-300 text-sm mb-4">{dayLesson.speakingPrompt}</p>
 
@@ -393,7 +393,7 @@ export default function LearningPathPage() {
                           : speakingScore.score >= 60 ? "text-yellow-400" : "text-red-400")}>
                           {speakingScore.score}%
                         </p>
-                        <p className="text-xs text-gray-500">điểm</p>
+                        <p className="text-xs text-gray-500">di?m</p>
                       </div>
                       <div>
                         <p className="text-sm font-semibold text-white">{speakingScore.feedback}</p>
@@ -405,7 +405,7 @@ export default function LearningPathPage() {
 
                 {scoringLoading && (
                   <div className="flex items-center gap-2 text-pink-400 text-sm mb-3">
-                    <Loader2 className="w-4 h-4 animate-spin" /> AI đang chấm điểm...
+                    <Loader2 className="w-4 h-4 animate-spin" /> AI dang ch?m di?m...
                   </div>
                 )}
 
@@ -420,21 +420,21 @@ export default function LearningPathPage() {
                           ? "bg-red-600 hover:bg-red-500 text-white animate-pulse"
                           : "bg-pink-600 hover:bg-pink-500 text-white")}>
                       {isRecording
-                        ? <><MicOff className="w-4 h-4" /> Dừng ghi âm</>
-                        : <><Mic className="w-4 h-4" /> Bắt đầu nói</>}
+                        ? <><MicOff className="w-4 h-4" /> D?ng ghi �m</>
+                        : <><Mic className="w-4 h-4" /> B?t d?u n�i</>}
                     </button>
                     <button onClick={() => setSpeakingDone(true)}
                       className="px-4 py-3 rounded-xl border border-gray-700 text-gray-500 hover:text-gray-300 text-xs transition-colors">
-                      Bỏ qua
+                      B? qua
                     </button>
                   </div>
                 ) : (
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-green-400" />
-                    <span className="text-green-400 text-sm font-semibold">Đã hoàn thành luyện nói!</span>
+                    <span className="text-green-400 text-sm font-semibold">�� ho�n th�nh luy?n n�i!</span>
                     <button onClick={() => { setSpeakingDone(false); setSpeakingScore(null); }}
                       className="ml-auto text-xs text-gray-500 hover:text-gray-300 transition-colors">
-                      Thử lại
+                      Th? l?i
                     </button>
                   </div>
                 )}
@@ -444,7 +444,7 @@ export default function LearningPathPage() {
             {/* Quiz */}
             {dayLesson.quiz?.length > 0 && (
               <div className="rounded-2xl p-4" style={{ background: "rgba(26,16,53,0.8)", border: "1px solid rgba(139,92,246,0.2)" }}>
-                <p className="text-purple-400 font-semibold text-sm mb-4">🧠 Mini Quiz</p>
+                <p className="text-purple-400 font-semibold text-sm mb-4">?? Mini Quiz</p>
                 <div className="flex flex-col gap-4">
                   {dayLesson.quiz.map((q: any, qi: number) => (
                     <div key={qi}>
@@ -468,13 +468,13 @@ export default function LearningPathPage() {
                         })}
                       </div>
                       {quizChecked && q.explanation && (
-                        <p className="text-xs text-yellow-300 mt-2 bg-yellow-900/20 rounded-lg px-3 py-1.5">💡 {q.explanation}</p>
+                        <p className="text-xs text-yellow-300 mt-2 bg-yellow-900/20 rounded-lg px-3 py-1.5">?? {q.explanation}</p>
                       )}
                     </div>
                   ))}
                   {!quizChecked && Object.keys(quizAnswers).length === dayLesson.quiz.length && (
                     <button onClick={() => setQuizChecked(true)} className="w-full py-2.5 bg-purple-600/30 hover:bg-purple-600/50 text-purple-300 rounded-xl text-sm font-medium transition-colors">
-                      Kiểm tra đáp án
+                      Ki?m tra d�p �n
                     </button>
                   )}
                 </div>
@@ -486,7 +486,7 @@ export default function LearningPathPage() {
               <div className="rounded-2xl p-4 flex items-start gap-3" style={{ background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.2)" }}>
                 <Star className="w-5 h-5 text-yellow-400 shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-yellow-400 font-semibold text-sm mb-1">Thử thách hôm nay</p>
+                  <p className="text-yellow-400 font-semibold text-sm mb-1">Th? th�ch h�m nay</p>
                   <p className="text-gray-300 text-sm">{dayLesson.dailyChallenge}</p>
                 </div>
               </div>
@@ -497,7 +497,7 @@ export default function LearningPathPage() {
               <div>
                 {dayLesson.speakingPrompt && !speakingDone && (
                   <p className="text-center text-xs text-pink-400 mb-3">
-                    🎤 Hoàn thành phần luyện nói để tiếp tục
+                    ?? Ho�n th�nh ph?n luy?n n�i d? ti?p t?c
                   </p>
                 )}
                 <button
@@ -507,12 +507,12 @@ export default function LearningPathPage() {
                     dayLesson.speakingPrompt && !speakingDone
                       ? "bg-gray-700 text-gray-500 cursor-not-allowed opacity-60"
                       : "bg-primary-600 hover:bg-primary-500 text-white")}>
-                  <CheckCircle2 className="w-5 h-5" /> Hoàn thành ngày {activeDayIdx + 1}
+                  <CheckCircle2 className="w-5 h-5" /> Ho�n th�nh ng�y {activeDayIdx + 1}
                 </button>
               </div>
             ) : (
               <div className="w-full py-4 rounded-2xl bg-green-700/20 border border-green-600/30 text-green-300 font-bold text-center">
-                ✅ Đã hoàn thành!
+                ? �� ho�n th�nh!
               </div>
             )}
           </div>
@@ -522,15 +522,15 @@ export default function LearningPathPage() {
             style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}>
             <div className="w-full max-w-sm rounded-3xl p-6 text-center"
               style={{ background: "rgba(20,12,40,0.98)", border: "1px solid rgba(139,92,246,0.3)" }}>
-              <p className="text-white font-bold text-lg mb-5">Bạn có chắc chắn muốn thoát không?</p>
+              <p className="text-white font-bold text-lg mb-5">B?n c� ch?c ch?n mu?n tho�t kh�ng?</p>
               <button onClick={() => setShowExitConfirm(false)}
                 className="w-full py-4 rounded-2xl font-bold text-white mb-3 text-base"
                 style={{ background: "linear-gradient(135deg,#3b82f6,#2563eb)" }}>
-                Tiếp tục học
+                Ti?p t?c h?c
               </button>
               <button onClick={() => { setShowExitConfirm(false); setStep("path"); }}
                 className="w-full py-2 text-white font-bold text-base">
-                Thoát Bài Học
+                Tho�t B�i H?c
               </button>
             </div>
           </div>
@@ -539,7 +539,7 @@ export default function LearningPathPage() {
     );
   }
 
-  // ── Path Overview ───────────────────────────────────────────────────────────
+  // -- Path Overview -----------------------------------------------------------
   if (!learningPath) return null;
   const goalObj = GOALS.find(g => g.label === learningPath.goal);
   const totalDays = learningPath.days?.length ?? 0;
@@ -551,7 +551,7 @@ export default function LearningPathPage() {
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-bold text-white">{learningPath.pathTitle}</h1>
           <button onClick={clearLearningPath} className="text-xs text-gray-600 hover:text-gray-400 flex items-center gap-1">
-            <RotateCcw className="w-3.5 h-3.5" /> Tạo lại
+            <RotateCcw className="w-3.5 h-3.5" /> T?o l?i
           </button>
         </div>
         <p className="text-sm text-gray-400 mt-1">{learningPath.description}</p>
@@ -560,8 +560,8 @@ export default function LearningPathPage() {
       {/* TOEIC Practice */}
       <div className="mb-5 rounded-2xl overflow-hidden" style={{ background: "rgba(10,6,24,0.95)", border: "1px solid rgba(59,130,246,0.2)" }}>
         <div className="px-4 pt-3 pb-2 border-b border-white/5 flex items-center justify-between">
-          <p className="text-white font-bold text-sm">📝 Luyện tập TOEIC</p>
-          <p className="text-gray-500 text-xs">7 parts · 200 câu</p>
+          <p className="text-white font-bold text-sm">?? Luy?n t?p TOEIC</p>
+          <p className="text-gray-500 text-xs">7 parts � 200 c�u</p>
         </div>
         <div className="flex items-center gap-1 px-3 py-2 border-b border-white/5 overflow-x-auto scrollbar-hide">
           {(["P1","P2","P3","P4","P5","P6","P7"]).map(p => (
@@ -577,7 +577,7 @@ export default function LearningPathPage() {
                 {q.image && <img src={q.image} alt="" className="w-full max-w-xs rounded-lg mb-2 object-cover" style={{ maxHeight: 120 }} />}
                 {q.passage && <div className="mb-2 px-3 py-2 rounded-lg text-xs text-gray-400 italic whitespace-pre-line" style={{ background: "rgba(255,255,255,0.04)" }}>{q.passage}</div>}
                 <div className="flex items-start justify-between gap-2 mb-2">
-                  <p className="text-white text-sm">Câu {i+1}{q.question ? `. ${q.question}` : ""}</p>
+                  <p className="text-white text-sm">C�u {i+1}{q.question ? `. ${q.question}` : ""}</p>
                   <button onClick={() => setToeicFlagged(prev => { const n = new Set(prev); n.has(qk) ? n.delete(qk) : n.add(qk); return n; })} className={cn("shrink-0 transition-colors", isFlagged ? "text-yellow-400" : "text-gray-600 hover:text-yellow-400")}><Flag className="w-3.5 h-3.5" /></button>
                 </div>
                 <div className="flex flex-col gap-1.5">
@@ -597,12 +597,12 @@ export default function LearningPathPage() {
           {!toeicChecked ? (
             <button onClick={() => setToeicChecked(true)} disabled={Object.keys(toeicAnswers).filter(k => k.startsWith(toeicPart)).length < toeicQs.length}
               className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white text-sm font-bold transition-colors">
-              Kiểm tra ({Object.keys(toeicAnswers).filter(k => k.startsWith(toeicPart)).length}/{toeicQs.length} câu)
+              Ki?m tra ({Object.keys(toeicAnswers).filter(k => k.startsWith(toeicPart)).length}/{toeicQs.length} c�u)
             </button>
           ) : (
             <div className="flex items-center justify-between px-4 py-3 rounded-xl" style={{ background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.2)" }}>
-              <span className="text-white text-sm font-bold">{toeicScore}/{toeicQs.length} đúng</span>
-              <button onClick={() => { setToeicAnswers({}); setToeicChecked(false); }} className="text-xs text-gray-400 hover:text-white">Làm lại</button>
+              <span className="text-white text-sm font-bold">{toeicScore}/{toeicQs.length} d�ng</span>
+              <button onClick={() => { setToeicAnswers({}); setToeicChecked(false); }} className="text-xs text-gray-400 hover:text-white">L�m l?i</button>
             </div>
           )}
         </div>
@@ -612,34 +612,34 @@ export default function LearningPathPage() {
       <div className="rounded-2xl p-4 mb-5" style={{ background: "linear-gradient(135deg,rgba(139,92,246,0.2),rgba(99,102,241,0.1))", border: "1px solid rgba(139,92,246,0.3)" }}>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <span className="text-xl">{goalObj?.emoji ?? "🎯"}</span>
+            <span className="text-xl">{goalObj?.emoji ?? "??"}</span>
             <div>
               <p className="text-white font-semibold text-sm">{learningPath.goal}</p>
-              <p className="text-gray-400 text-xs">{learningPath.level} · {learningPath.dailyMinutes} phút/ngày</p>
+              <p className="text-gray-400 text-xs">{learningPath.level} � {learningPath.dailyMinutes} ph�t/ng�y</p>
             </div>
           </div>
           <div className="text-right">
             <p className="text-2xl font-bold text-white">{doneDays}/{totalDays}</p>
-            <p className="text-xs text-gray-400">ngày hoàn thành</p>
+            <p className="text-xs text-gray-400">ng�y ho�n th�nh</p>
           </div>
         </div>
         <div className="w-full bg-white/10 rounded-full h-2">
           <div className="h-2 rounded-full transition-all" style={{ width: `${totalDays > 0 ? (doneDays / totalDays) * 100 : 0}%`, background: "linear-gradient(90deg,#7c3aed,#6366f1)" }} />
         </div>
         <div className="flex items-center gap-3 mt-3 text-xs text-gray-400">
-          <span className="flex items-center gap-1"><Flame className="w-3.5 h-3.5 text-orange-400" />{learningPath.estimatedWeeks} tuần</span>
-          <span>·</span>
+          <span className="flex items-center gap-1"><Flame className="w-3.5 h-3.5 text-orange-400" />{learningPath.estimatedWeeks} tu?n</span>
+          <span>�</span>
           <span>{settings.targetLanguage.flag} {settings.targetLanguage.name}</span>
         </div>
       </div>
 
       {/* Days list */}
       <div className="flex flex-col gap-2 mb-5">
-        <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">Kế hoạch 7 ngày</p>
+        <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">K? ho?ch 7 ng�y</p>
         {(learningPath.days ?? []).map((day: any, i: number) => {
           const done = pathDaysDone.includes(i + 1);
           const isToday = i === doneDays;
-          const prevDone = i === 0 || pathDaysDone.includes(i); // ngày trước đã hoàn thành
+          const prevDone = i === 0 || pathDaysDone.includes(i); // ng�y tru?c d� ho�n th�nh
           const isPremiumLocked = !isPremium && i >= 3;
           const isSequenceLocked = !isPremiumLocked && i > 0 && !prevDone;
           const isLocked = isPremiumLocked || isSequenceLocked;
@@ -659,7 +659,7 @@ export default function LearningPathPage() {
                   : "bg-gray-700")}>
                 {isPremiumLocked ? <Crown className="w-4 h-4 text-yellow-400" />
                   : isSequenceLocked ? <Lock className="w-4 h-4 text-gray-500" />
-                  : done ? "✓"
+                  : done ? "?"
                   : i + 1}
               </div>
               <div className="flex-1 min-w-0">
@@ -667,13 +667,13 @@ export default function LearningPathPage() {
                 <p className="text-xs text-gray-500 capitalize">{day.focus}</p>
               </div>
               {isToday && !done && !isLocked && !isSequenceLocked && (
-                <span className="text-xs bg-primary-600/30 text-primary-300 px-2 py-0.5 rounded-full shrink-0">Hôm nay</span>
+                <span className="text-xs bg-primary-600/30 text-primary-300 px-2 py-0.5 rounded-full shrink-0">H�m nay</span>
               )}
               {isPremiumLocked && (
                 <span className="text-xs bg-yellow-900/30 text-yellow-400 px-2 py-0.5 rounded-full shrink-0">Premium</span>
               )}
               {isSequenceLocked && (
-                <span className="text-xs text-gray-600 shrink-0">Hoàn thành ngày trước</span>
+                <span className="text-xs text-gray-600 shrink-0">Ho�n th�nh ng�y tru?c</span>
               )}
               <ChevronRight className="w-4 h-4 text-gray-600 shrink-0" />
             </button>
@@ -684,7 +684,7 @@ export default function LearningPathPage() {
       {/* Milestones */}
       {learningPath.milestones?.length > 0 && (
         <div className="rounded-2xl p-4" style={{ background: "rgba(26,16,53,0.8)", border: "1px solid rgba(139,92,246,0.15)" }}>
-          <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-3">🏆 Cột mốc</p>
+          <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-3">?? C?t m?c</p>
           <div className="flex flex-col gap-2">
             {learningPath.milestones.map((m: any, i: number) => (
               <div key={i} className="flex items-center gap-3">
