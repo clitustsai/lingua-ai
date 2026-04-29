@@ -97,6 +97,12 @@ export default function LessonsPage() {
     setCompleted(true);
     incrementLessons();
     checkAchievements();
+    // Hiện tất cả đáp án khi hoàn thành
+    if (lesson?.exercises) {
+      const all: Record<number, boolean> = {};
+      lesson.exercises.forEach((_: any, i: number) => { all[i] = true; });
+      setShowAnswers(all);
+    }
   };
 
   const TABS: { id: Tab; label: string; emoji: string }[] = [
