@@ -1,14 +1,58 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useAppStore } from "@/store/useAppStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useRouter } from "next/navigation";
 import { CONVERSATION_TOPICS } from "@ai-lang/shared";
-import { Loader2, BookOpen, ChevronDown, ChevronUp, Plus, Volume2, Star, Zap, Target } from "lucide-react";
+import { Loader2, BookOpen, ChevronDown, ChevronUp, Plus, Volume2, Star, Zap, Target, Mic, MicOff, CheckCircle2, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { speakText } from "@/components/VoiceButton";
 import PremiumGate from "@/components/PremiumGate";
 import { canUseFeature, getRemainingUses, incrementUsage, FREE_LIMITS } from "@/lib/usageLimit";
+
+// Mic button component for dialogue practice
+function MicButton({ text, lang }: { text: string; lang: string }) {
+  const [recording, setRecording] = useState(false);
+  const [result, setResult] = useState<"correct" | "wrong" | null>(null);
+  const [heard, setHeard] = useState("");
+  const recRef = useRef<any>(null);
+
+  const start = () => {
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SR) { alert("Trình duyệt không hỗ trợ mic. Dùng Chrome nhé!"); return; }
+    const rec = new SR();
+    rec.lang = lang;
+    rec.interimResults = false;
+    rec.maxAlternatives = 1;
+    recRef.current = rec;
+    setRecording(true);
+    setResult(null);
+    setHeard("");
+    rec.onresult = (e: any) => {
+      const transcript = e.results[0][0].transcript.toLowerCase().trim();
+      const expected = text.toLowerCase().trim();
+      setHeard(transcript);
+      setResult(transcript === expected || expected.includes(transcript) || transcript.includes(expected.split(" ")[0]) ? "correct" : "wrong");
+      setRecording(false);
+    };
+    rec.onerror = () => { setRecording(false); };
+    rec.onend = () => { setRecording(false); };
+    rec.start();
+  };
+
+  const stop = () => { recRef.current?.stop(); setRecording(false); };
+
+  return (
+    <div className="flex flex-col items-center gap-1">
+      <button onClick={recording ? stop : start}
+        className={cn("w-8 h-8 rounded-full flex items-center justify-center transition-all shrink-0",
+          recording ? "bg-red-500 animate-pulse" : result === "correct" ? "bg-green-600" : result === "wrong" ? "bg-red-600/60" : "bg-gray-700 hover:bg-gray-600")}>
+        {recording ? <MicOff className="w-3.5 h-3.5 text-white" /> : result === "correct" ? <CheckCircle2 className="w-3.5 h-3.5 text-white" /> : result === "wrong" ? <XCircle className="w-3.5 h-3.5 text-white" /> : <Mic className="w-3.5 h-3.5 text-gray-300" />}
+      </button>
+      {heard && <p className="text-[10px] text-gray-500 max-w-[80px] text-center truncate">{heard}</p>}
+    </div>
+  );
+}
 
 interface Vocab { word: string; translation: string; example: string; pronunciation?: string; romanization?: string; }
 interface DialogueLine { speaker: string; text: string; translation: string; }
@@ -255,7 +299,7 @@ export default function LessonsPage() {
           {/* DIALOGUE TAB */}
           {tab === "dialogue" && lesson.dialogue?.length > 0 && (
             <div className="flex flex-col gap-3">
-              <p className="text-xs text-gray-500 text-center">Nhấn vào bong bóng để nghe phát âm</p>
+              <p className="text-xs text-gray-500 text-center">Nhấn 🔊 để nghe · Nhấn 🎤 để luyện nói</p>
               {lesson.dialogue.map((line, i) => (
                 <div key={i} className={cn("flex gap-3", line.speaker === "B" && "flex-row-reverse")}>
                   <div className={cn("w-8 h-8 rounded-2xl flex items-center justify-center text-xs font-bold shrink-0 mt-0.5",
@@ -263,11 +307,14 @@ export default function LessonsPage() {
                     {line.speaker}
                   </div>
                   <div className={cn("max-w-[78%]", line.speaker === "B" && "items-end flex flex-col")}>
-                    <button onClick={() => speakText(line.text, settings.targetLanguage.code)}
-                      className={cn("px-4 py-2.5 rounded-2xl text-sm text-left hover:opacity-80 transition-opacity shadow-md",
-                        line.speaker === "A" ? "bg-gray-800 text-white rounded-tl-sm" : "bg-primary-600/40 text-white rounded-tr-sm")}>
-                      {line.text}
-                    </button>
+                    <div className="flex items-center gap-1.5">
+                      <button onClick={() => speakText(line.text, settings.targetLanguage.code)}
+                        className={cn("px-4 py-2.5 rounded-2xl text-sm text-left hover:opacity-80 transition-opacity shadow-md",
+                          line.speaker === "A" ? "bg-gray-800 text-white rounded-tl-sm" : "bg-primary-600/40 text-white rounded-tr-sm")}>
+                        {line.text}
+                      </button>
+                      <MicButton text={line.text} lang={settings.targetLanguage.code} />
+                    </div>
                     <p className="text-xs text-gray-500 mt-1 px-1 italic">{line.translation}</p>
                   </div>
                 </div>
