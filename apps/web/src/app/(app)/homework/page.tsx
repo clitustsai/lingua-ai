@@ -88,9 +88,9 @@ export default function HomeworkPage() {
 
   const TOEIC_DATA: Record<string, {options:string[];correct:number;question?:string;image?:string;passage?:string}[]> = {
     P1:[
-      {options:["A woman is walking down a street.","A man is riding a bicycle.","Two people are sitting on a bench.","A car is parked on the road."],correct:0,image:"https://picsum.photos/seed/street/400/250"},
-      {options:["Workers are repairing a building.","A train is arriving at the station.","People are waiting on the platform.","A bus is parked near the entrance."],correct:2,image:"https://picsum.photos/seed/station/400/250"},
-      {options:["A chef is cooking in the kitchen.","Customers are ordering food.","Tables are being set for dinner.","A waiter is serving drinks."],correct:2,image:"https://picsum.photos/seed/restaurant/400/250"},
+      {options:["A woman is walking down a street.","A man is riding a bicycle.","Two people are sitting on a bench.","A car is parked on the road."],correct:0,image:"https://fastly.picsum.photos/id/1/400/250"},
+      {options:["Workers are repairing a building.","A train is arriving at the station.","People are waiting on the platform.","A bus is parked near the entrance."],correct:2,image:"https://fastly.picsum.photos/id/10/400/250"},
+      {options:["A chef is cooking in the kitchen.","Customers are ordering food.","Tables are being set for dinner.","A waiter is serving drinks."],correct:2,image:"https://fastly.picsum.photos/id/20/400/250"},
     ],
     P2:[
       {question:"Where is the nearest post office?",options:["It's on Main Street.","I went there yesterday.","The mail arrived late."],correct:0},
